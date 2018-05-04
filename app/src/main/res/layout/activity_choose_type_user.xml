@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBlack">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/btn_login_customer"
+        android:text="Customer"
+        android:textSize="30sp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/btn_login_driver"
+        android:layout_below="@+id/btn_login_customer"
+        android:text="Driver"
+        android:textSize="30sp"
+        />
+
+</RelativeLayout>
