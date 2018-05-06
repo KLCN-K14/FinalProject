@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:background="@color/colorYellow"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        style="@style/Theme.AppCompat.Light.NoActionBar"
+        >
+
+        <ImageView
+            android:id="@+id/toolbar_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:minHeight="?attr/actionBarSize"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_back_black_24dp" />
+
+    </android.support.v7.widget.Toolbar>
+    <TextView
+        android:id="@+id/txt_confirm_title"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/my_toolbar"
+        android:text="Xác nhận thông tin của bạn"
+        android:textColor="@color/black"
+        android:textSize="22sp"/>
+    <LinearLayout
+        android:id="@+id/ln_name_group"
+        android:layout_below="@+id/txt_confirm_title"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/rl_name"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/txt_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên"
+                android:textSize="18sp"
+                android:textColor="@color/Gray1"/>
+            <EditText
+                android:id="@+id/edit_name"
+                android:layout_width="wrap_content"
+                android:textColor="@color/black"
+                android:inputType="text"
+                android:layout_height="40dp"
+                tools:ignore="LabelFor"
+                android:hint="Enter last name"
+                android:background="@null"/>
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="0.5dp"
+                android:background="@color/Gray2"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rl_fisrt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_fisrt_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Họ"
+                android:textColor="@color/Gray1"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/edit_fisrt_name"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="@null"
+                android:inputType="text"
+                android:hint="Enter first name"
+                android:textColor="@color/black"
+                tools:ignore="LabelFor" />
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="0.5dp"
+                android:background="@color/Gray2" />
+
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ln_email"
+        android:padding="20dp"
+        android:layout_below="@+id/ln_name_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Email"
+            android:textSize="18sp"
+            android:textColor="@color/Gray1"/>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:inputType="text"
+            android:hint="Enter your email"
+            android:textColor="@color/black"
+            android:background="@null"
+            tools:ignore="LabelFor" />
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="0.5dp"
+            android:background="@color/Gray2"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_below="@+id/ln_email"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:paddingRight="20dp"
+        android:id="@+id/country_phone_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.hbb20.CountryCodePicker
+            android:gravity="center"
+            android:id="@+id/area_code"
+            android:background="@null"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_width="30dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            app:contentColor="@color/black"
+            app:defaultCode="84"
+            app:hideNameCode="true"
+            app:keyboardAutoPopOnSearch="false"
+            app:showFlag="false"
+            app:textSize="18sp"
+            />
+        <EditText
+            android:id="@+id/edit_phone"
+            android:background="@null"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="11"
+            android:layout_marginLeft="5dp"
+            android:imeOptions="actionDone"
+            android:inputType="phone"
+            android:textColor="@color/black"
+            android:textColorHint="@color/Gray1"
+            android:textSize="18sp"
+            android:hint="Enter your phone number"/>
+    </LinearLayout>
+    <View
+        android:id="@+id/view"
+        android:layout_width="wrap_content"
+        android:layout_height="0.5dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="70dp"
+        android:layout_below="@+id/country_phone_group"
+        android:background="@color/Gray2"/>
+    <TextView
+        android:layout_below="@+id/view"
+        android:paddingLeft="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:textColor="@color/royalblue"
+        android:text="Bằng cách tiếp tục, tôi xác nhận rằng tôi đã đọc và đồng ý với điều khoản"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        app:backgroundTint="@color/black"
+        app:layout_anchorGravity="bottom|right|end"
+        android:src="@drawable/ic_next" />
+
+
+</RelativeLayout>

@@ -1,0 +1,143 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:contentInsetEnd="0dp"
+        android:contentInsetLeft="0dp"
+        android:visibility="gone"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_back_black_24dp"/>
+
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="PINCode Verification"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:id="@+id/ln_enter_pincode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/pin_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:textSize="18dp"
+            android:text="@string/enter_pin_tiitle"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/txt_phone"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:text="+841645059996"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="28dp"/>
+        <TextView
+            android:id="@+id/txt_edit_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@color/colorYellow"
+            android:gravity="center"
+            android:textSize="18dp"
+            android:layout_marginBottom="30dp"
+            android:text="Edit number"
+            />
+        <com.alimuzaffar.lib.pin.PinEntryEditText
+            android:id="@+id/edit_pincode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cursorVisible="false"
+            android:digits="1234567890"
+            android:inputType="number"
+            android:maxLength="6"
+            android:textIsSelectable="false"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/txt_no_receive_pin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:textSize="18dp"
+            android:text="I didn't receive a code!"
+            android:textAlignment="center"/>
+        <TextView
+            android:id="@+id/txt_request_new_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/colorYellow"
+            android:gravity="center"
+            android:textSize="18dp"
+            android:text="Request new code" />
+
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/rl_progressbar_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/ln_enter_pincode">
+
+        <TextView
+            android:id="@+id/detail"
+            style="@style/ThemeOverlay.MyTextDetail"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:textStyle="bold"
+            tools:text="Veriication Sucessfull" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_below="@+id/detail"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:padding="5dp"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/status"
+        style="@style/ThemeOverlay.MyTextDetail"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/colorAccent"
+        android:text="You are not logged in !"
+        android:layout_below="@+id/rl_progressbar_group"/>
+
+
+</RelativeLayout>

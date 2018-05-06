@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.klcn.xuant.transporter.mvp.signup.view.CustomerSignUpActivity;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -33,7 +35,7 @@ public class ChooseTypeUserActivity extends AppCompatActivity implements View.On
         switch (view.getId()){
             case R.id.btn_login_customer:
 
-                Intent intentCustomer = new Intent(getApplicationContext(), DriverLoginActivity.class);
+                Intent intentCustomer = new Intent(getApplicationContext(), CustomerSignUpActivity.class);
                 startActivity(intentCustomer);
                 finish();
 

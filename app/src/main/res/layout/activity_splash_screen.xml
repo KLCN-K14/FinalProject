@@ -7,7 +7,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:src="@drawable/splash_screen"
+        android:src="@drawable/bg_login"
         android:layout_gravity="center"
         />
 </LinearLayout>
