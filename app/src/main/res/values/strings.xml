@@ -28,4 +28,5 @@
     <string name="phone_number">01645059996</string>
     <string name="point">206 Điểm</string>
     <string name="title_activity_customer_home">CustomerHomeActivity</string>
+    <string name="title_activity_customer_maps">Map</string>
 </resources>

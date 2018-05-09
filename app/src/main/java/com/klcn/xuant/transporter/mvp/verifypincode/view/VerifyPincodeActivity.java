@@ -132,7 +132,7 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                 // [START_EXCLUDE silent]
                 mVerificationInProgress = false;
 
-                Toast.makeText(VerifyPincodeActivity.this, "Verification Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerifyPincodeActivity.this, "Verification Failed"+e.getMessage(), Toast.LENGTH_SHORT).show();
 
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
@@ -326,10 +326,12 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                 // No-op, handled by sign-in check
                 mDetailText.setText(R.string.status_sign_in_failed);
                 mDetailText.setTextColor(Color.parseColor("#dd2c00"));
+                Toast.makeText(VerifyPincodeActivity.this, "Sign in FAILED", Toast.LENGTH_SHORT).show();
                 break;
             case STATE_SIGNIN_SUCCESS:
                 // Np-op, handled by sign-in check
                 mStatusText.setText(R.string.signed_in);
+                Toast.makeText(VerifyPincodeActivity.this, "Sign in SUCCESS", Toast.LENGTH_SHORT).show();
                 break;
         }
 
