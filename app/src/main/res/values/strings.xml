@@ -29,4 +29,7 @@
     <string name="point">206 Điểm</string>
     <string name="title_activity_customer_home">CustomerHomeActivity</string>
     <string name="title_activity_customer_maps">Map</string>
+    <string name="grabcar4">GrabCar 4 chỗ</string>
+    <string name="min">4 min</string>
+    <string name="di_chuyen">Di chuyển</string>
 </resources>

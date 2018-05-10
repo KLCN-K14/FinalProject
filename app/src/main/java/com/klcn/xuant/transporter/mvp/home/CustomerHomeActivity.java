@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,12 +14,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
+import com.klcn.xuant.transporter.mvp.home.adapter.ListCarAdapter;
 
 public class CustomerHomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private String[] listcar = {"GrabCar 4 chỗ","GrabCar 7 chỗ"};
+    private String[] listTimeWait = {"4 min","6 min"};
+
+    private ListView mListViewCar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +35,13 @@ public class CustomerHomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_customer_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ActionBar ab = getSupportActionBar();
+        if(ab!=null)
+        {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setTitle("");
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -35,6 +51,11 @@ public class CustomerHomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mListViewCar= (ListView) findViewById(R.id.lv_car);
+        ListCarAdapter arrayAdapter = new ListCarAdapter(this,listcar,listTimeWait);
+
+        mListViewCar.setAdapter(arrayAdapter);
     }
 
     @Override
