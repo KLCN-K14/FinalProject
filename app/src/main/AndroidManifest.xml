@@ -41,8 +41,7 @@
         <activity android:name=".mvp.signup.view.CustomerSignUpActivity" />
         <activity
             android:name=".mvp.home.CustomerHomeActivity"
-            android:label="@string/title_activity_customer_home"
-            android:theme="@style/AppTheme">
+            android:theme="@style/NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -65,8 +64,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".mvp.home.CustomerMapsActivity"
-            android:label="@string/title_activity_customer_maps">
+            android:name=".mvp.home.CustomerMapsActivity">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 

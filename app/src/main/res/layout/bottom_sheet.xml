@@ -22,7 +22,7 @@
         android:layout_marginTop="20dp"
         android:background="#000"
         android:foreground="?attr/selectableItemBackground"
-        android:text="PROCEED PAYMENT"
+        android:text="PICK THIS CAR"
         android:textColor="#fff" />
 
 </LinearLayout>

@@ -42,4 +42,5 @@
     <color name="sky">#3bafda</color>
     <color name="skyDark">#1A90A0</color>
     <color name="orange_lite">#FD757C</color>
+    <color name="colorGray">#73716f</color>
 </resources>
