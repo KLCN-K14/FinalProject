@@ -43,4 +43,11 @@
     <color name="skyDark">#1A90A0</color>
     <color name="orange_lite">#FD757C</color>
     <color name="colorGray">#73716f</color>
+
+    <color name="bgColor1">#ec6e51</color>
+    <color name="bgColor2">#3366cc</color>
+    <color name="bgColor3">#336699</color>
+    <color name="bgColor4">#4A89DC</color>
+    <color name="bgColor5">#e6b800</color>
+    <color name="bgColor6">#0040ff</color>
 </resources>

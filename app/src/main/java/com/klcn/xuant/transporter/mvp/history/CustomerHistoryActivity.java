@@ -36,9 +36,9 @@ public class CustomerHistoryActivity extends TabActivity {
 
             public void onTabChanged(String arg0) {
                 for (int i = 0; i < tabHost.getTabWidget().getChildCount(); i++) {
-                    tabHost.getTabWidget().getChildAt(i).setBackgroundColor(Color.parseColor("#ffffff")); // unselected
+                    tabHost.getTabWidget().getChildAt(i).setBackgroundColor(Color.parseColor("#fbbf20")); // unselected
                 }
-                tabHost.getTabWidget().getChildAt(tabHost.getCurrentTab()).setBackgroundColor(Color.parseColor("#fbbf20")); // selected
+                tabHost.getTabWidget().getChildAt(tabHost.getCurrentTab()).setBackgroundColor(Color.parseColor("#ffffff")); // selected
 
             }
         });

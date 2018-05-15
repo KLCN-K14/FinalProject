@@ -6,39 +6,55 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".mvp.history.CustomerHistoryActivity">
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
-        android:background="@color/colorYellow"
+        style="@style/Theme.AppCompat.Light.NoActionBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        style="@style/Theme.AppCompat.Light.NoActionBar"
-        >
-
+        android:background="@color/colorYellow">
         <ImageView
             android:id="@+id/toolbar_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:minHeight="?attr/actionBarSize"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:src="@drawable/ic_arrow_back_black_24dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/dimen_title_20_sp"
+                android:layout_gravity="center_horizontal"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:text="History"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
     </android.support.v7.widget.Toolbar>
+
     <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@android:id/tabhost"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
-                android:background="@color/colorYellow"/>
+                android:background="@color/colorYellow" />
 
             <FrameLayout
                 android:id="@android:id/tabcontent"

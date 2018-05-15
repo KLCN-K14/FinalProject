@@ -23,6 +23,7 @@
         android:background="#000"
         android:foreground="?attr/selectableItemBackground"
         android:text="PICK THIS CAR"
+        android:visibility="gone"
         android:textColor="#fff" />
 
 </LinearLayout>
