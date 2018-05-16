@@ -1,5 +1,6 @@
 package com.klcn.xuant.transporter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,8 @@ import com.klcn.xuant.transporter.mvp.signup.view.CustomerSignUpActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class ChooseTypeUserActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -20,8 +23,17 @@ public class ChooseTypeUserActivity extends AppCompatActivity implements View.On
     Button mBtnDriver;
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Arkhip_font.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_choose_type_user);
         ButterKnife.bind(this);
 
@@ -37,15 +49,13 @@ public class ChooseTypeUserActivity extends AppCompatActivity implements View.On
 
                 Intent intentCustomer = new Intent(getApplicationContext(), CustomerSignUpActivity.class);
                 startActivity(intentCustomer);
-                finish();
-
+//                finish();
                 break;
             case R.id.btn_login_driver:
 
                 Intent intentDriver = new Intent(getApplicationContext(), DriverLoginActivity.class);
                 startActivity(intentDriver);
-                finish();
-
+//                finish();
                 break;
 
         }

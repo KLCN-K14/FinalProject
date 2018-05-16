@@ -50,4 +50,18 @@
     <color name="bgColor4">#4A89DC</color>
     <color name="bgColor5">#e6b800</color>
     <color name="bgColor6">#0040ff</color>
+
+    // Driver
+    <color name="bottomText">#6b6b76</color>
+    <color name="rippleEffectColor">#f816a463</color>
+    <color name="btnSignInDriver">#1fbad6</color>
+    <color name="btnRegisterDriver">#83838c</color>
+
+    <color name="edtRegister">#0a091b</color>
+    <color name="edtRegisterDark">#070716</color>
+
+    <color name="colorNavigation">#1B1A2A</color>
+    <color name="colorInactiveNavigation">#999A9F</color>
+    <color name="colorActiveNavigation">#1FBAD6</color>
+
 </resources>

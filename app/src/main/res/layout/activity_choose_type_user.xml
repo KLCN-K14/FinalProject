@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="2"
     android:background="@color/colorBlack">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/btn_login_customer"
-        android:text="Customer"
-        android:textSize="30sp"
-        />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/btn_login_customer"
+            android:background="@drawable/background_i_am_customer"
+            android:layout_below="@+id/btn_login_customer"
+            android:text="C U S T O M E R"
+            android:textColor="@color/white"
+            android:textSize="36sp"
+            />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/btn_login_driver"
-        android:layout_below="@+id/btn_login_customer"
-        android:text="Driver"
-        android:textSize="30sp"
-        />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/background_i_am_driver"
+            android:id="@+id/btn_login_driver"
+            android:layout_below="@+id/btn_login_customer"
+            android:text="D R I V E R"
+            android:textColor="@color/white"
+            android:textSize="36sp"
+            />
 
-</RelativeLayout>
+</LinearLayout>
