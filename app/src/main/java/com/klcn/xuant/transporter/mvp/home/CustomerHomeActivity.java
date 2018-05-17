@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,6 +27,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.firebase.geofire.GeoFire;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
@@ -41,27 +43,36 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
-import com.klcn.xuant.transporter.mvp.home.adapter.ListCarAdapter;
 
-import java.util.Objects;
 
 public class CustomerHomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, PlaceSelectionListener {
 
-    private String[] listcar = {"GrabCar 4 chỗ","GrabCar 7 chỗ"};
-    private String[] listTimeWait = {"4 min","6 min"};
-
     private ListView mListViewCar;
 
 
     private GoogleMap mMap;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+
+    private static final int MY_PERMISTION_REQUEST_CODE = 1234;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 891996;
+    private static int UPDATE_INTERVAL = 5000;
+    private static int FATEST_INTERVAL = 3000;
+    private static int DISPLACEMENT = 10;
+
+    DatabaseReference ref;
+    GeoFire geoFire;
+    Marker mUserMarker;
+
 
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
@@ -88,31 +99,92 @@ public class CustomerHomeActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mListViewCar= (ListView) findViewById(R.id.lv_car);
-        ListCarAdapter arrayAdapter = new ListCarAdapter(this,listcar,listTimeWait);
-
-        mListViewCar.setAdapter(arrayAdapter);
-
-
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
 
+        initView();
+
+        ref = FirebaseDatabase.getInstance().getReference("Drivers");
+        geoFire = new GeoFire(ref);
+    }
+
+    private void initView(){
+
+        //Vị trí của bạn
+        PlaceAutocompleteFragment autocompleteFragmentPlace = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_location);
+        autocompleteFragmentPlace.setOnPlaceSelectedListener(this);
+        autocompleteFragmentPlace.setText("99, Nguyễn Văn Thạnh");
+        autocompleteFragmentPlace.setHint("Vị trí của bạn");
+        ((View)findViewById(R.id.place_autocomplete_search_button)).setVisibility(View.GONE);
+        ((View)findViewById(R.id.place_autocomplete_clear_button)).setVisibility(View.GONE);
+        autocompleteFragmentPlace.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                Log.e("CustomerHomeActivity"," "+place.getName());
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.e("error:::::"," "+status);
+            }
+        });
+
+        //Bạn muốn đi đâu
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_destination);
         autocompleteFragment.setOnPlaceSelectedListener(this);
         autocompleteFragment.setHint("Bạn muốn đi đâu?");
         autocompleteFragment.setBoundsBias(BOUNDS_MOUNTAIN_VIEW);
-        (autocompleteFragment.getView()).findViewById(R.id.place_autocomplete_clear_button).setVisibility(View.GONE);
+        autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                Log.e("CustomerHomeActivity"," "+place.getName());
+            }
 
-        PlaceAutocompleteFragment autocompleteFragmentPlace = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_location);
-        autocompleteFragmentPlace.setOnPlaceSelectedListener(this);
-        autocompleteFragmentPlace.setText("99, Nguyễn Văn Thạnh");
-        autocompleteFragmentPlace.setBoundsBias(BOUNDS_MOUNTAIN_VIEW);
-        ((View)findViewById(R.id.place_autocomplete_search_button)).setVisibility(View.GONE);
+            @Override
+            public void onError(Status status) {
+                Log.e("error 2:::::"," "+status);
+            }
+        });
+    }
+
+    private void setUpdateLocation(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,this);
+
+    }
+    private void startLocationUpdate(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,this);
+
+    }
+    private void stopLocationUpdate(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+
+    }
+
+    private void displayLocation(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
     }
 
     @Override
@@ -181,8 +253,8 @@ public class CustomerHomeActivity extends AppCompatActivity
 //        buildGoogleApiClient();
 //        mMap.setMyLocationEnabled(true);
         mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(37.7750,-122.4183))
-                        .title("San Francisco"));
+                .position(new LatLng(37.7750,-122.4183))
+                .title("San Francisco"));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7750,-122.4183),12));
     }
 
@@ -199,15 +271,15 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+//        mLocationRequest = new LocationRequest();
+//        mLocationRequest.setInterval(1000);
+//        mLocationRequest.setFastestInterval(1000);
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
     }
 
@@ -223,12 +295,12 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
-
-        LatLng latLng = new LatLng(location.getLongitude(),location.getLongitude());
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+//        mLastLocation = location;
+//
+//        LatLng latLng = new LatLng(location.getLongitude(),location.getLongitude());
+//
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
     }
 
     @Override

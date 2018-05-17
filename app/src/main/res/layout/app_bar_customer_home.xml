@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#2e5cb8"
+        android:background="@color/colorYellow"
         android:theme="@style/NoActionBar">
 
         <android.support.v7.widget.Toolbar
@@ -22,13 +22,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="30dp"
+                android:layout_marginRight="40dp"
                 android:gravity="center">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/di_chuyen"
-                    android:textColor="@color/white"
+                    android:textColor="@color/Gray1"
                     android:textSize="@dimen/dimen_title_20_sp"
                     android:textStyle="bold" />
             </LinearLayout>
