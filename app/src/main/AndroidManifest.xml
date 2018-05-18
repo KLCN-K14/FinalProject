@@ -23,11 +23,11 @@
         <activity
             android:name=".SplashScreenActivity"
             android:theme="@style/NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".ChooseTypeUserActivity"
@@ -41,11 +41,18 @@
         <activity
             android:name=".mvp.home.CustomerHomeActivity"
             android:theme="@style/NoActionBar">
-            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <activity android:name=".mvp.history.CustomerHistoryActivity" />
-        <activity android:name=".mvp.history.HistoryBookCarActivity" />
-        <activity android:name=".mvp.history.HistoryOrdersActivity" />
+        <activity android:name=".mvp.history.CustomerHistoryActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".mvp.home.CustomerHomeActivity" />
+        </activity>
+        <activity android:name=".mvp.history.ItemHistoryActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -53,7 +60,13 @@
 
         <activity
             android:name=".DriverMainActivity"
-            android:label="@string/title_activity_test_navigation"></activity>
+            android:label="@string/title_activity_test_navigation">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
     </application>
 
 </manifest>

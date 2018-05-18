@@ -45,4 +45,8 @@
     <string name="go_offline">GO OFFLINE</string>
     <string name="error">ERROR</string>
     <string name="sign_up">Sign Up</string>
+    <string name="history">History</string>
+    <string name="confirm_infomation">Confirm Infomation</string>
+    <string name="date_time_history">10/2/2018, 04:02pm</string>
+    <string name="send_feedback">Send feedback</string>
 </resources>

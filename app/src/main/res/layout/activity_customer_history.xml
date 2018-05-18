@@ -12,14 +12,16 @@
         style="@style/Theme.AppCompat.Light.NoActionBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorYellow">
+        android:background="@color/colorYellow"
+        app:contentInsetStart="0dp">
+
         <ImageView
             android:id="@+id/toolbar_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:minHeight="?attr/actionBarSize"
-            android:scaleType="fitXY"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_arrow_back_black_24dp" />
 
         <LinearLayout
@@ -27,41 +29,23 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal">
+
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/history"
+                android:textColor="@color/Gray1"
                 android:textSize="@dimen/dimen_title_20_sp"
-                android:layout_gravity="center_horizontal"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:text="History"
-                android:textColor="@color/black" />
+                android:textStyle="bold" />
         </LinearLayout>
 
     </android.support.v7.widget.Toolbar>
 
-    <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@android:id/tabhost"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical">
-
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:background="@color/colorYellow" />
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
-        </LinearLayout>
-
-    </TabHost>
+    <ListView
+        android:id="@+id/list_history"
+        android:layout_width="match_parent"
+        android:paddingBottom="10dp"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

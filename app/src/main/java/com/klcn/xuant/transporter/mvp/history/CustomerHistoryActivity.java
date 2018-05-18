@@ -5,42 +5,49 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TabHost;
 
 import com.klcn.xuant.transporter.R;
 
-public class CustomerHistoryActivity extends TabActivity {
+public class CustomerHistoryActivity extends AppCompatActivity implements View.OnClickListener{
+
+    String[] listDistination= {"145 Trần Não", "Vimcom Quận 9"};
+    ImageView mImgback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_history);
 
-        final TabHost tabHost = getTabHost();
+        mImgback = (ImageView) findViewById(R.id.toolbar_back);
+        ListView listView = (ListView) findViewById(R.id.list_history);
+        ListHistoryAdapter listHistoryAdapter = new ListHistoryAdapter(this,listDistination );
+        listView.setAdapter(listHistoryAdapter);
 
-        TabHost.TabSpec datxespec = tabHost.newTabSpec("DatXe");
-        datxespec.setIndicator("Đặt xe", getResources().getDrawable(R.drawable.ic_menu_camera));
-        Intent photosIntent = new Intent(this, HistoryBookCarActivity.class);
-        datxespec.setContent(photosIntent);
+        mImgback.setOnClickListener(this);
 
-        TabHost.TabSpec orderspec = tabHost.newTabSpec("Orders");
-        orderspec.setIndicator("Orders", getResources().getDrawable(R.drawable.ic_menu_gallery));
-        Intent songsIntent = new Intent(this, HistoryOrdersActivity.class);
-        orderspec.setContent(songsIntent);
-
-        //Thêm các TabSpec trên vào TabHost
-        tabHost.addTab(datxespec);
-        tabHost.addTab(orderspec);
-
-        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-
-            public void onTabChanged(String arg0) {
-                for (int i = 0; i < tabHost.getTabWidget().getChildCount(); i++) {
-                    tabHost.getTabWidget().getChildAt(i).setBackgroundColor(Color.parseColor("#fbbf20")); // unselected
-                }
-                tabHost.getTabWidget().getChildAt(tabHost.getCurrentTab()).setBackgroundColor(Color.parseColor("#ffffff")); // selected
-
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(CustomerHistoryActivity.this,ItemHistoryActivity.class);
+                startActivity(intent);
             }
         });
+
+
     }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.toolbar_back:
+                finish();
+                break;
+        }
+    }
+
 }

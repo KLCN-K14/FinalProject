@@ -12,16 +12,17 @@
         style="@style/Theme.AppCompat.Light.NoActionBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorYellow">
+        android:background="@color/colorYellow"
+        app:contentInsetStart="0dp">
 
-        <ImageView
-            android:id="@+id/toolbar_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:minHeight="?attr/actionBarSize"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_arrow_back_black_24dp" />
+        <!--<ImageView-->
+            <!--android:id="@+id/toolbar_back"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="left"-->
+            <!--android:minHeight="?attr/actionBarSize"-->
+            <!--android:scaleType="centerInside"-->
+            <!--android:src="@drawable/ic_arrow_back_black_24dp" />-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Confirm Infomation"
+                android:text="@string/confirm_infomation"
                 android:textColor="@color/Gray1"
                 android:textSize="@dimen/dimen_title_20_sp"
                 android:textStyle="bold" />
