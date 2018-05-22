@@ -19,10 +19,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.hbb20.CountryCodePicker;
 import com.klcn.xuant.transporter.R;
+import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
+import com.klcn.xuant.transporter.mvp.verifypincode.view.TestVerify;
 import com.klcn.xuant.transporter.mvp.verifypincode.view.VerifyPincodeActivity;
 
 
@@ -70,6 +73,8 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
             ab.setDisplayHomeAsUpEnabled(true);
         }
 
+        checkIsLogged();
+
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 
@@ -97,6 +102,15 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
 
         countryCodePicker.setCountryForNameCode(countryNameCode);
 
+    }
+
+    private void checkIsLogged() {
+        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+            Intent intentHome = new Intent(CustomerSignUpActivity.this, CustomerHomeActivity.class);
+            startActivity(intentHome);
+            finish();
+            Toast.makeText(getApplicationContext(),"LOGGED",Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -186,7 +200,7 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
                     updateUI(STATE_VERIFY_FAILED);
                 }else {
                     updateUI(STATE_VERIFY_SUCCESS);
-                    Intent intent = new Intent(this, VerifyPincodeActivity.class);
+                    Intent intent = new Intent(this, TestVerify.class);
                     intent.putExtra("EXTRA_PHONE", phoneStr);
                     startActivity(intent);
                     finish();

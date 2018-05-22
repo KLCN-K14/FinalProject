@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.alimuzaffar.lib.pin.PinEntryEditText;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseError;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
@@ -23,8 +24,14 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.confirminfo.view.ConfirmInfoActivity;
+import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
 import com.klcn.xuant.transporter.mvp.signup.view.CustomerSignUpActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -61,11 +68,16 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
     private TextView mDetailText;
     TextView mTxtResendCode;
 
+    DatabaseReference postRef;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_pincode);
+
+
 
         mTxtEditNumber = (TextView) findViewById(R.id.txt_edit_number);
         mEditPinCode = (PinEntryEditText) findViewById(R.id.edit_pincode);
@@ -84,13 +96,15 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
 
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
+        postRef = FirebaseDatabase.getInstance().getReference("Customers");
+
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             @Override
             public void onVerificationCompleted(final PhoneAuthCredential credential) {
 
-                Log.d(TAG, "onVerificationCompleted:" + credential);
+                Log.e(TAG, "onVerificationCompleted:" + credential);
                 // [START_EXCLUDE silent]
                 mVerificationInProgress = false;
 
@@ -99,17 +113,43 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                 updateUI(STATE_VERIFY_SUCCESS, credential);
 
                 if (credential != null) {
+                        Log.e(TAG, "Credential != null");
+
                     if (credential.getSmsCode() != null) {
                         Log.e("STATE_VERIFY_SUCCESS", credential.getSmsCode());
                         mEditPinCode.setText(credential.getSmsCode());
                         Log.e("Pincode edittext:::", mEditPinCode.getText().toString());
+
                         if (mEditPinCode != null) {
+
                             if (mEditPinCode.getText().toString().equals(credential.getSmsCode())) {
+
                                 verifyPhoneNumberWithCode(mVerificationId, mEditPinCode.getText().toString());
-                                Intent intent = new Intent(VerifyPincodeActivity.this, ConfirmInfoActivity.class);
-                                intent.putExtra("EXTRA_PHONE",phone);
-                                startActivity(intent);
-                                finish();
+
+                                // checkExistUser()
+                                postRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for(DataSnapshot data: dataSnapshot.getChildren()){
+                                            if (data.child(phone).exists()) {
+                                                Intent intentHome = new Intent(VerifyPincodeActivity.this, CustomerHomeActivity.class);
+                                                startActivity(intentHome);
+                                                finish();
+                                            } else {
+                                                Intent intent = new Intent(VerifyPincodeActivity.this, ConfirmInfoActivity.class);
+                                                intent.putExtra("EXTRA_PHONE", phone);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+
+                                });
                                 Toast.makeText(VerifyPincodeActivity.this, "SUCCESS", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(VerifyPincodeActivity.this, "FAIL", Toast.LENGTH_SHORT).show();
@@ -122,7 +162,6 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                     }
                 }
 
-                signInWithPhoneAuthCredential(credential);
             }
 
             @Override
@@ -132,7 +171,7 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                 // [START_EXCLUDE silent]
                 mVerificationInProgress = false;
 
-                Toast.makeText(VerifyPincodeActivity.this, "Verification Failed"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerifyPincodeActivity.this, "Verification Failed" + e.getMessage(), Toast.LENGTH_SHORT).show();
 
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
@@ -154,8 +193,8 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
             public void onCodeSent(String verificationId,
                                    PhoneAuthProvider.ForceResendingToken token) {
 
-                Log.d(TAG, "onCodeSent:" + verificationId);
-
+                // Log.d(TAG, "onCodeSent:" + verificationId);
+                Toast.makeText(VerifyPincodeActivity.this,"Verification code has been send on your number",Toast.LENGTH_SHORT).show();
                 // Save verification ID and resending token so we can use them later
                 mVerificationId = verificationId;
                 mResendToken = token;
@@ -213,8 +252,9 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
     }
 
     private void verifyPhoneNumberWithCode(String verificationId, String code) {
-
+        // [START verify_with_code]
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+        // [END verify_with_code]
         signInWithPhoneAuthCredential(credential);
     }
 
@@ -253,6 +293,7 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                         }
                     }
                 });
+
     }
 
     private void updateUI(int uiState) {
@@ -290,8 +331,8 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                 break;
             case STATE_VERIFY_SUCCESS:
 
-                mDetailText.setText("Verfication Sucessfull");
-                mDetailText.setTextColor(Color.parseColor("#43a047"));
+//                mDetailText.setText("Verfication Sucessfull");
+//                mDetailText.setTextColor(Color.parseColor("#43a047"));
 
                 if (cred != null) {
 
@@ -386,6 +427,7 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
         }
 
     }
+
 
 
 }

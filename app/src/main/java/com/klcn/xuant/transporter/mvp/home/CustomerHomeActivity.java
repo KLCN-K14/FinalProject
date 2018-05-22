@@ -72,6 +72,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     DatabaseReference ref;
     GeoFire geoFire;
     Marker mUserMarker;
+    FirebaseAuth mAuth;
 
 
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
@@ -111,6 +112,8 @@ public class CustomerHomeActivity extends AppCompatActivity
         geoFire = new GeoFire(ref);
 
         setupLocation();
+
+        mAuth = FirebaseAuth.getInstance();
     }
 
     private void initView(){
@@ -323,6 +326,8 @@ public class CustomerHomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_sign_out) {
+            mAuth.signOut();
+            finish();
 
         }
 

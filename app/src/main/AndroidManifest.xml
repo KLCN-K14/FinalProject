@@ -23,11 +23,11 @@
         <activity
             android:name=".SplashScreenActivity"
             android:theme="@style/NoActionBar">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ChooseTypeUserActivity"
@@ -41,11 +41,11 @@
         <activity
             android:name=".mvp.home.CustomerHomeActivity"
             android:theme="@style/NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <activity android:name=".mvp.history.CustomerHistoryActivity">
             <meta-data
@@ -67,6 +67,7 @@
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
+        <activity android:name=".mvp.verifypincode.view.TestVerify"/>
     </application>
 
 </manifest>
