@@ -40,6 +40,7 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+
     </android.support.v7.widget.Toolbar>
 
     <TextView
@@ -231,7 +232,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="10dp"
         android:layout_marginRight="20dp"
-        android:src="@drawable/ic_next"
+        app:srcCompat="@drawable/ic_next"
         app:backgroundTint="@color/black"
         app:layout_anchorGravity="bottom|right|end" />
 

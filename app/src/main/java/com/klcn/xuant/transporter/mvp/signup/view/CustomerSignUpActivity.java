@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.hbb20.CountryCodePicker;
+import com.klcn.xuant.transporter.DriverMainActivity;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
 import com.klcn.xuant.transporter.mvp.verifypincode.view.TestVerify;
@@ -54,6 +57,8 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
     private RelativeLayout mTopBackground;
     private TextView mTxtSocialNetwork;
     private RelativeLayout mProgressBarGroup;
+
+    private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
 
     ProgressBar progressBar;
     CountryCodePicker countryCodePicker;

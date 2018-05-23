@@ -22,7 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_arrow_back_black_24dp"/>
+                app:srcCompat="@drawable/ic_arrow_back_black_24dp"/>
 
         <TextView
             android:textStyle="bold"
@@ -136,6 +136,8 @@
         style="@style/ThemeOverlay.MyTextDetail"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/colorAccent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:text="You are not logged in !"
         android:layout_below="@+id/rl_progressbar_group"/>
 

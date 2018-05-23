@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Driver;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -69,7 +70,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
         // Init Firebase
         mFirebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
-        drivers = db.getReference().child("Drivers");
+        drivers = db.getReference(Common.drivers_tbl);
 
         firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -158,9 +159,8 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                     }else{
                                         Driver driver = new Driver();
                                         driver.setEmail(editEmail.getText().toString());
-                                        driver.setPassword(editPassword.getText().toString());
                                         driver.setName(editName.getText().toString());
-                                        driver.setPhone(editPhone.getText().toString());
+                                        driver.setPhoneNum(editPhone.getText().toString());
                                         drivers.child(mFirebaseAuth.getCurrentUser().getUid())
                                                 .setValue(driver)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -231,6 +231,9 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if(!task.isSuccessful()){
                                         Toast.makeText(getApplicationContext(), "Sign in fail! "+task.getException().getMessage(),
+                                                Toast.LENGTH_LONG).show();
+                                    }else{
+                                        Toast.makeText(getApplicationContext(), "Sign in success! "+task.getException().getMessage(),
                                                 Toast.LENGTH_LONG).show();
                                     }
                                 }

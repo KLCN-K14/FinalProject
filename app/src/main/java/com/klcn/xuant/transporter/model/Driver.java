@@ -5,16 +5,20 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Driver {
 
-    private String name,email,password,phone;
+    private String name,email,phoneNum,imgUrl,serviceCar,nameCar,licensePlate,avgRatings;
 
     public Driver() {
     }
 
-    public Driver(String name, String email, String password, String phone) {
+    public Driver(String name, String email, String phoneNum, String imgUrl, String serviceCar, String nameCar, String licensePlate, String avgRatings) {
         this.name = name;
         this.email = email;
-        this.password = password;
-        this.phone = phone;
+        this.phoneNum = phoneNum;
+        this.imgUrl = imgUrl;
+        this.serviceCar = serviceCar;
+        this.nameCar = nameCar;
+        this.licensePlate = licensePlate;
+        this.avgRatings = avgRatings;
     }
 
     public String getName() {
@@ -33,19 +37,51 @@ public class Driver {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPhoneNum() {
+        return phoneNum;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPhoneNum(String phoneNum) {
+        this.phoneNum = phoneNum;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getImgUrl() {
+        return imgUrl;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getServiceCar() {
+        return serviceCar;
+    }
+
+    public void setServiceCar(String serviceCar) {
+        this.serviceCar = serviceCar;
+    }
+
+    public String getNameCar() {
+        return nameCar;
+    }
+
+    public void setNameCar(String nameCar) {
+        this.nameCar = nameCar;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
+
+    public String getAvgRatings() {
+        return avgRatings;
+    }
+
+    public void setAvgRatings(String avgRatings) {
+        this.avgRatings = avgRatings;
     }
 }

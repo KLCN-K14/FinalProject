@@ -12,6 +12,7 @@
     <color name="white">#ffffff</color>
     <color name="royalblue">#4169E1</color>
     <color name="colorYellow">#fbbf20</color>
+    <color name="colorYellow2">#e7ad13</color>
     <color name="gray_50_percent">#50808080</color>
     <color name="colorAccent2">#e68a00</color>
     <color name="colorYello">#FFCE54</color>
@@ -43,6 +44,7 @@
     <color name="skyDark">#1A90A0</color>
     <color name="orange_lite">#FD757C</color>
     <color name="colorGray">#73716f</color>
+    <color name="colorGray2">#e2e0de</color>
 
     <color name="bgColor1">#404E68</color>
     <color name="bgColor2">#192231</color>
@@ -54,6 +56,7 @@
     // Driver
     <color name="bottomText">#6b6b76</color>
     <color name="rippleEffectColor">#f816a463</color>
+    <color name="rippleEffectBtnBookCar">#f57f17</color>
     <color name="btnSignInDriver">#1fbad6</color>
     <color name="btnRegisterDriver">#83838c</color>
 

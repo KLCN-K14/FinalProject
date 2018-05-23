@@ -27,7 +27,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/di_chuyen"
+                    android:text="Transport"
                     android:textColor="@color/Gray1"
                     android:textSize="@dimen/dimen_title_20_sp"
                     android:textStyle="bold" />
@@ -37,7 +37,5 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_customer_home" />
-
-    <include layout="@layout/bottom_sheet" />
 
 </android.support.design.widget.CoordinatorLayout>

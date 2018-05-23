@@ -1,9 +1,12 @@
-package com.klcn.xuant.transporter;
+package com.klcn.xuant.transporter.mvp.splashScreen;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import com.klcn.xuant.transporter.ChooseTypeUserActivity;
+import com.klcn.xuant.transporter.R;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;

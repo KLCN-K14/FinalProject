@@ -1,12 +1,11 @@
 package com.klcn.xuant.transporter.mvp.home;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -21,12 +20,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -46,16 +47,28 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Driver;
+import com.klcn.xuant.transporter.mvp.findDriver.CustomerFindDriverActivity;
+import com.klcn.xuant.transporter.helper.CustomInfoWindow;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class CustomerHomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, PlaceSelectionListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        com.google.android.gms.location.LocationListener, PlaceSelectionListener,
+        View.OnClickListener{
 
 
     private GoogleMap mMap;
@@ -68,12 +81,22 @@ public class CustomerHomeActivity extends AppCompatActivity
     private static int UPDATE_INTERVAL = 5000;
     private static int FASTEST_INTERVAL = 3000;
     private static int DISPLACEMENT = 10;
+    private static int REQUEST_CODE_FIND_DRIVER = 1111;
+    private static int LIMIT_RANGE = 5;// 5km
 
+    int distance = 1;
+
+    Place mPlaceDestination = null;
     DatabaseReference ref;
     GeoFire geoFire;
     Marker mUserMarker;
     FirebaseAuth mAuth;
 
+    @BindView(R.id.btn_pick_request)
+    Button btnPickRequest;
+
+    boolean isChooseDropOff = false;
+    PlaceAutocompleteFragment pickDestination;
 
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
@@ -82,6 +105,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_home);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -100,6 +124,9 @@ public class CustomerHomeActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -107,9 +134,10 @@ public class CustomerHomeActivity extends AppCompatActivity
 
 
         initView();
+        btnPickRequest.setOnClickListener(this);
 
-        ref = FirebaseDatabase.getInstance().getReference("Drivers");
-        geoFire = new GeoFire(ref);
+//        ref = FirebaseDatabase.getInstance().getReference("Drivers");
+//        geoFire = new GeoFire(ref);
 
         setupLocation();
 
@@ -122,8 +150,7 @@ public class CustomerHomeActivity extends AppCompatActivity
         PlaceAutocompleteFragment autocompleteFragmentPlace = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_location);
         autocompleteFragmentPlace.setOnPlaceSelectedListener(this);
-        autocompleteFragmentPlace.setText("99, Nguyễn Văn Thạnh");
-        autocompleteFragmentPlace.setHint("Vị trí của bạn");
+        autocompleteFragmentPlace.setText("Your position");
         ((View)findViewById(R.id.place_autocomplete_search_button)).setVisibility(View.GONE);
         ((View)findViewById(R.id.place_autocomplete_clear_button)).setVisibility(View.GONE);
         autocompleteFragmentPlace.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -139,15 +166,18 @@ public class CustomerHomeActivity extends AppCompatActivity
         });
 
         //Bạn muốn đi đâu
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+        pickDestination = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_destination);
-        autocompleteFragment.setOnPlaceSelectedListener(this);
-        autocompleteFragment.setHint("Bạn muốn đi đâu?");
-        autocompleteFragment.setBoundsBias(BOUNDS_MOUNTAIN_VIEW);
-        autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        pickDestination.setOnPlaceSelectedListener(this);
+        pickDestination.setHint("Where are you going?");
+        pickDestination.setBoundsBias(BOUNDS_MOUNTAIN_VIEW);
+        pickDestination.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
+        pickDestination.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
+                mPlaceDestination = place;
+                isChooseDropOff = true;
+                btnPickRequest.setText("BOOK");
                 Log.e("CustomerHomeActivity"," "+place.getName());
             }
 
@@ -217,14 +247,6 @@ public class CustomerHomeActivity extends AppCompatActivity
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest, this);
 
     }
-    private void stopLocationUpdate(){
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            return;
-        }
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
-
-    }
 
     private void displayLocation(){
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
@@ -233,51 +255,79 @@ public class CustomerHomeActivity extends AppCompatActivity
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(mLastLocation!=null){
-                final double latitude = mLastLocation.getLatitude();
-                final double longitude = mLastLocation.getLongitude();
+            final double latitude = mLastLocation.getLatitude();
+            final double longitude = mLastLocation.getLongitude();
 
-                //Update to Firebase
-                geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(), new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
-                    @Override
-                    public void onComplete(String key, DatabaseError error) {
-                        //Add marker
-                        if(mUserMarker!=null)
-                            mUserMarker.remove();
-                        mUserMarker = mMap.addMarker(new MarkerOptions()
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_vitri))
-                                .position(new LatLng(latitude,longitude))
-                                .title("You"));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
-//                        rotateMarker(mUserMarker,-360,mMap);
-                    }
-                });
+            //Add marker
+            if(mUserMarker!=null)
+                mUserMarker.remove();
+            mUserMarker = mMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_vitri))
+                    .position(new LatLng(latitude,longitude))
+                    .title("You"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
+
+            // load drivers available in map
+            loadAllDriverAvailable();
         }else{
             Log.e("ERROR","Can't get your location");
         }
-
     }
 
-    private void rotateMarker(final Marker mMarker,final float i, GoogleMap mMap) {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        final float startRotation = mMarker.getRotation();
-        final long duration = 1500;
+    private void loadAllDriverAvailable() {
+        DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
+        GeoFire gfDriverAvailable = new GeoFire(driverAvailable);
 
-        final Interpolator interpolator = new LinearInterpolator();
-
-        handler.post(new Runnable() {
+        GeoQuery geoQuery = gfDriverAvailable.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(),mLastLocation.getLongitude()),distance);
+        geoQuery.removeAllListeners();
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - start;
-                float t = interpolator.getInterpolation((float)elapsed/duration);
-                float rot = t*i+(1-t)+startRotation;
-                mMarker.setRotation(-rot>180?rot/2:rot);
-                if(t<1.0){
-                    handler.postDelayed(this,16);
+            public void onKeyEntered(String key, final GeoLocation location) {
+                FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                        .child(key)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Driver driver = dataSnapshot.getValue(Driver.class);
+
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(location.latitude,location.longitude))
+                                        .snippet(driver.getPhoneNum())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
+                                        .title(driver.getName())
+                                        .flat(true));
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                if(distance<=LIMIT_RANGE){
+                    distance++;
+                    loadAllDriverAvailable();
                 }
             }
-        });
 
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
     }
 
     private void buildGoogleApiClient() {
@@ -329,6 +379,11 @@ public class CustomerHomeActivity extends AppCompatActivity
             mAuth.signOut();
             finish();
 
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if(user!=null){
+                FirebaseAuth.getInstance().signOut();
+                finish();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -339,7 +394,9 @@ public class CustomerHomeActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
     }
 
     @Override
@@ -374,5 +431,100 @@ public class CustomerHomeActivity extends AppCompatActivity
     @Override
     public void onError(Status status) {
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_pick_request:
+                if(isChooseDropOff){
+                    requestPickUpHere();
+                }else{
+                    final View root = pickDestination.getView();
+                    root.findViewById(R.id.place_autocomplete_search_input)
+                            .performClick();
+                }
+        }
+    }
+
+    private void requestPickUpHere() {
+        DatabaseReference dbRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
+        GeoFire mGeoFire = new GeoFire(dbRequest);
+        mGeoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                new GeoLocation(mLastLocation.getLatitude(),mLastLocation.getLongitude()));
+
+        if(mUserMarker.isVisible())
+            mUserMarker.remove();
+        mUserMarker = mMap.addMarker(new MarkerOptions()
+                .title("Pickup here")
+                .snippet("")
+                .position(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        mUserMarker.showInfoWindow();
+
+        findDriver();
+    }
+
+    private void findDriver() {
+        Intent intent = new Intent(this, CustomerFindDriverActivity.class);
+        intent.putExtra("lat",mLastLocation.getLatitude());
+        intent.putExtra("lng",mLastLocation.getLongitude());
+        intent.putExtra("destination",mPlaceDestination.getName());
+        startActivityForResult(intent,REQUEST_CODE_FIND_DRIVER);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_FIND_DRIVER) {
+            if(resultCode == Activity.RESULT_OK){
+                String driverID = data.getStringExtra("driverID");
+                if(driverID.equals("0")){ // don't have driver
+                    Toast.makeText(getApplicationContext(),"Don't have any driver",Toast.LENGTH_LONG).show();
+                }else{
+
+                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+            }
+        }
+    }
+
+//    private void getDirection(double lat, double lng) {
+//        String requestApi = null;
+//        try{
+//            requestApi = "https://maps.googleapis.com/maps/api/directions/json?"+
+//                    "mode=driving&"+
+//                    "transit_routing_preference=less_driving&"+
+//                    "origin="+ mLastLocation.getLatitude()+","+mLastLocation.getLongitude()+"&"+
+//                    "destination="+mPlaceDestination.getLatLng().latitude+","+mPlaceDestination.getLatLng().longitude+"&"+
+//                    "key="+getResources().getString(R.string.google_direction_api);
+//            Log.e("TRANSPORT",requestApi);
+//            mService.getPath(requestApi)
+//                    .enqueue(new Callback<String>() {
+//                        @Override
+//                        public void onResponse(Call<String> call, Response<String> response) {
+//                            try {
+//                                JSONObject jsonObject = new JSONObject(response.body().toString());
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<String> call, Throwable t) {
+//
+//                        }
+//                    });
+//
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isChooseDropOff = false;
+        btnPickRequest.setText("CHOOSE YOUR DROP-OFF");
     }
 }
