@@ -112,8 +112,11 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                     displayLocation();
                     Snackbar.make(getView(), "You are online", Snackbar.LENGTH_SHORT).show();
                 } else {
-                    mMarker.remove();
-                    mGeoFire.removeLocation(driverID);
+                    stopLocationUpdate();
+                    if (mMarker != null) {
+                        mMarker.remove();
+                        offlineDriver();
+                    }
                     Snackbar.make(getView(), "You are offline", Snackbar.LENGTH_SHORT).show();
                     mTxtStatus.setText("OFFLINE");
                 }
@@ -128,6 +131,14 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         setupLocation();
 
         return view;
+    }
+
+    private void stopLocationUpdate() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     @Override
@@ -318,15 +329,19 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         super.onStop();
         // Remove driver when driver not available
         if(isLoggingOut){
-            disconnectDriver();
+            offlineDriver();
         }
     }
 
-    public static void disconnectDriver() {
+    public void offlineDriver() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
 
         GeoFire geoFire = new GeoFire(ref);
-        geoFire.removeLocation(userId);
+        geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+            }
+        });
     }
 }

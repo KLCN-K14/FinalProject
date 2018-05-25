@@ -1,11 +1,17 @@
 package com.klcn.xuant.transporter.mvp.findDriver;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +20,7 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,6 +37,10 @@ import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.remote.IFCMService;
 import com.skyfishjy.library.RippleBackground;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -45,6 +56,15 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
     @BindView(R.id.txt_your_destination)
     TextView mTxtDestination;
+
+    @BindView(R.id.txt_your_position)
+    TextView mTxtYourPlace;
+
+    @BindView(R.id.txt_price)
+    TextView mTxtPrice;
+
+    @BindView(R.id.btn_cancel_find_driver)
+    Button mBtnCancel;
 
     Double  lat, lng;
     int radius = 1;
@@ -64,60 +84,89 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         if(getIntent()!=null){
             lat = getIntent().getDoubleExtra("lat",-1.0);
             lng = getIntent().getDoubleExtra("lng",-1.0);
+            getNameAdress(lat,lng);
             mTxtDestination.setText(getIntent().getStringExtra("destination"));
-           // findDriver(lat,lng);
+            findDriver(lat,lng);
+        }
+
+        mBtnCancel.setOnClickListener(this);
+    }
+
+    private void getNameAdress(Double lat, Double lng) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            Address obj = addresses.get(0);
+            String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+            mTxtYourPlace.setText(namePlacePickup);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void findDriver(final double lat,final double lng) {
-        if(getIntent().getStringExtra("lat")!=null){
-            DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
-            GeoFire gfDrivers = new GeoFire(driverAvailable);
+        Log.e("findDriver", " in find driver");
+        DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
+        GeoFire gfDrivers = new GeoFire(driverAvailable);
 
-            GeoQuery geoQuery = gfDrivers.queryAtLocation(new GeoLocation(lat,lng), radius);
-            geoQuery.removeAllListeners();
-            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                @Override
-                public void onKeyEntered(String key, GeoLocation location) {
-                    if(!isDriverFound){
-                        isDriverFound = true;
-                        sendRequestToDriver(key);
-                        Intent resultIntent = new Intent();
-//                        resultIntent.putExtra("driverID", key);
-//                        setResult(RESULT_OK, resultIntent);
-//                        finish();
-                    }
+        GeoQuery geoQuery = gfDrivers.queryAtLocation(new GeoLocation(lat,lng), radius);
+        geoQuery.removeAllListeners();
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(final String key, GeoLocation location) {
+                if(!isDriverFound){
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendRequestToDriver(key);
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("driverID", key);
+                            setResult(RESULT_OK, resultIntent);
+                            finish();
+                        }
+                    },3000);
                 }
+            }
 
-                @Override
-                public void onKeyExited(String key) {
+            @Override
+            public void onKeyExited(String key) {
 
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                Log.e("RADIUS", String.valueOf(radius));
+                if(!isDriverFound && radius<=LIMIT_RANGE){
+                    radius++;
+                    findDriver(lat,lng);
+                }else{
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("driverID", "0");
+                            setResult(RESULT_OK, resultIntent);
+                            finish();
+                        }
+                    },3000);
                 }
+            }
 
-                @Override
-                public void onKeyMoved(String key, GeoLocation location) {
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
 
-                }
-
-                @Override
-                public void onGeoQueryReady() {
-                    if(!isDriverFound && radius<=LIMIT_RANGE){
-                        radius++;
-                        findDriver(lat,lng);
-                    }else{
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("driverID", "0");
-                        setResult(RESULT_OK, resultIntent);
-                        finish();
-                    }
-                }
-
-                @Override
-                public void onGeoQueryError(DatabaseError error) {
-
-                }
-            });
-        }
+            }
+        });
     }
 
     private void sendRequestToDriver(String key) {
@@ -168,11 +217,25 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.btn_sign_in:
-                break;
-            case R.id.btn_register:
+            case R.id.btn_cancel_find_driver:
+                cancelPickupRequest();
+                Intent intent = new Intent();
+                setResult(Activity.RESULT_CANCELED,intent);
+                finish();
                 break;
         }
+    }
+
+    private void cancelPickupRequest() {
+        DatabaseReference dbRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
+        GeoFire mGeoFire = new GeoFire(dbRequest);
+        mGeoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                new GeoFire.CompletionListener() {
+                    @Override
+                    public void onComplete(String key, DatabaseError error) {
+
+                    }
+                });
     }
 
     @Override
@@ -183,5 +246,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     @Override
     protected void onStop() {
         super.onStop();
+        cancelPickupRequest();
+        finish();
     }
+
+
 }

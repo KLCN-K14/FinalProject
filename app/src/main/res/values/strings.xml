@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Transporter</string>
+    <string name="app_name">Transport</string>
     <string name="google_direction_api">AIzaSyAOEbw-GFk9BSzU_E8RjTKrPzO64lSxNzM</string>
     <string name="action_settings">Settings</string>
     <string name="enter_pin_tiitle">Please enter the 6-digit activation code that was sent to the number below</string>

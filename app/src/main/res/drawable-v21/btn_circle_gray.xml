@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/rippleEffectBtnBookCar"
+    tools:targetApi="lollipop">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorGray2"></solid>
+            <stroke android:color="@color/colorGray2"
+                android:width="2dp"></stroke>
+            <corners android:radius="2dp"></corners>
+        </shape>
+    </item>
+</ripple>

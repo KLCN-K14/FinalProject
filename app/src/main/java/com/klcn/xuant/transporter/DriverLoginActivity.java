@@ -168,6 +168,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                                     public void onSuccess(Void aVoid) {
                                                         Snackbar.make(mRootLayout, "Register success", Snackbar.LENGTH_LONG)
                                                                 .show();
+                                                        dialog.dismiss();
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
@@ -232,9 +233,11 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                     if(!task.isSuccessful()){
                                         Toast.makeText(getApplicationContext(), "Sign in fail! "+task.getException().getMessage(),
                                                 Toast.LENGTH_LONG).show();
+                                        dialog.dismiss();
                                     }else{
-                                        Toast.makeText(getApplicationContext(), "Sign in success! "+task.getException().getMessage(),
+                                        Toast.makeText(getApplicationContext(), "Sign in success!",
                                                 Toast.LENGTH_LONG).show();
+                                        dialog.dismiss();
                                     }
                                 }
                             });

@@ -21,9 +21,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.klcn.xuant.transporter.DriverHomeFragment.disconnectDriver;
-import static com.klcn.xuant.transporter.DriverHomeFragment.isLoggingOut;
-
 public class DriverAccountFragment extends Fragment implements View.OnClickListener{
 
     @BindView(R.id.txt_name)
@@ -85,8 +82,6 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
                 break;
             case R.id.panel_sign_out:
                 Toast.makeText(getContext(),"Panel sign out",Toast.LENGTH_LONG).show();
-                isLoggingOut = true;
-                disconnectDriver();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if(user!=null){
                     mFirebaseAuth.signOut();

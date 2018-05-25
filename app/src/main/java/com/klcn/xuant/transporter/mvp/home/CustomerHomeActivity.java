@@ -4,10 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
@@ -63,6 +66,12 @@ import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
 import com.klcn.xuant.transporter.mvp.profile.CustomerProfileActivity;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -101,6 +110,7 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     boolean isChooseDropOff = false;
     PlaceAutocompleteFragment pickDestination;
+    PlaceAutocompleteFragment pickPickupPlace;
 
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
@@ -170,13 +180,13 @@ public class CustomerHomeActivity extends AppCompatActivity
     private void initView(){
 
         //Vị trí của bạn
-        PlaceAutocompleteFragment autocompleteFragmentPlace = (PlaceAutocompleteFragment)
+        pickPickupPlace= (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_location);
-        autocompleteFragmentPlace.setOnPlaceSelectedListener(this);
-        autocompleteFragmentPlace.setText("Your position");
+        pickPickupPlace.setOnPlaceSelectedListener(this);
+        pickPickupPlace.setText("Your position");
         ((View)findViewById(R.id.place_autocomplete_search_button)).setVisibility(View.GONE);
         ((View)findViewById(R.id.place_autocomplete_clear_button)).setVisibility(View.GONE);
-        autocompleteFragmentPlace.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        pickPickupPlace.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
                 Log.e("CustomerHomeActivity"," "+place.getName());
@@ -212,6 +222,7 @@ public class CustomerHomeActivity extends AppCompatActivity
 
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
@@ -277,10 +288,11 @@ public class CustomerHomeActivity extends AppCompatActivity
             return;
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
         if(mLastLocation!=null){
             final double latitude = mLastLocation.getLatitude();
             final double longitude = mLastLocation.getLongitude();
-
+            getNameAdress(mLastLocation);
             //Add marker
             if(mUserMarker!=null)
                 mUserMarker.remove();
@@ -297,6 +309,8 @@ public class CustomerHomeActivity extends AppCompatActivity
         }
     }
 
+    HashMap<String,Marker> hashMapMarker = new HashMap<>();
+
     private void loadAllDriverAvailable() {
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         GeoFire gfDriverAvailable = new GeoFire(driverAvailable);
@@ -312,13 +326,17 @@ public class CustomerHomeActivity extends AppCompatActivity
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Driver driver = dataSnapshot.getValue(Driver.class);
-
-                                mMap.addMarker(new MarkerOptions()
-                                        .position(new LatLng(location.latitude,location.longitude))
-                                        .snippet(driver.getPhoneNum())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
-                                        .title(driver.getName())
-                                        .flat(true));
+                                Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                if(mMarker==null){
+                                    mMarker = mMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(location.latitude,location.longitude))
+                                            .snippet(driver.getPhoneNum())
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
+                                            .title(driver.getName())
+                                            .flat(true));
+                                    hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                }
+                                Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
                             }
 
                             @Override
@@ -330,12 +348,22 @@ public class CustomerHomeActivity extends AppCompatActivity
 
             @Override
             public void onKeyExited(String key) {
-
+                Marker marker = hashMapMarker.get(key);
+                if(marker!=null){
+                    marker.remove();
+                    hashMapMarker.remove(key);
+                    Log.e("REMOVE",key+"  out hashMapMarker");
+                }
             }
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-
+                Marker marker = hashMapMarker.get(key);
+                if(marker!=null){
+                    marker.remove();
+                    hashMapMarker.remove(key);
+                    Log.e("REMOVE",key+"  out hashMapMarker");
+                }
             }
 
             @Override
@@ -475,7 +503,12 @@ public class CustomerHomeActivity extends AppCompatActivity
         DatabaseReference dbRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
         GeoFire mGeoFire = new GeoFire(dbRequest);
         mGeoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                new GeoLocation(mLastLocation.getLatitude(),mLastLocation.getLongitude()));
+                new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
+                    @Override
+                    public void onComplete(String key, DatabaseError error) {
+
+                    }
+                });
 
         if(mUserMarker.isVisible())
             mUserMarker.remove();
@@ -503,52 +536,33 @@ public class CustomerHomeActivity extends AppCompatActivity
             if(resultCode == Activity.RESULT_OK){
                 String driverID = data.getStringExtra("driverID");
                 if(driverID.equals("0")){ // don't have driver
-                    Toast.makeText(getApplicationContext(),"Don't have any driver",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Don't have any driver available now",Toast.LENGTH_LONG).show();
                 }else{
-
-                }
+                    Toast.makeText(getApplicationContext(),"Find driver with id: "+driverID,Toast.LENGTH_LONG).show();                }
             }
             if (resultCode == Activity.RESULT_CANCELED) {
+                Snackbar.make(getCurrentFocus(),"Cancel book",Snackbar.LENGTH_SHORT).show();
             }
         }
     }
 
-//    private void getDirection(double lat, double lng) {
-//        String requestApi = null;
-//        try{
-//            requestApi = "https://maps.googleapis.com/maps/api/directions/json?"+
-//                    "mode=driving&"+
-//                    "transit_routing_preference=less_driving&"+
-//                    "origin="+ mLastLocation.getLatitude()+","+mLastLocation.getLongitude()+"&"+
-//                    "destination="+mPlaceDestination.getLatLng().latitude+","+mPlaceDestination.getLatLng().longitude+"&"+
-//                    "key="+getResources().getString(R.string.google_direction_api);
-//            Log.e("TRANSPORT",requestApi);
-//            mService.getPath(requestApi)
-//                    .enqueue(new Callback<String>() {
-//                        @Override
-//                        public void onResponse(Call<String> call, Response<String> response) {
-//                            try {
-//                                JSONObject jsonObject = new JSONObject(response.body().toString());
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Call<String> call, Throwable t) {
-//
-//                        }
-//                    });
-//
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//    }
+    private void getNameAdress(Location mLastLocation) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+            Address obj = addresses.get(0);
+            String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+            pickPickupPlace.setText(namePlacePickup);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void onStop() {
         super.onStop();
         isChooseDropOff = false;
-        btnPickRequest.setText("CHOOSE YOUR DROP-OFF");
     }
 }
