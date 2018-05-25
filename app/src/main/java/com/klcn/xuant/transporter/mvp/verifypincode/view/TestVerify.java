@@ -81,7 +81,7 @@ public class TestVerify extends AppCompatActivity implements
     private Button mSignOutButton;
 
     ProgressBar progressBar;
-    String phone;
+    String phone, phoneNum;
     DatabaseReference postRef;
 
     @Override
@@ -120,6 +120,7 @@ public class TestVerify extends AppCompatActivity implements
 
         phone = getIntent().getStringExtra("EXTRA_PHONE");
         mPhoneNumberField.setText(phone);
+        phoneNum = "0" + phone.substring(3);
 
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
@@ -383,34 +384,26 @@ public class TestVerify extends AppCompatActivity implements
         } else {
             // Signed in
             mPhoneNumberViews.setVisibility(View.GONE);
+            postRef.orderByChild("phoneNum").equalTo(phoneNum).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        Intent intent = new Intent(TestVerify.this, CustomerHomeActivity.class);
+                        intent.putExtra("EXTRA_PHONE", phone);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        Intent intent = new Intent(TestVerify.this, ConfirmInfoActivity.class);
+                        intent.putExtra("EXTRA_PHONE", phone);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-//            postRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    for(DataSnapshot data: dataSnapshot.getChildren()){
-//                        if (data.child(phone).exists()) {
-//                            Intent intentHome = new Intent(TestVerify.this, CustomerHomeActivity.class);
-//                            startActivity(intentHome);
-//                            finish();
-//                        } else {
-//                            Intent intent = new Intent(TestVerify.this, ConfirmInfoActivity.class);
-//                            intent.putExtra("EXTRA_PHONE", phone);
-//                            startActivity(intent);
-//                            finish();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//
-//            });
-            Intent intent = new Intent(TestVerify.this, ConfirmInfoActivity.class);
-            intent.putExtra("EXTRA_PHONE", phone);
-            startActivity(intent);
-            finish();
+                }
+            });
 
         }
     }

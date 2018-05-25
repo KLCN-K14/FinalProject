@@ -37,8 +37,8 @@
             android:theme="@style/NoActionBar" />
         <activity
             android:name=".DriverLoginActivity"
-            android:theme="@style/NoActionBar"
-            android:hardwareAccelerated="true"/>
+            android:hardwareAccelerated="true"
+            android:theme="@style/NoActionBar" />
         <activity
             android:name=".mvp.findDriver.CustomerFindDriverActivity"
             android:theme="@style/NoActionBar" />
@@ -47,20 +47,22 @@
         <activity android:name=".mvp.signup.view.CustomerSignUpActivity" />
         <activity
             android:name=".mvp.home.CustomerHomeActivity"
-            android:theme="@style/NoActionBar"
-            android:hardwareAccelerated="true">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            android:hardwareAccelerated="true"
+            android:theme="@style/NoActionBar">
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".mvp.history.CustomerHistoryActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".mvp.home.CustomerHomeActivity" />
         </activity>
-        <activity android:name=".mvp.history.ItemHistoryActivity"/>
+        <activity android:name=".mvp.history.ItemHistoryActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -69,23 +71,28 @@
         <activity
             android:name=".DriverMainActivity"
             android:label="@string/title_activity_test_navigation">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".mvp.verifypincode.view.TestVerify"/>
+        <activity android:name=".mvp.verifypincode.view.TestVerify" />
+
         <service android:name=".Service.MyFirebaseIdService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
         <service android:name=".Service.MyFirebaseMessaging">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <activity android:name=".mvp.profile.CustomerProfileActivity"></activity>
     </application>
 
 </manifest>

@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -54,11 +55,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.mvp.findDriver.CustomerFindDriverActivity;
 import com.klcn.xuant.transporter.helper.CustomInfoWindow;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
+import com.klcn.xuant.transporter.mvp.profile.CustomerProfileActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,10 +90,11 @@ public class CustomerHomeActivity extends AppCompatActivity
     int distance = 1;
 
     Place mPlaceDestination = null;
-    DatabaseReference ref;
     GeoFire geoFire;
     Marker mUserMarker;
-    FirebaseAuth mAuth;
+    FirebaseAuth mFirebaseAuth;
+    DatabaseReference customers;
+    Customer customerModel;
 
     @BindView(R.id.btn_pick_request)
     Button btnPickRequest;
@@ -100,6 +104,8 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
+
+    TextView mTxtPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +120,24 @@ public class CustomerHomeActivity extends AppCompatActivity
         {
             ab.setDisplayHomeAsUpEnabled(true);
         }
+        mFirebaseAuth= FirebaseAuth.getInstance();
+        customers = FirebaseDatabase.getInstance().getReference().child("Customers").child(mFirebaseAuth.getCurrentUser().getUid());
+        Log.e("Hom activity:::",customers.toString());
+
+        mTxtPhone = (TextView) findViewById(R.id.txt_phone);
+
+        customers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                customerModel = dataSnapshot.getValue(Customer.class);
+//                mTxtPhone.setText(customerModel.getPhoneNum());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -141,7 +165,6 @@ public class CustomerHomeActivity extends AppCompatActivity
 
         setupLocation();
 
-        mAuth = FirebaseAuth.getInstance();
     }
 
     private void initView(){
@@ -367,8 +390,9 @@ public class CustomerHomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_payment) {
-            // Handle the camera action
+        if (id == R.id.nav_profile) {
+            Intent intentHistory = new Intent(CustomerHomeActivity.this, CustomerProfileActivity.class);
+            startActivity(intentHistory);
         } else if (id == R.id.nav_history) {
             Intent intentHistory = new Intent(CustomerHomeActivity.this, CustomerHistoryActivity.class);
             startActivity(intentHistory);
@@ -376,7 +400,7 @@ public class CustomerHomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_sign_out) {
-            mAuth.signOut();
+            mFirebaseAuth.signOut();
             finish();
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

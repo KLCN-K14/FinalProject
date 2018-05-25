@@ -114,7 +114,6 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
             Intent intentHome = new Intent(CustomerSignUpActivity.this, CustomerHomeActivity.class);
             startActivity(intentHome);
             finish();
-            Toast.makeText(getApplicationContext(),"LOGGED",Toast.LENGTH_LONG).show();
         }
     }
 
