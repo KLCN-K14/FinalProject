@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,16 +19,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.hbb20.CountryCodePicker;
-import com.klcn.xuant.transporter.DriverMainActivity;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
-import com.klcn.xuant.transporter.mvp.verifypincode.view.TestVerify;
-import com.klcn.xuant.transporter.mvp.verifypincode.view.VerifyPincodeActivity;
+import com.klcn.xuant.transporter.mvp.verifypincode.view.TestVerifyActivity;
 
 
 public class CustomerSignUpActivity extends AppCompatActivity implements View.OnClickListener {
@@ -204,7 +199,7 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
                     updateUI(STATE_VERIFY_FAILED);
                 }else {
                     updateUI(STATE_VERIFY_SUCCESS);
-                    Intent intent = new Intent(this, TestVerify.class);
+                    Intent intent = new Intent(this, TestVerifyActivity.class);
                     intent.putExtra("EXTRA_PHONE", phoneStr);
                     startActivity(intent);
                     finish();

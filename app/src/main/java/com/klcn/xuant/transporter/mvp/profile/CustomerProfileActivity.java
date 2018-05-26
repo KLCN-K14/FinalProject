@@ -1,12 +1,15 @@
 package com.klcn.xuant.transporter.mvp.profile;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,13 +19,20 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.utils.Base64Utils;
@@ -34,6 +44,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -51,6 +62,10 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
     FirebaseAuth mFirebaseAuth;
     DatabaseReference customers;
     Customer customerModel;
+
+    FirebaseStorage storage;
+    StorageReference storageReference;
+    private Uri filePath;
 
 
     @Override
@@ -71,13 +86,20 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         mFirebaseAuth= FirebaseAuth.getInstance();
         customers = FirebaseDatabase.getInstance().getReference().child("Customers").child(mFirebaseAuth.getCurrentUser().getUid());
 
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+
         customers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 customerModel = dataSnapshot.getValue(Customer.class);
-                mTxtName.setText(customerModel.getName());
-                mTxtMail.setText(customerModel.getEmail());
-                mTxtPhone.setText(customerModel.getPhoneNum());
+                if(customerModel.getName()!=null || !customerModel.getName().equals("")){
+                    Log.e("profile2::::::",customerModel.getName());
+                    mTxtName.setText(customerModel.getName());
+                    mTxtMail.setText(customerModel.getEmail());
+                    mTxtPhone.setText(customerModel.getPhoneNum());
+                }
+
             }
 
             @Override
@@ -150,7 +172,11 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SELECT_FILE)
+        {
             onSelectFromGalleryResult(data);
+            filePath= data.getData();
+
+        }
         else if (requestCode == REQUEST_CAMERA)
             onCaptureImageResult(data);
     }
@@ -230,7 +256,7 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
 
                 break;
             case R.id.toolbar_back:
-                if(mTxtName.getText().toString().equals(customerModel.getName()))
+                if(mTxtName.getText().toString().equals(customerModel.getName())&& filePath.equals(""))
                 {
                     finish();
                 }else {
@@ -242,7 +268,9 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     Log.e("CustomerProfile::",newName);
+                                    Log.e("profile filePath::::::",filePath + "");
                                     customers.child("name").setValue(newName);
+                                    customers.child("imgUrl").setValue(filePath);
                                     finish();
                                 }
                             });
@@ -265,6 +293,41 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
 
         }
     }
+
+//    private void uploadImage() {
+//
+//        if(filePath != null)
+//        {
+//            final ProgressDialog progressDialog = new ProgressDialog(this);
+//            progressDialog.setTitle("Uploading...");
+//            progressDialog.show();
+//
+//            StorageReference ref = storageReference.child("images/"+ UUID.randomUUID().toString());
+//            ref.putFile(filePath)
+//                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                            progressDialog.dismiss();
+//                            Toast.makeText(CustomerProfileActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            progressDialog.dismiss();
+//                            Toast.makeText(CustomerProfileActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    })
+//                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+//                            double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
+//                                    .getTotalByteCount());
+//                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
+//                        }
+//                    });
+//        }
+//    }
 
 
 }

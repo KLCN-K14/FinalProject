@@ -1,163 +1,136 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-
     <LinearLayout
-        android:background="#cfd8dc"
+        android:id="@+id/ln_enter_pincode"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4.2"
-        android:gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_marginTop="45dp"
-            android:layout_width="280dp"
-            android:layout_height="140dp"
-            android:contentDescription="@string/desc_firebase_lockup"
-            android:src="@drawable/ic_logo" />
-
         <TextView
-            android:id="@+id/title_text"
+            android:id="@+id/pin_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:textColor="@color/colorBlack"
-            android:textSize="@dimen/dimen_title_20_sp"
-            android:text="Tranporter" />
+            android:layout_marginTop="40dp"
+            android:text="@string/enter_pin_tiitle"
+            android:textAlignment="center"
+            android:textSize="18dp" />
 
         <TextView
-            android:id="@+id/status"
-            style="@style/ThemeOverlay.MyTextDetail"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="@color/colorAccent"
-            android:text="You are not logged in !" />
-        <RelativeLayout
+            android:id="@+id/txt_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="+841645059996"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="28dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_edit_number"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:gravity="center"
+            android:text="Edit number"
+            android:textColor="@color/colorYellow"
+            android:textSize="18dp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/detail"
-                style="@style/ThemeOverlay.MyTextDetail"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:textStyle="bold"
-                tools:text="Veriication Sucessfull" />
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_below="@+id/detail"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:padding="5dp"
-                android:layout_centerHorizontal="true" />
+        <EditText
+            android:id="@+id/field_verification_code"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_height="45dp"
+            android:hint="Enter code here!"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:inputType="number" />
 
-        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/txt_no_receive_pin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="I didn't receive a code!"
+            android:textAlignment="center"
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/txt_request_new_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:text="Request new code"
+            android:textColor="@color/colorYellow"
+            android:textSize="18dp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1.8"
-        android:background="#bdbdbd"
-        android:gravity="center_vertical">
+        android:id="@+id/rl_progressbar_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ln_enter_pincode"
+        android:layout_marginTop="20dp">
 
-        <LinearLayout
-            android:id="@+id/phone_auth_fields"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2.0">
-
-                <EditText
-                    android:id="@+id/field_phone_number"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_phone_number"
-                    android:layout_weight="1.0"
-                    android:inputType="phone"/>
-
-                <EditText
-                    android:id="@+id/field_verification_code"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_verification_code"
-                    android:layout_weight="1.0"
-                    android:inputType="number"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3.0">
-
-                <Button
-                    android:id="@+id/button_start_verification"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/start_phone_auth"/>
-
-                <Button
-                    android:id="@+id/button_verify_phone"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/verify_phone_auth"/>
-
-                <Button
-                    android:id="@+id/button_resend"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/resend_phone_auth"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/signed_in_buttons"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+        <TextView
+            android:id="@+id/detail"
+            style="@style/ThemeOverlay.MyTextDetail"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:textStyle="bold"
             android:visibility="gone"
-            android:weightSum="1.0">
+            tools:text="Veriication Sucessfull" />
 
-            <Button
-                android:id="@+id/sign_out_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:text="Sign Out" />
-
-        </LinearLayout>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/detail"
+            android:layout_centerHorizontal="true"
+            android:padding="5dp"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/status"
+        style="@style/ThemeOverlay.MyTextDetail"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/rl_progressbar_group"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:text="You are not logged in !"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/colorAccent" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_next"
+        app:backgroundTint="@color/black" />
 
 
-</LinearLayout>
+
+</RelativeLayout>

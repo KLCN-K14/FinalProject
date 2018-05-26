@@ -63,7 +63,7 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
     private PinEntryEditText mEditPinCode;
 
     private CountDownTimer countDownTimer;
-    String phone;
+    String phone, phoneNum;
     private TextView mStatusText;
     private TextView mDetailText;
     TextView mTxtResendCode;
@@ -93,6 +93,7 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
 
         phone = getIntent().getStringExtra("EXTRA_PHONE");
         mTxtPhoneNumber.setText(phone);
+        phoneNum = "0" + phone.substring(3);
 
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
@@ -127,28 +128,25 @@ public class VerifyPincodeActivity extends AppCompatActivity implements View.OnC
                                 verifyPhoneNumberWithCode(mVerificationId, mEditPinCode.getText().toString());
 
                                 // checkExistUser()
-                                postRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                postRef.orderByChild("phoneNum").equalTo(phoneNum).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        for(DataSnapshot data: dataSnapshot.getChildren()){
-                                            if (data.child(phone).exists()) {
-                                                Intent intentHome = new Intent(VerifyPincodeActivity.this, CustomerHomeActivity.class);
-                                                startActivity(intentHome);
-                                                finish();
-                                            } else {
-                                                Intent intent = new Intent(VerifyPincodeActivity.this, ConfirmInfoActivity.class);
-                                                intent.putExtra("EXTRA_PHONE", phone);
-                                                startActivity(intent);
-                                                finish();
-                                            }
+                                        if(dataSnapshot.exists()){
+                                            Intent intent = new Intent(VerifyPincodeActivity.this, CustomerHomeActivity.class);
+                                            intent.putExtra("EXTRA_PHONE", phone);
+                                            startActivity(intent);
+                                            finish();
+                                        }else{
+                                            Intent intent = new Intent(VerifyPincodeActivity.this, ConfirmInfoActivity.class);
+                                            intent.putExtra("EXTRA_PHONE", phone);
+                                            startActivity(intent);
+                                            finish();
                                         }
                                     }
-
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
 
                                     }
-
                                 });
                                 Toast.makeText(VerifyPincodeActivity.this, "SUCCESS", Toast.LENGTH_SHORT).show();
                             } else {
