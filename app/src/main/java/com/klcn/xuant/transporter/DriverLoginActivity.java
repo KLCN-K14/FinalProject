@@ -1,8 +1,10 @@
 package com.klcn.xuant.transporter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -10,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,6 +33,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dmax.dialog.SpotsDialog;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -72,17 +76,17 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
         db = FirebaseDatabase.getInstance();
         drivers = db.getReference(Common.drivers_tbl);
 
-        firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if(user!=null){
-                    Intent intent = new Intent(getApplicationContext(), DriverMainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        };
+//        firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//                if(user!=null){
+//                    Intent intent = new Intent(getApplicationContext(), DriverMainActivity.class);
+//                    startActivity(intent);
+//                    finish();
+//                }
+//            }
+//        };
 
         // Init view
         mBtnSignIn.setOnClickListener(this);
@@ -147,6 +151,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                     Toast.makeText(getApplicationContext(), "Password too short",Toast.LENGTH_SHORT)
                             .show();
                 }else {
+                    final SpotsDialog waitingDialog = new SpotsDialog(DriverLoginActivity.this);
 
                     mFirebaseAuth.createUserWithEmailAndPassword(editEmail.getText().toString(),editPassword.getText().toString())
                             .addOnCompleteListener(DriverLoginActivity.this, new OnCompleteListener<AuthResult>() {
@@ -166,16 +171,42 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        Snackbar.make(mRootLayout, "Register success", Snackbar.LENGTH_LONG)
-                                                                .show();
                                                         dialog.dismiss();
+                                                        waitingDialog.show();
+                                                        Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                waitingDialog.dismiss();
+                                                                Toast.makeText(getApplicationContext(), "Register success",
+                                                                        Toast.LENGTH_SHORT).show();
+                                                                Handler handler = new Handler();
+                                                                handler.postDelayed(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        Intent intentHome = new Intent(DriverLoginActivity.this, DriverMainActivity.class);
+                                                                        startActivity(intentHome);
+                                                                        finish();
+                                                                    }
+                                                                },1000);
+                                                            }
+                                                        },2000);
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
                                                     @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Snackbar.make(mRootLayout, "Create fail! "+e.getMessage(), Snackbar.LENGTH_LONG)
-                                                                .show();
+                                                    public void onFailure(@NonNull final Exception e) {
+                                                        dialog.dismiss();
+                                                        waitingDialog.show();
+                                                        Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                waitingDialog.dismiss();
+                                                                Toast.makeText(getApplicationContext(), "Register fail"+ e.getMessage(),
+                                                                        Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        },2000);
                                                     }
                                                 });
                                     }
@@ -226,18 +257,45 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                     Toast.makeText(getApplicationContext(), "Please enter password",Toast.LENGTH_SHORT)
                             .show();
                 }else {
+                    final SpotsDialog waitingDialog = new SpotsDialog(DriverLoginActivity.this);
                     mFirebaseAuth.signInWithEmailAndPassword(editEmail.getText().toString(),editPassword.getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                public void onComplete(@NonNull final Task<AuthResult> task) {
                                     if(!task.isSuccessful()){
-                                        Toast.makeText(getApplicationContext(), "Sign in fail! "+task.getException().getMessage(),
-                                                Toast.LENGTH_LONG).show();
                                         dialog.dismiss();
+                                        waitingDialog.show();
+                                        Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                waitingDialog.dismiss();
+                                                Toast.makeText(getApplicationContext(), "Sign in fail "+task.getException().getMessage(),
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+                                        },2000);
+
                                     }else{
-                                        Toast.makeText(getApplicationContext(), "Sign in success!",
-                                                Toast.LENGTH_LONG).show();
                                         dialog.dismiss();
+                                        waitingDialog.show();
+                                        Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                waitingDialog.dismiss();
+                                                Toast.makeText(getApplicationContext(), "Sign in success ",
+                                                        Toast.LENGTH_SHORT).show();
+                                                Handler handler = new Handler();
+                                                handler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        Intent intentHome = new Intent(DriverLoginActivity.this, DriverMainActivity.class);
+                                                        startActivity(intentHome);
+                                                        finish();
+                                                    }
+                                                },1000);
+                                            }
+                                        },2000);
                                     }
                                 }
                             });
@@ -258,7 +316,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onStart() {
         super.onStart();
-        mFirebaseAuth.addAuthStateListener(firebaseAuthStateListener);
+//        mFirebaseAuth.addAuthStateListener(firebaseAuthStateListener);
     }
 
     @Override

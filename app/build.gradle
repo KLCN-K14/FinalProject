@@ -56,6 +56,7 @@ dependencies {
     implementation 'com.github.zcweng:switch-button:0.0.3@aar'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.skyfishjy.ripplebackground:library:1.0.1'
+    implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
     implementation 'com.google.android.gms:play-services-location:15.0.1'

@@ -1,5 +1,6 @@
 package com.klcn.xuant.transporter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -85,6 +86,8 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if(user!=null){
                     mFirebaseAuth.signOut();
+                    Intent intent = new Intent(getContext(),ChooseTypeUserActivity.class);
+                    startActivity(intent);
                     getActivity().finish();
                 }
                 break;

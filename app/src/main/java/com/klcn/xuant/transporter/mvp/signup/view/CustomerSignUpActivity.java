@@ -19,10 +19,22 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hbb20.CountryCodePicker;
 import com.klcn.xuant.transporter.R;
+import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Customer;
+import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
 import com.klcn.xuant.transporter.mvp.verifypincode.view.TestVerifyActivity;
 
@@ -73,8 +85,6 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
             ab.setDisplayHomeAsUpEnabled(true);
         }
 
-        checkIsLogged();
-
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 
@@ -102,14 +112,6 @@ public class CustomerSignUpActivity extends AppCompatActivity implements View.On
 
         countryCodePicker.setCountryForNameCode(countryNameCode);
 
-    }
-
-    private void checkIsLogged() {
-        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
-            Intent intentHome = new Intent(CustomerSignUpActivity.this, CustomerHomeActivity.class);
-            startActivity(intentHome);
-            finish();
-        }
     }
 
 

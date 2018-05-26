@@ -550,9 +550,12 @@ public class CustomerHomeActivity extends AppCompatActivity
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-            Address obj = addresses.get(0);
-            String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
-            pickPickupPlace.setText(namePlacePickup);
+            if(!addresses.isEmpty()){
+                Address obj = addresses.get(0);
+                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+                pickPickupPlace.setText(namePlacePickup);
+            }
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
