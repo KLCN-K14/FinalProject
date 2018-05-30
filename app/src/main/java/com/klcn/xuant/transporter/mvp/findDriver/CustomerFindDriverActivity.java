@@ -1,11 +1,9 @@
 package com.klcn.xuant.transporter.mvp.findDriver;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.klcn.xuant.transporter.R;
-import com.klcn.xuant.transporter.Service.MyFirebaseMessaging;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
@@ -81,13 +78,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
         mService = Common.getFCMService();
 
-        if(getIntent()!=null){
-            lat = getIntent().getDoubleExtra("lat",-1.0);
-            lng = getIntent().getDoubleExtra("lng",-1.0);
-            getNameAdress(lat,lng);
-            mTxtDestination.setText(getIntent().getStringExtra("destination"));
-            findDriver(lat,lng);
-        }
+
+        getNameAdress(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
+        findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
 
         mBtnCancel.setOnClickListener(this);
     }
@@ -121,11 +114,12 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            Toast.makeText(getApplicationContext(),"Start send request to dirver",Toast.LENGTH_SHORT).show();
                             sendRequestToDriver(key);
-                            Intent resultIntent = new Intent();
-                            resultIntent.putExtra("driverID", key);
-                            setResult(RESULT_OK, resultIntent);
-                            finish();
+//                            Intent resultIntent = new Intent();
+//                            resultIntent.putExtra("driverID", key);
+//                            setResult(RESULT_OK, resultIntent);
+//                            finish();
                         }
                     },3000);
                 }
@@ -149,16 +143,16 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                     findDriver(lat,lng);
                 }else{
 
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent resultIntent = new Intent();
-                            resultIntent.putExtra("driverID", "0");
-                            setResult(RESULT_OK, resultIntent);
-                            finish();
-                        }
-                    },3000);
+//                    Handler handler = new Handler();
+//                    handler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Intent resultIntent = new Intent();
+//                            resultIntent.putExtra("driverID", "0");
+//                            setResult(RESULT_OK, resultIntent);
+//                            finish();
+//                        }
+//                    },3000);
                 }
             }
 
@@ -182,7 +176,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                             String json_lat_lng = new Gson().toJson(new LatLng(lat,lng));
                             Notification notification = new Notification("TRANSPORT",json_lat_lng);
                             Sender content = new Sender(token.getToken(),notification);
-
                             mService.sendMessage(content)
                                     .enqueue(new Callback<FCMResponse>() {
                                         @Override

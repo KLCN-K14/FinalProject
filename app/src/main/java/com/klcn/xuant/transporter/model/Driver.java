@@ -5,18 +5,18 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Driver {
 
-    private String name,email,phoneNum,imgUrl,serviceCar,nameCar,licensePlate,avgRatings;
+    private String name,email,phoneNum,imgUrl,serviceVehicle,nameVehicle,licensePlate,avgRatings;
 
     public Driver() {
     }
 
-    public Driver(String name, String email, String phoneNum, String imgUrl, String serviceCar, String nameCar, String licensePlate, String avgRatings) {
+    public Driver(String name, String email, String phoneNum, String imgUrl, String serviceVehicle, String nameVehicle, String licensePlate, String avgRatings) {
         this.name = name;
         this.email = email;
         this.phoneNum = phoneNum;
         this.imgUrl = imgUrl;
-        this.serviceCar = serviceCar;
-        this.nameCar = nameCar;
+        this.serviceVehicle = serviceVehicle;
+        this.nameVehicle = nameVehicle;
         this.licensePlate = licensePlate;
         this.avgRatings = avgRatings;
     }
@@ -53,20 +53,20 @@ public class Driver {
         this.imgUrl = imgUrl;
     }
 
-    public String getServiceCar() {
-        return serviceCar;
+    public String getServiceVehicle() {
+        return serviceVehicle;
     }
 
-    public void setServiceCar(String serviceCar) {
-        this.serviceCar = serviceCar;
+    public void setServiceVehicle(String serviceVehicle) {
+        this.serviceVehicle = serviceVehicle;
     }
 
-    public String getNameCar() {
-        return nameCar;
+    public String getNameVehicle() {
+        return nameVehicle;
     }
 
-    public void setNameCar(String nameCar) {
-        this.nameCar = nameCar;
+    public void setNameVehicle(String nameVehicle) {
+        this.nameVehicle = nameVehicle;
     }
 
     public String getLicensePlate() {

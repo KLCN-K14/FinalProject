@@ -3,37 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:custom="http://schemas.android.com/tools"
     android:background="@color/colorNavigation"
     android:layout_weight="5"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3">
-        <com.skyfishjy.library.RippleBackground
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/ripple_background"
-            app:rb_color="@color/btnSignInDriver"
-            app:rb_radius="32dp"
-            app:rb_rippleAmount="4"
-            app:rb_duration="3000"
-            app:rb_scale="6">
-            <ImageView
+        android:layout_weight="2.5">
+            <com.github.lzyzsd.circleprogress.ArcProgress
+                android:id="@+id/arc_progress"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_centerInParent="true"
-                android:id="@+id/centerImage"
-                android:src="@drawable/ic_routes"/>
-        </com.skyfishjy.library.RippleBackground>
+                custom:arc_progress="55"
+                custom:arc_bottom_text=""
+                app:arc_max="30"
+                app:arc_finished_color="@color/colorActiveNavigation"
+                app:arc_unfinished_color="@color/colorGray2"
+                app:arc_stroke_width="10sp"
+                app:arc_suffix_text="S"
+                app:arc_text_size="86sp"
+                app:arc_text_color="@color/colorActiveNavigation"
+                app:arc_suffix_text_size="0sp"
+                app:arc_bottom_text="SEC"
+                app:arc_bottom_text_size="36sp"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
         android:layout_weight="2">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -139,7 +137,7 @@
             android:orientation="horizontal">
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <ImageView
@@ -147,43 +145,44 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:src="@drawable/pin_maps" />
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="15dp"
-                    android:layout_marginLeft="3dp"
-                    android:src="@drawable/icons_menu_vertical" />
+                <!--<ImageView-->
+                    <!--android:layout_width="18dp"-->
+                    <!--android:layout_height="15dp"-->
+                    <!--android:layout_marginLeft="3dp"-->
+                    <!--android:src="@drawable/icons_menu_vertical" />-->
 
-                <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="-5dp"
-                    android:layout_marginLeft="4dp"
-                    android:src="@drawable/ic_pointer_map" />
+                <!--<ImageView-->
+                    <!--android:layout_width="15dp"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="-5dp"-->
+                    <!--android:layout_marginLeft="4dp"-->
+                    <!--android:src="@drawable/ic_pointer_map" />-->
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginLeft="10dp">
 
                 <TextView
-                    android:id="@+id/txt_your_position"
+                    android:id="@+id/txt_your_destination"
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="13dp"
+                    android:layout_marginBottom="10dp"
                     android:text="12/109 T12-kp3, Tăng Long"
                     android:textSize="16sp"
                     android:textColor="@color/black"
                     />
-                <TextView
-                    android:id="@+id/txt_your_destination"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:text="Ngã tư thủ đức"
-                    android:textSize="16sp"
-                    android:textColor="@color/black"
-                    />
+                <!--<TextView-->
+                    <!--android:id="@+id/txt_your_destination"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="35dp"-->
+                    <!--android:text="Ngã tư thủ đức"-->
+                    <!--android:textSize="16sp"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--/>-->
             </LinearLayout>
 
         </LinearLayout>
@@ -209,9 +208,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="5dp"
-                android:id="@+id/btn_cancel_pickup_request"
+                android:id="@+id/btn_cancel_find_driver"
                 android:background="@drawable/btn_register_driver"
-                android:text="CANCEL"
+                android:text="DECLINE"
                 />
         </LinearLayout>
 

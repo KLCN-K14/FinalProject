@@ -20,6 +20,8 @@ public class Common {
 
 
     public static Location mLastLocationDriver = null;
+    public static Location mLastLocationCustomer = null;
+    public static boolean isDriverOnline = false;
 
     public static final String baseURL = "https://maps.googleapis.com";
     public static final String fcmURL = "https://fcm.googleapis.com/";

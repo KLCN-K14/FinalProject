@@ -63,7 +63,7 @@
                 android:id="@+id/txt_name_type_driver"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TransportBike"
+                android:text="Transport Standard"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/img_type_driver"
                 android:textColor="@color/btnRegisterDriver"

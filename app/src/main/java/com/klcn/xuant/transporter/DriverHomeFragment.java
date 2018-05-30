@@ -3,6 +3,7 @@ package com.klcn.xuant.transporter;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +45,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Token;
 import com.suke.widget.SwitchButton;
 
 import butterknife.BindView;
@@ -92,6 +96,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -107,11 +112,13 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (isChecked) {
+                    slideDown(DriverMainActivity.mBottomNavigationView);
                     mTxtStatus.setText("ONLINE");
                     startLocationUpdate();
                     displayLocation();
                     Snackbar.make(getView(), "You are online", Snackbar.LENGTH_SHORT).show();
                 } else {
+                    slideUp(DriverMainActivity.mBottomNavigationView);
                     stopLocationUpdate();
                     if (mMarker != null) {
                         mMarker.remove();
@@ -130,7 +137,19 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
 
         setupLocation();
 
+
+
+        updateFireBaseToken();
+
         return view;
+    }
+
+    private void updateFireBaseToken() {
+        DatabaseReference dbToken = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        Token token = new Token(FirebaseInstanceId.getInstance().getToken());
+        dbToken.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .setValue(token);
     }
 
     private void stopLocationUpdate() {
@@ -343,5 +362,26 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
             public void onComplete(String key, DatabaseError error) {
             }
         });
+    }
+
+    public void slideUp(View view){
+        view.setVisibility(View.VISIBLE);
+        TranslateAnimation animate = new TranslateAnimation(
+                0,                 // fromXDelta
+                0,                 // toXDelta
+                view.getHeight(),  // fromYDelta
+                0);                // toYDelta
+        animate.setDuration(1000);
+        view.startAnimation(animate);
+    }
+
+    public void slideDown(View view){
+        TranslateAnimation animate = new TranslateAnimation(
+                0,                 // fromXDelta
+                0,                 // toXDelta
+                0,                 // fromYDelta
+                view.getHeight()); // toYDelta
+        animate.setDuration(1000);
+        view.startAnimation(animate);
     }
 }

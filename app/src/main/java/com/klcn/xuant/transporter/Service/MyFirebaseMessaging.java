@@ -1,4 +1,4 @@
-package com.klcn.xuant.transporter.Service;
+package com.klcn.xuant.transporter.service;
 
 import android.content.Intent;
 
@@ -17,6 +17,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Intent intent = new Intent(getApplicationContext(), CustomerCallActivity.class);
         intent.putExtra("lat",customer_location.latitude);
         intent.putExtra("lng",customer_location.longitude);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 }

@@ -51,6 +51,8 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
     @BindView(R.id.btn_register)
     Button mBtnRegister;
 
+    private int REQUEST_REGISTER_CODE = 2896;
+
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
     private FirebaseDatabase db;
@@ -106,8 +108,22 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                     showSignInDialog();
                 break;
             case R.id.btn_register:
-                    showRegisterDialog();
+                Intent intent = new Intent(DriverLoginActivity.this,DriverRegisterActivity.class);
+                startActivityForResult(intent,REQUEST_REGISTER_CODE);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_REGISTER_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                Intent intent = new Intent(DriverLoginActivity.this,DriverMainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+            }
         }
     }
 

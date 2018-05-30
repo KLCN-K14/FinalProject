@@ -20,8 +20,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.klcn.xuant.transporter.common.Common;
 import com.suke.widget.SwitchButton;
 
 import java.lang.reflect.Field;
@@ -33,8 +35,9 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class DriverMainActivity extends AppCompatActivity {
 
-    @BindView(R.id.navigation)
-    BottomNavigationView mBottomNavigationView;
+//    @BindView(R.id.navigation)
+
+    public static BottomNavigationView mBottomNavigationView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -77,6 +80,8 @@ public class DriverMainActivity extends AppCompatActivity {
                 .build());
         setContentView(R.layout.activity_driver_main);
         ButterKnife.bind(this);
+
+        mBottomNavigationView = findViewById(R.id.navigation);
 
         mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

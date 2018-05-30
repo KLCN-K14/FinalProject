@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorNavigation">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/img_back"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_arrow_back_white_24dp"
+                />
+            <TextView
+                android:id="@+id/txt_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REGISTER"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:textSize="24sp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:id="@+id/img_register"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_register_ok"/>
+
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edt_first_name"
+                android:hint="First name"
+                android:inputType="textPersonName"
+                android:text=""
+                android:textColor="@color/edtRegister"
+                android:textColorHint="@color/edtRegister"
+                android:textSize="20sp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                app:met_singleLineEllipsis="true"
+                app:met_baseColor="@color/edtRegister"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/edtRegister"/>
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edt_last_name"
+                android:hint="Last name"
+                android:inputType="textPersonName"
+                android:text=""
+                android:textColor="@color/edtRegister"
+                android:textColorHint="@color/edtRegister"
+                android:textSize="20sp"
+                android:layout_width="0dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                app:met_singleLineEllipsis="true"
+                app:met_baseColor="@color/edtRegister"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/edtRegister"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/area_code"
+                android:layout_width="wrap_content"
+                android:layout_height="55dp"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="center"
+                android:textStyle="bold"
+                app:contentColor="@color/edtRegister"
+                app:defaultCode="84"
+                android:layout_marginBottom="5dp"
+                app:hideNameCode="true"
+                app:keyboardAutoPopOnSearch="false"
+                app:showFlag="false"
+                app:textSize="20sp" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edt_phone"
+                android:hint="Phone"
+                android:inputType="phone"
+                android:text=""
+                android:textColor="@color/edtRegister"
+                android:textColorHint="@color/edtRegister"
+                android:textSize="20sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_singleLineEllipsis="true"
+                app:met_baseColor="@color/edtRegister"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/edtRegister"/>
+        </LinearLayout>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_email"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:text=""
+            android:textColor="@color/edtRegister"
+            android:textColorHint="@color/edtRegister"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:met_singleLineEllipsis="true"
+            app:met_baseColor="@color/edtRegister"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/edtRegister"/>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_pass"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:text=""
+            android:textColor="@color/edtRegister"
+            android:textColorHint="@color/edtRegister"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:met_singleLineEllipsis="true"
+            app:met_baseColor="@color/edtRegister"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/edtRegister"/>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_name_vehicle"
+            android:hint="Name vehicle"
+            android:inputType="textPersonName"
+            android:text=""
+            android:textColor="@color/edtRegister"
+            android:textColorHint="@color/edtRegister"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:met_singleLineEllipsis="true"
+            app:met_baseColor="@color/edtRegister"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/edtRegister"/>
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_license_plate"
+            android:hint="License plate"
+            android:inputType="textPersonName"
+            android:textColor="@color/edtRegister"
+            android:textColorHint="@color/edtRegister"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:met_singleLineEllipsis="true"
+            app:met_baseColor="@color/edtRegister"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/edtRegister"/>
+
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColorHint="@color/edtRegister"
+            app:ms_text_color="@color/edtRegister"
+            app:ms_hint_color="@color/edtRegister"
+            android:textColor="@color/edtRegister"
+            android:id="@+id/spinner_service"/>
+
+    </LinearLayout>
+</LinearLayout>

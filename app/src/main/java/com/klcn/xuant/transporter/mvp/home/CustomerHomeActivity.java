@@ -8,12 +8,15 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +46,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -61,9 +66,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.maps.android.SphericalUtil;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.Driver;
+import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.mvp.findDriver.CustomerFindDriverActivity;
 import com.klcn.xuant.transporter.helper.CustomInfoWindow;
 import com.klcn.xuant.transporter.R;
@@ -74,7 +82,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,12 +117,15 @@ public class CustomerHomeActivity extends AppCompatActivity
     DatabaseReference customers;
     Customer customerModel;
 
+    Driver currentDriver = null;
+
     @BindView(R.id.btn_pick_request)
     Button btnPickRequest;
 
     boolean isChooseDropOff = false;
     PlaceAutocompleteFragment pickDestination;
     PlaceAutocompleteFragment pickPickupPlace;
+    AutocompleteFilter mAutocompleteFilter;
 
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
@@ -124,6 +134,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     CircleImageView mAvatar;
 
     HashMap<String,Marker> hashMapMarker = new HashMap<>();
+
 
 
     @Override
@@ -164,7 +175,6 @@ public class CustomerHomeActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         initView();
         btnPickRequest.setOnClickListener(this);
 //        ref = FirebaseDatabase.getInstance().getReference("Drivers");
@@ -174,6 +184,17 @@ public class CustomerHomeActivity extends AppCompatActivity
 //        getUserInfo();
 
 
+
+        updateFireBaseToken();
+    }
+
+
+    private void updateFireBaseToken() {
+        DatabaseReference dbToken = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        Token token = new Token(FirebaseInstanceId.getInstance().getToken());
+        dbToken.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .setValue(token);
     }
 
     private void initView(){
@@ -219,6 +240,10 @@ public class CustomerHomeActivity extends AppCompatActivity
             }
         });
 
+        mAutocompleteFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                .setTypeFilter(3)
+                .build();
 
     }
 
@@ -286,12 +311,30 @@ public class CustomerHomeActivity extends AppCompatActivity
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             return;
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        Common.mLastLocationCustomer = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        if(mLastLocation!=null){
-            final double latitude = mLastLocation.getLatitude();
-            final double longitude = mLastLocation.getLongitude();
-            getNameAdress(mLastLocation);
+        if(Common.mLastLocationCustomer!=null){
+
+
+            LatLng center = new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
+            // distance is meters. heading 0 is northside 90 is east 180 is south 270 is west
+            LatLng southSide = SphericalUtil.computeOffset(center,100000,180);
+            LatLng northSide = SphericalUtil.computeOffset(center,100000,0);
+
+            LatLngBounds latLngBounds = LatLngBounds.builder()
+                    .include(southSide)
+                    .include(northSide)
+                    .build();
+
+            pickPickupPlace.setBoundsBias(latLngBounds);
+            pickPickupPlace.setFilter(mAutocompleteFilter);
+
+            pickDestination.setBoundsBias(latLngBounds);
+            pickDestination.setFilter(mAutocompleteFilter);
+
+            final double latitude = Common.mLastLocationCustomer.getLatitude();
+            final double longitude = Common.mLastLocationCustomer.getLongitude();
+            getNameAdress(Common.mLastLocationCustomer);
             //Add marker
             if(mUserMarker!=null)
                 mUserMarker.remove();
@@ -312,7 +355,8 @@ public class CustomerHomeActivity extends AppCompatActivity
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         GeoFire gfDriverAvailable = new GeoFire(driverAvailable);
 
-        GeoQuery geoQuery = gfDriverAvailable.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(),mLastLocation.getLongitude()),distance);
+        GeoQuery geoQuery = gfDriverAvailable.queryAtLocation(new GeoLocation(Common.mLastLocationCustomer.getLatitude(),
+                Common.mLastLocationCustomer.getLongitude()),distance);
         geoQuery.removeAllListeners();
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
@@ -468,7 +512,7 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
+        Common.mLastLocationCustomer = location;
         displayLocation();
     }
 
@@ -500,7 +544,8 @@ public class CustomerHomeActivity extends AppCompatActivity
         DatabaseReference dbRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
         GeoFire mGeoFire = new GeoFire(dbRequest);
         mGeoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
+                new GeoLocation(Common.mLastLocationCustomer.getLatitude(),
+                        Common.mLastLocationCustomer.getLongitude()), new GeoFire.CompletionListener() {
                     @Override
                     public void onComplete(String key, DatabaseError error) {
 
@@ -512,7 +557,7 @@ public class CustomerHomeActivity extends AppCompatActivity
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .title("Pickup here")
                 .snippet("")
-                .position(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
+                .position(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         mUserMarker.showInfoWindow();
 
@@ -521,9 +566,6 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     private void findDriver() {
         Intent intent = new Intent(this, CustomerFindDriverActivity.class);
-        intent.putExtra("lat",mLastLocation.getLatitude());
-        intent.putExtra("lng",mLastLocation.getLongitude());
-        intent.putExtra("destination",mPlaceDestination.getName());
         startActivityForResult(intent,REQUEST_CODE_FIND_DRIVER);
     }
 
@@ -532,10 +574,11 @@ public class CustomerHomeActivity extends AppCompatActivity
         if (requestCode == REQUEST_CODE_FIND_DRIVER) {
             if(resultCode == Activity.RESULT_OK){
                 String driverID = data.getStringExtra("driverID");
-                if(driverID.equals("0")){ // don't have driver
-                    Toast.makeText(getApplicationContext(),"Don't have any driver available now",Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(getApplicationContext(),"Find driver with id: "+driverID,Toast.LENGTH_LONG).show();                }
+                if(driverID.equals("0")){
+                    showNotFoundDriverDialog();
+                }else {
+                    showFoundDriverDialog();
+                }
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 Snackbar.make(getCurrentFocus(),"Cancel book",Snackbar.LENGTH_SHORT).show();
@@ -595,5 +638,50 @@ public class CustomerHomeActivity extends AppCompatActivity
         });
 
 
+    private void showNotFoundDriverDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View notFoundDriverLayout = inflater.inflate(R.layout.layout_not_found_driver,null);
+
+        builder.setView(notFoundDriverLayout);
+        final AlertDialog dialog;
+        dialog = builder.create();
+
+        dialog.show();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+            }
+        },2000);
+    }
+
+    private void showFoundDriverDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View foundDriverLayout = inflater.inflate(R.layout.layout_found_driver,null);
+
+        builder.setView(foundDriverLayout);
+        final AlertDialog dialog;
+        dialog = builder.create();
+
+        final TextView txtNameDriver = foundDriverLayout.findViewById(R.id.txt_name_driver_dialog);
+        final TextView txtNameCar = foundDriverLayout.findViewById(R.id.txt_name_car_dialog);
+        final TextView txtLicensePlate = foundDriverLayout.findViewById(R.id.txt_license_plate_dialog);
+        final RatingBar ratingBar = foundDriverLayout.findViewById(R.id.rating_bar);
+
+        dialog.show();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+            }
+        },3000);
     }
 }
