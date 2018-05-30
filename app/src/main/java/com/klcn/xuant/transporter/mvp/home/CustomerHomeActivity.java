@@ -28,6 +28,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -74,6 +78,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class CustomerHomeActivity extends AppCompatActivity
@@ -116,6 +121,10 @@ public class CustomerHomeActivity extends AppCompatActivity
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
 
     TextView mTxtPhone;
+    CircleImageView mAvatar;
+
+    HashMap<String,Marker> hashMapMarker = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,19 +144,8 @@ public class CustomerHomeActivity extends AppCompatActivity
         Log.e("Hom activity:::",customers.toString());
 
         mTxtPhone = (TextView) findViewById(R.id.txt_phone);
+        mAvatar = (CircleImageView) findViewById(R.id.img_avatar_nav);
 
-        customers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                customerModel = dataSnapshot.getValue(Customer.class);
-//                mTxtPhone.setText(customerModel.getPhoneNum());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -169,11 +167,12 @@ public class CustomerHomeActivity extends AppCompatActivity
 
         initView();
         btnPickRequest.setOnClickListener(this);
-
 //        ref = FirebaseDatabase.getInstance().getReference("Drivers");
 //        geoFire = new GeoFire(ref);
 
         setupLocation();
+//        getUserInfo();
+
 
     }
 
@@ -308,8 +307,6 @@ public class CustomerHomeActivity extends AppCompatActivity
             Log.e("ERROR","Can't get your location");
         }
     }
-
-    HashMap<String,Marker> hashMapMarker = new HashMap<>();
 
     private void loadAllDriverAvailable() {
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
@@ -567,5 +564,36 @@ public class CustomerHomeActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         isChooseDropOff = false;
+    }
+
+    private void getUserInfo(){
+        customers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
+                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
+                    if(map.get("phoneNum")!=null)
+                        mTxtPhone.setText(map.get("phoneNum").toString());
+
+                    if(map.get("imgUrl")!=null){
+                        RequestOptions options = new RequestOptions()
+                                .centerCrop()
+                                .placeholder(R.drawable.avavtar)
+                                .error(R.drawable.avavtar)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .priority(Priority.HIGH);
+                        Glide.with(getApplication()).load(map.get("imgUrl").toString()).apply(options).into(mAvatar);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+
     }
 }

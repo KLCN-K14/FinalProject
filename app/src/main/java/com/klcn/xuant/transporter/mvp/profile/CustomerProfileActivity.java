@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -21,8 +23,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,11 +53,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class CustomerProfileActivity extends AppCompatActivity implements View.OnClickListener{
+public class CustomerProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
     private String userChoosenTask;
@@ -56,8 +67,8 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
     TextView mTxtName, mTxtMail, mTxtPhone;
     ImageView mImgvBack;
     final Context context = this;
-    String encodedString="";
-    String newName="";
+    String encodedString = "";
+    String newName = "";
 
     FirebaseAuth mFirebaseAuth;
     DatabaseReference customers;
@@ -66,6 +77,8 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
     FirebaseStorage storage;
     StorageReference storageReference;
     private Uri filePath;
+    private boolean isNameChange = false;
+
 
 
     @Override
@@ -83,30 +96,13 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         mTxtName.setOnClickListener(this);
         mImgvBack.setOnClickListener(this);
 
-        mFirebaseAuth= FirebaseAuth.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
         customers = FirebaseDatabase.getInstance().getReference().child("Customers").child(mFirebaseAuth.getCurrentUser().getUid());
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        customers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                customerModel = dataSnapshot.getValue(Customer.class);
-                if(customerModel.getName()!=null || !customerModel.getName().equals("")){
-                    Log.e("profile2::::::",customerModel.getName());
-                    mTxtName.setText(customerModel.getName());
-                    mTxtMail.setText(customerModel.getEmail());
-                    mTxtPhone.setText(customerModel.getPhoneNum());
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
+        getUserInfo();
 
     }
 
@@ -115,9 +111,9 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         switch (requestCode) {
             case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(userChoosenTask.equals("Take Photo"))
+                    if (userChoosenTask.equals("Take Photo"))
                         cameraIntent();
-                    else if(userChoosenTask.equals("Choose from Library"))
+                    else if (userChoosenTask.equals("Choose from Library"))
                         galleryIntent();
                 } else {
 
@@ -127,24 +123,24 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
     }
 
     private void selectImage() {
-        final CharSequence[] items = { "Take Photo", "Choose from Library",
-                "Cancel" };
+        final CharSequence[] items = {"Take Photo", "Choose from Library",
+                "Cancel"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(CustomerProfileActivity.this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                boolean result=Utility.checkPermission(CustomerProfileActivity.this);
+                boolean result = Utility.checkPermission(CustomerProfileActivity.this);
 
                 if (items[item].equals("Take Photo")) {
-                    userChoosenTask ="Take Photo";
-                    if(result)
+                    userChoosenTask = "Take Photo";
+                    if (result)
                         cameraIntent();
 
                 } else if (items[item].equals("Choose from Library")) {
-                    userChoosenTask ="Choose from Library";
-                    if(result)
+                    userChoosenTask = "Choose from Library";
+                    if (result)
                         galleryIntent();
 
                 } else if (items[item].equals("Cancel")) {
@@ -155,30 +151,34 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         builder.show();
     }
 
-    private void galleryIntent()
-    {
+    private void galleryIntent() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);//
-        startActivityForResult(Intent.createChooser(intent, "Select File"),SELECT_FILE);
+        startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
     }
 
-    private void cameraIntent()
-    {
+    private void cameraIntent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SELECT_FILE)
-        {
+        if (requestCode == SELECT_FILE) {
             onSelectFromGalleryResult(data);
-            filePath= data.getData();
+            final Uri imgFile = data.getData();
+            filePath = imgFile;
+            mAvatar.setImageURI(filePath);
 
-        }
-        else if (requestCode == REQUEST_CAMERA)
+        } else if (requestCode == REQUEST_CAMERA) {
             onCaptureImageResult(data);
+            final Uri imgFileCam = data.getData();
+            filePath = imgFileCam;
+            mAvatar.setImageURI(filePath);
+        }
+
     }
 
     private void onCaptureImageResult(Intent data) {
@@ -217,7 +217,7 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        mAvatar.setImageBitmap(bitmap);
+//        mAvatar.setImageBitmap(bitmap);
         encodedString = myBitMap.getStringFromBitmap(bitmap);
 
     }
@@ -239,6 +239,7 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
                         .setCancelable(false)
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogBox, int id) {
+                                isNameChange = true;
                                 mTxtName.setText(userInputDialogEditText.getText().toString());
                                 newName = userInputDialogEditText.getText().toString();
                             }
@@ -256,10 +257,11 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
 
                 break;
             case R.id.toolbar_back:
-                if(mTxtName.getText().toString().equals(customerModel.getName())&& filePath.equals(""))
-                {
+                Log.e("Customer name::", customers.child("name").toString());
+                Log.e("Customer name2::", mTxtName.getText().toString());
+                if (!isNameChange && filePath == null) {
                     finish();
-                }else {
+                } else {
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
                     builder1.setMessage("Bạn có muốn lưu những thay đổi?");
                     builder1.setCancelable(true);
@@ -267,10 +269,10 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    Log.e("CustomerProfile::",newName);
-                                    Log.e("profile filePath::::::",filePath + "");
-                                    customers.child("name").setValue(newName);
-                                    customers.child("imgUrl").setValue(filePath);
+                                    Log.e("CustomerProfile::", newName);
+                                    Log.e("profile filePath::::::", filePath + "");
+                                    customers.child("name").setValue(mTxtName.getText().toString());
+                                    uploadImage();
                                     finish();
                                 }
                             });
@@ -294,40 +296,114 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         }
     }
 
-//    private void uploadImage() {
-//
-//        if(filePath != null)
-//        {
-//            final ProgressDialog progressDialog = new ProgressDialog(this);
-//            progressDialog.setTitle("Uploading...");
-//            progressDialog.show();
-//
-//            StorageReference ref = storageReference.child("images/"+ UUID.randomUUID().toString());
-//            ref.putFile(filePath)
-//                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                        @Override
-//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                            progressDialog.dismiss();
-//                            Toast.makeText(CustomerProfileActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            progressDialog.dismiss();
-//                            Toast.makeText(CustomerProfileActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
-//                        }
-//                    })
-//                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-//                        @Override
-//                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-//                            double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
-//                                    .getTotalByteCount());
-//                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
-//                        }
-//                    });
-//        }
-//    }
+    private void getUserInfo() {
+        customers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
+                    if (map.get("name") != null)
+                        mTxtName.setText(map.get("name").toString());
 
+                    if (map.get("email") != null)
+                        mTxtMail.setText(map.get("email").toString());
+
+                    if (map.get("phoneNum") != null)
+                        mTxtPhone.setText(map.get("phoneNum").toString());
+
+                    if (map.get("imgUrl") != null) {
+                        RequestOptions options = new RequestOptions()
+                                .centerCrop()
+                                .placeholder(R.drawable.avavtar)
+                                .error(R.drawable.avavtar)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .priority(Priority.HIGH);
+                        Glide.with(getApplication()).load(map.get("imgUrl").toString()).apply(options).into(mAvatar);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+
+    }
+
+    private void uploadImage() {
+
+        if (filePath != null) {
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading...");
+
+            final StorageReference ref = FirebaseStorage.getInstance().getReference().child("images/").child(mFirebaseAuth.getCurrentUser().getUid());
+
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
+
+            final UploadTask uploadTask = ref.putBytes(data);
+
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+
+                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
+                            }
+
+                            // Continue with the task to get the download URL
+                            return ref.getDownloadUrl();
+
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                Uri downloadUri = task.getResult();
+                                Map newImg = new HashMap();
+                                newImg.put("imgUrl", task.getResult().toString());
+                                customers.updateChildren(newImg);
+                            } else {
+                                // Handle failures
+                                // ...
+                            }
+                        }
+                    });
+
+                }
+            });
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progressDialog.dismiss();
+                    Toast.makeText(CustomerProfileActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot
+                            .getTotalByteCount());
+                    progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                }
+            });
+        }
+    }
 
 }
