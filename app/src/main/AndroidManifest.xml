@@ -10,8 +10,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -26,11 +26,13 @@
         <activity
             android:name=".mvp.splashScreen.SplashScreenActivity"
             android:theme="@style/NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".ChooseTypeUserActivity"
@@ -46,7 +48,13 @@
             android:theme="@style/NoActionBar" />
         <activity
             android:name=".CustomerTrackingActivity"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".DriverLoginActivity"
             android:hardwareAccelerated="true"
@@ -104,7 +112,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".mvp.profile.CustomerProfileActivity"></activity>
+        <activity android:name=".mvp.profile.CustomerProfileActivity" />
+        <activity android:name=".CancelBookActivity"></activity>
     </application>
 
 </manifest>
