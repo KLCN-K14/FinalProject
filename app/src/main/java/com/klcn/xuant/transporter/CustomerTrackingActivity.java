@@ -1,17 +1,21 @@
 package com.klcn.xuant.transporter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import butterknife.BindView;
 
 public class CustomerTrackingActivity extends AppCompatActivity implements
         View.OnClickListener{
+    Button mBtnCancelBook;
+    private static final int PICK_REQUEST = 1;
 
 
     @Override
@@ -36,10 +40,18 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 //                fab.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
             }
         });
+
+        mBtnCancelBook = (Button) findViewById(R.id.btn_cancel_book);
+        mBtnCancelBook.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-
+        switch (view.getId()){
+            case R.id.btn_cancel_book:
+                Intent intent = new Intent(CustomerTrackingActivity.this, CancelBookActivity.class);
+                startActivityForResult(intent, PICK_REQUEST);
+                break;
+        }
     }
 }

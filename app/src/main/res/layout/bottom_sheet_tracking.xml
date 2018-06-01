@@ -10,7 +10,7 @@
     android:layout_margin="10dp"
     android:gravity="center"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="56dp"
+    app:behavior_peekHeight="75dp"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
     <LinearLayout
         android:layout_width="match_parent"
@@ -140,6 +140,7 @@
         android:background="@color/divider"/>
 
     <Button
+        android:id="@+id/btn_cancel_book"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
