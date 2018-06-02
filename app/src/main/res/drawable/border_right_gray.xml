@@ -2,20 +2,17 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <stroke
-                android:width="2dp"
-                android:color="@color/gray_50_percent" />
-            <solid android:color="@color/colorNavigation" />
+            <!-- draw a 4 dp width border around the rectangle shape -->
+            <stroke android:color="@color/gray_50_percent" android:width="4dp"/>
         </shape>
     </item>
-
-    <item
-        android:right="1dp"
-        >
+    <!--
+        hide left, top and right side border using white color
+        by padding 4 dp bottom side
+    -->
+    <item android:right="2dp">
         <shape android:shape="rectangle">
-            <stroke
-                android:width="2dp"
-                android:color="@color/colorNavigation" />
+            <solid android:color="@color/colorNavigation"/>
         </shape>
     </item>
 </layer-list>

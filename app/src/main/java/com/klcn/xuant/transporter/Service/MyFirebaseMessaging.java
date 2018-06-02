@@ -12,6 +12,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+
+//        String[] data = remoteMessage.getNotification().getBody().split("TRANSORT");
         LatLng customer_location = new Gson().fromJson(remoteMessage.getNotification().getBody(),LatLng.class);
 
         Intent intent = new Intent(getApplicationContext(), CustomerCallActivity.class);

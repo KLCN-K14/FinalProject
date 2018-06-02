@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.Sender;
@@ -115,6 +116,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                         @Override
                         public void run() {
                             Toast.makeText(getApplicationContext(),"Start send request to dirver",Toast.LENGTH_SHORT).show();
+
                             sendRequestToDriver(key);
 //                            Intent resultIntent = new Intent();
 //                            resultIntent.putExtra("driverID", key);

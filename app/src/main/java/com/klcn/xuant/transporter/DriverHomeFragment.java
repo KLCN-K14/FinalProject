@@ -1,6 +1,7 @@
 package com.klcn.xuant.transporter;
 
 import android.Manifest;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.MediaPlayer;
@@ -48,6 +49,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Token;
+import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
 import com.suke.widget.SwitchButton;
 
 import butterknife.BindView;
@@ -56,8 +58,9 @@ import butterknife.ButterKnife;
 public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,NetworkStateReceiver.NetworkStateReceiverListener {
 
+    private NetworkStateReceiver networkStateReceiver;
     private GoogleMap mMap;
 
     private static final int MY_PERMISSION_REQUEST_CODE = 7000;
@@ -130,16 +133,11 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
-        driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        //Geo Fire
-        driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
-        mGeoFire = new GeoFire(driverAvailable);
-
-        setupLocation();
 
 
-
-        updateFireBaseToken();
+        networkStateReceiver = new NetworkStateReceiver();
+        networkStateReceiver.addListener(this);
+        getContext().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
         return view;
     }
@@ -252,7 +250,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                                 if (mMarker != null)
                                     mMarker.remove();
                                 mMarker = mMap.addMarker(new MarkerOptions()
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
                                         .position(new LatLng(latitude, longitude))
                                         .title("You"));
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15.0f));
@@ -263,31 +261,6 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
             Log.e("ERROR", "Can't get your location");
         }
     }
-
-    // Change rotate marker
-    private void rotateMarker(final Marker mMarker, final float i, GoogleMap mMap) {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        final float startRotation = mMarker.getRotation();
-        final long duration = 1500;
-
-        final Interpolator interpolator = new LinearInterpolator();
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - start;
-                float t = interpolator.getInterpolation((float) elapsed / duration);
-                float rot = t * i + (1 - t) + startRotation;
-                mMarker.setRotation(-rot > 180 ? rot / 2 : rot);
-                if (t < 1.0) {
-                    handler.postDelayed(this, 16);
-                }
-            }
-        });
-
-    }
-
 
     // Update location driver
     private void startLocationUpdate() {
@@ -383,5 +356,22 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                 view.getHeight()); // toYDelta
         animate.setDuration(1000);
         view.startAnimation(animate);
+    }
+
+    @Override
+    public void networkAvailable() {
+        driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        //Geo Fire
+        driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
+        mGeoFire = new GeoFire(driverAvailable);
+
+        updateFireBaseToken();
+
+        setupLocation();
+    }
+
+    @Override
+    public void networkUnavailable() {
+        Toast.makeText(getActivity(),"Please connect internet !!!",Toast.LENGTH_LONG).show();
     }
 }

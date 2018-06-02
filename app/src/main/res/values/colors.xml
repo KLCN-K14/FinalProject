@@ -54,6 +54,8 @@
     <color name="bgColor6">#0040ff</color>
 
     // Driver
+    <color name="customerMainColor">#273B7A</color>
+    <color name="customerMainColor2">#386895</color>
     <color name="bottomText">#6b6b76</color>
     <color name="rippleEffectColor">#f816a463</color>
     <color name="rippleEffectBtnBookCar">#f57f17</color>

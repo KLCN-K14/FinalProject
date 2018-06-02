@@ -567,6 +567,7 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     private void findDriver() {
         Intent intent = new Intent(this, CustomerFindDriverActivity.class);
+        intent.putExtra("destination",mPlaceDestination.getName());
         startActivityForResult(intent,REQUEST_CODE_FIND_DRIVER);
     }
 
@@ -585,80 +586,6 @@ public class CustomerHomeActivity extends AppCompatActivity
                 Snackbar.make(getCurrentFocus(),"Cancel book",Snackbar.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void getNameAdress(Location mLastLocation) {
-        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-            if(!addresses.isEmpty()){
-                Address obj = addresses.get(0);
-                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
-                pickPickupPlace.setText(namePlacePickup);
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        isChooseDropOff = false;
-    }
-
-    private void getUserInfo(){
-        customers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
-                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
-                    if(map.get("phoneNum")!=null)
-                        mTxtPhone.setText(map.get("phoneNum").toString());
-
-                    if(map.get("imgUrl")!=null){
-                        RequestOptions options = new RequestOptions()
-                                .centerCrop()
-                                .placeholder(R.drawable.avavtar)
-                                .error(R.drawable.avavtar)
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .priority(Priority.HIGH);
-                        Glide.with(getApplication()).load(map.get("imgUrl").toString()).apply(options).into(mAvatar);
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
-        }
-
-
-    private void showNotFoundDriverDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View notFoundDriverLayout = inflater.inflate(R.layout.layout_not_found_driver,null);
-
-        builder.setView(notFoundDriverLayout);
-        final AlertDialog dialog;
-        dialog = builder.create();
-
-        dialog.show();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dialog.dismiss();
-            }
-        },2000);
     }
 
     private void showFoundDriverDialog() {
@@ -685,5 +612,79 @@ public class CustomerHomeActivity extends AppCompatActivity
                 dialog.dismiss();
             }
         },3000);
+    }
+
+    private void showNotFoundDriverDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View notFoundDriverLayout = inflater.inflate(R.layout.layout_not_found_driver,null);
+
+        builder.setView(notFoundDriverLayout);
+        final AlertDialog dialog;
+        dialog = builder.create();
+
+        dialog.show();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+            }
+        },2000);
+    }
+
+    private void getNameAdress(Location mLastLocation) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+            if(!addresses.isEmpty()){
+                Address obj = addresses.get(0);
+                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+                pickPickupPlace.setText(namePlacePickup);
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isChooseDropOff = false;
+    }
+
+    private void getUserInfo() {
+        customers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
+                    if (map.get("phoneNum") != null)
+                        mTxtPhone.setText(map.get("phoneNum").toString());
+
+                    if (map.get("imgUrl") != null) {
+                        RequestOptions options = new RequestOptions()
+                                .centerCrop()
+                                .placeholder(R.drawable.avavtar)
+                                .error(R.drawable.avavtar)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .priority(Priority.HIGH);
+                        Glide.with(getApplication()).load(map.get("imgUrl").toString()).apply(options).into(mAvatar);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
     }
 }
