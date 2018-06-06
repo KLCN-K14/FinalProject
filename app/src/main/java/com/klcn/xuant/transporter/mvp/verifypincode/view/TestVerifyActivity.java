@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.R;
+import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.mvp.confirminfo.view.ConfirmInfoActivity;
 import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
 import com.klcn.xuant.transporter.mvp.signup.view.CustomerSignUpActivity;
@@ -118,7 +119,7 @@ public class TestVerifyActivity extends AppCompatActivity implements
 
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
-        postRef = FirebaseDatabase.getInstance().getReference("Customers");
+        postRef = FirebaseDatabase.getInstance().getReference(Common.customers_tbl);
         // [END initialize_auth]
 
         // Initialize phone auth callbacks

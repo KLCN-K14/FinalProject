@@ -8,6 +8,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import butterknife.BindView;
@@ -16,6 +17,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         View.OnClickListener{
     Button mBtnCancelBook;
     private static final int PICK_REQUEST = 1;
+    ImageView mImgChat;
 
 
     @Override
@@ -42,7 +44,10 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         });
 
         mBtnCancelBook = (Button) findViewById(R.id.btn_cancel_book);
+        mImgChat = (ImageView) findViewById(R.id.img_ic_chat);
+
         mBtnCancelBook.setOnClickListener(this);
+        mImgChat.setOnClickListener(this);
     }
 
     @Override
@@ -51,6 +56,10 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             case R.id.btn_cancel_book:
                 Intent intent = new Intent(CustomerTrackingActivity.this, CancelBookActivity.class);
                 startActivityForResult(intent, PICK_REQUEST);
+                break;
+            case R.id.img_ic_chat:
+                Intent intentChat = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
+                startActivity(intentChat);
                 break;
         }
     }
