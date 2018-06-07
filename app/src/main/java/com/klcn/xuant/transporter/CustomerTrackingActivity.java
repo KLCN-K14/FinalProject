@@ -6,10 +6,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import butterknife.BindView;
 
@@ -18,6 +28,16 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     Button mBtnCancelBook;
     private static final int PICK_REQUEST = 1;
     ImageView mImgChat;
+    private FirebaseAuth mFirebaseAuth;
+
+    private DatabaseReference mConvDatabase;
+    private DatabaseReference mMessageDatabase;
+    private DatabaseReference mDriversDatabase;
+
+
+    private String mCurrent_user_id;
+    private TextView mNameDriver;
+
 
 
     @Override
@@ -25,7 +45,19 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.customer_tracking_activity);
 
+        mBtnCancelBook = (Button) findViewById(R.id.btn_cancel_book);
+        mImgChat = (ImageView) findViewById(R.id.img_ic_chat);
+        mNameDriver = (TextView) findViewById(R.id.txt_name_driver);
 
+        mFirebaseAuth= FirebaseAuth.getInstance();
+        mCurrent_user_id = mFirebaseAuth.getCurrentUser().getUid();
+
+        mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
+
+        mConvDatabase.keepSynced(true);
+        mDriversDatabase = FirebaseDatabase.getInstance().getReference().child("Drivers");
+        mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrent_user_id);
+        mDriversDatabase.keepSynced(true);
         //Bottom sheet
         View llBottomSheet = (View)findViewById(R.id.bottom_sheet);
 
@@ -43,8 +75,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             }
         });
 
-        mBtnCancelBook = (Button) findViewById(R.id.btn_cancel_book);
-        mImgChat = (ImageView) findViewById(R.id.img_ic_chat);
 
         mBtnCancelBook.setOnClickListener(this);
         mImgChat.setOnClickListener(this);
@@ -58,8 +88,46 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 startActivityForResult(intent, PICK_REQUEST);
                 break;
             case R.id.img_ic_chat:
-                Intent intentChat = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
-                startActivity(intentChat);
+
+//                Query queryRef = mDriversDatabase
+//                        .orderByChild("name")
+//                        .equalTo(mNameDriver.getText().toString());
+//
+//                queryRef.addChildEventListener(new ChildEventListener() {
+//                    @Override
+//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                        Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
+//                        chatIntent.putExtra("user_id", mDriversDatabase.getKey());
+//                        chatIntent.putExtra("user_name", mNameDriver.getText().toString());
+//                        startActivity(chatIntent);
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                    }
+//                });
+                Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
+                chatIntent.putExtra("user_id", "VxE53ShAMWOdkKbTOQ6KT6J3ZII2");
+                chatIntent.putExtra("user_name", "test");
+                startActivity(chatIntent);
+
                 break;
         }
     }
