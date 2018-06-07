@@ -382,7 +382,12 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 //                call();
 
                 break;
-            case R.id.btn_chat: break;
+            case R.id.btn_chat:
+                Intent chatIntent = new Intent(DriverTrackingAcitivity.this, ChatActivity.class);
+                chatIntent.putExtra("user_id", "VdlChGocK2bqNsnK1K8Jv0c2wXu2");
+                chatIntent.putExtra("user_name", "thao le");
+                startActivity(chatIntent);
+                break;
             case R.id.btn_cancel:
                 final String[] listCancel = {"Emergency contact","Customer request to cancel trips"};
                 ressonCancelTrip = listCancel[0];

@@ -65,7 +65,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        if (!TextUtils.equals(mChats.get(position).getFrom(),
+        if (TextUtils.equals(mChats.get(position).getFrom(),
                 FirebaseAuth.getInstance().getCurrentUser().getUid())) {
             configureMyChatViewHolder((MyChatViewHolder) holder, position);
         } else {
@@ -98,7 +98,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        if (!TextUtils.equals(mChats.get(position).getFrom(),
+        if (TextUtils.equals(mChats.get(position).getFrom(),
                 FirebaseAuth.getInstance().getCurrentUser().getUid())) {
             return VIEW_TYPE_ME;
         } else {
@@ -125,7 +125,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             txtChatMessage = (BubbleTextView) itemView.findViewById(R.id.text_message_recv);
             profileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_layout);
 
-            mUserDatabase = FirebaseDatabase.getInstance().getReference().child(Common.drivers_tbl).child("VxE53ShAMWOdkKbTOQ6KT6J3ZII2");
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child(Common.customers_tbl).child("VdlChGocK2bqNsnK1K8Jv0c2wXu2");
             mUserDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

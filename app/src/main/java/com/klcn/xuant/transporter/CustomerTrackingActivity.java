@@ -89,40 +89,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 break;
             case R.id.img_ic_chat:
 
-//                Query queryRef = mDriversDatabase
-//                        .orderByChild("name")
-//                        .equalTo(mNameDriver.getText().toString());
-//
-//                queryRef.addChildEventListener(new ChildEventListener() {
-//                    @Override
-//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                        Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
-//                        chatIntent.putExtra("user_id", mDriversDatabase.getKey());
-//                        chatIntent.putExtra("user_name", mNameDriver.getText().toString());
-//                        startActivity(chatIntent);
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
                 Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
                 chatIntent.putExtra("user_id", "VxE53ShAMWOdkKbTOQ6KT6J3ZII2");
                 chatIntent.putExtra("user_name", "test");

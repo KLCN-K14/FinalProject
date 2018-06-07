@@ -119,7 +119,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 //        mCurrentUserId = mAuth.getCurrentUser().getUid();
-        mCurrentUserId = "VdlChGocK2bqNsnK1K8Jv0c2wXu2";
+//        mCurrentUserId = "VdlChGocK2bqNsnK1K8Jv0c2wXu2";
+        mCurrentUserId = "VxE53ShAMWOdkKbTOQ6KT6J3ZII2";
 
         mChatUser = getIntent().getStringExtra("user_id");
 //        mChatUser = "VxE53ShAMWOdkKbTOQ6KT6J3ZII2";
@@ -146,7 +147,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         //------- IMAGE STORAGE ---------
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
-        mRootRef.child("Chat").child(mCurrentUserId).child("VxE53ShAMWOdkKbTOQ6KT6J3ZII2").child("seen").setValue(true);
+        mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
 
         loadMessages();
 
