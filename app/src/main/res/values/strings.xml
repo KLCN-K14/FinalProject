@@ -50,4 +50,5 @@
     <string name="confirm_infomation">Confirm Infomation</string>
     <string name="date_time_history">10/2/2018, 04:02pm</string>
     <string name="send_feedback">Send feedback</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>

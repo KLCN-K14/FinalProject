@@ -1,13 +1,20 @@
 package com.klcn.xuant.transporter;
 
+import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -88,6 +95,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
     private ChatRecyclerAdapter mAdapter;
+    private TextView mText1, mText2, mText3, mText4;
+
+    private Dialog dialog;
 
     private static final int TOTAL_ITEMS_TO_LOAD = 10;
     private int mCurrentPage = 1;
@@ -103,6 +113,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private String mLastKey = "";
     private String mPrevKey = "";
+    String userName = "";
 
 
     @Override
@@ -120,11 +131,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
 //        mCurrentUserId = mAuth.getCurrentUser().getUid();
 //        mCurrentUserId = "VdlChGocK2bqNsnK1K8Jv0c2wXu2";
-        mCurrentUserId = "VxE53ShAMWOdkKbTOQ6KT6J3ZII2";
+        mCurrentUserId = "V9W9DeH6Nia8uqs9qRDq8JSEe0e2";
 
         mChatUser = getIntent().getStringExtra("user_id");
 //        mChatUser = "VxE53ShAMWOdkKbTOQ6KT6J3ZII2";
-        String userName = getIntent().getStringExtra("user_name");
+        userName = getIntent().getStringExtra("user_name");
 
 
         mTitleView = (TextView) findViewById(R.id.txt_title);
@@ -156,7 +167,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mChatSendBtn.setOnClickListener(this);
         mChatAddBtn.setOnClickListener(this);
         mBtnBack.setOnClickListener(this);
-
 
 
         mRootRef.child("Customers").child(mChatUser).addValueEventListener(new ValueEventListener() {
@@ -527,6 +537,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
+            //Send notification
+            sendNotification(message);
+
+
             mChatMessageView.setText("");
 
             mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
@@ -554,20 +568,85 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.toolbar_back:
                 finish();
                 break;
             case R.id.chat_add_btn:
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
-                startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
+                dialog = new Dialog(ChatActivity.this);
+//                if(!getIntent().getStringExtra("from").equals("driver"))
+//                    dialog.setContentView(R.layout.suggest_driver_dialog);
+                dialog.setContentView(R.layout.suggest_customer_dialog);
+
+
+                dialog.show();
+                mText1 = (TextView) dialog.findViewById(R.id.text1);
+                mText2 = (TextView) dialog.findViewById(R.id.text2);
+                mText3 = (TextView) dialog.findViewById(R.id.text3);
+                mText4 = (TextView) dialog.findViewById(R.id.text4);
+                mText1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mChatMessageView.setText(mText1.getText().toString());
+                        dialog.dismiss();
+                    }
+                });
+                mText2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mChatMessageView.setText(mText2.getText().toString());
+                        dialog.dismiss();
+                    }
+                });
+                mText3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mChatMessageView.setText(mText3.getText().toString());
+                        dialog.dismiss();
+                    }
+                });
+                mText4.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mChatMessageView.setText(mText4.getText().toString());
+                        dialog.dismiss();
+                    }
+                });
                 break;
             case R.id.chat_send_btn:
                 sendMessage();
                 break;
         }
+    }
+    private void sendNotification(String messageBody) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        String channelId = getString(R.string.default_notification_channel_id);
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this, channelId)
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle("Transporter Message")
+                        .setContentText(messageBody)
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 }
