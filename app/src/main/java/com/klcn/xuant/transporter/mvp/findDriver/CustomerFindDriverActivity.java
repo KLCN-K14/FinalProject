@@ -6,6 +6,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -19,12 +21,14 @@ import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.klcn.xuant.transporter.DriverMainActivity;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Driver;
@@ -32,6 +36,8 @@ import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
+import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
+import com.klcn.xuant.transporter.mvp.splashScreen.SplashScreenActivity;
 import com.klcn.xuant.transporter.remote.IFCMService;
 import com.skyfishjy.library.RippleBackground;
 
@@ -69,6 +75,8 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     boolean isDriverFound = false;
     public static int LIMIT_RANGE = 5 ; // 5km
     IFCMService mService;
+    String driverID = "";
+    String destination = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +86,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         mRippleBackground.startRippleAnimation();
 
         mService = Common.getFCMService();
-
+        destination = getIntent().getStringExtra("destination");
 
         getNameAdress(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
         findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
@@ -101,7 +109,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     }
 
     private void findDriver(final double lat,final double lng) {
-        Log.e("findDriver", " in find driver");
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         GeoFire gfDrivers = new GeoFire(driverAvailable);
 
@@ -111,19 +118,10 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
             @Override
             public void onKeyEntered(final String key, GeoLocation location) {
                 if(!isDriverFound){
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),"Start send request to dirver",Toast.LENGTH_SHORT).show();
-
-                            sendRequestToDriver(key);
-//                            Intent resultIntent = new Intent();
-//                            resultIntent.putExtra("driverID", key);
-//                            setResult(RESULT_OK, resultIntent);
-//                            finish();
-                        }
-                    },3000);
+                    Toast.makeText(getApplicationContext(),"Start send request to dirver",Toast.LENGTH_SHORT).show();
+                    isDriverFound = true;
+                    sendRequestToDriver(key);
+                    driverID = key;
                 }
             }
 
@@ -144,17 +142,59 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                     radius++;
                     findDriver(lat,lng);
                 }else{
+                    final Intent resultIntent = new Intent();
 
-//                    Handler handler = new Handler();
-//                    handler.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Intent resultIntent = new Intent();
-//                            resultIntent.putExtra("driverID", "0");
-//                            setResult(RESULT_OK, resultIntent);
-//                            finish();
-//                        }
-//                    },3000);
+
+                    // finish when don't have any driver available
+                    if(driverID.equals("")){
+                        setResult(RESULT_CANCELED, resultIntent);
+                        finish();
+                    }else{
+                        // auto finish when driver not response after 15s
+                        final Handler handlerWaitRequest = new Handler();
+                        handlerWaitRequest.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                setResult(RESULT_CANCELED, resultIntent);
+                                finish();
+                            }
+                        },20000);
+                        // if driver response
+                        FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl)
+                                .addChildEventListener(new ChildEventListener() {
+                                    @Override
+                                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                                        if(dataSnapshot.getKey().equals(driverID)){
+                                            setResult(RESULT_OK, resultIntent);
+                                            resultIntent.putExtra("driverID", driverID);
+                                            Log.e("DRIVER",driverID);
+                                            finish();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                    }
+
+                                    @Override
+                                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                                    }
+
+                                    @Override
+                                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    }
+
                 }
             }
 
@@ -175,8 +215,14 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                         for(DataSnapshot postData: dataSnapshot.getChildren()){
                             Token token = postData.getValue(Token.class);
 
-                            String json_lat_lng = new Gson().toJson(new LatLng(lat,lng));
-                            Notification notification = new Notification("TRANSPORT",json_lat_lng);
+//                            String json_lat_lng = new Gson().toJson(new LatLng(lat,lng));
+                            String data = "";
+                            if(destination!=null){
+                                data = lat+Common.keySplit+lng+
+                                        Common.keySplit+destination;
+                            }
+
+                            Notification notification = new Notification("Request",data);
                             Sender content = new Sender(token.getToken(),notification);
                             mService.sendMessage(content)
                                     .enqueue(new Callback<FCMResponse>() {
@@ -214,9 +260,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         switch (view.getId()){
             case R.id.btn_cancel_find_driver:
                 cancelPickupRequest();
-                Intent intent = new Intent();
-                setResult(Activity.RESULT_CANCELED,intent);
-                finish();
                 break;
         }
     }
@@ -228,7 +271,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                 new GeoFire.CompletionListener() {
                     @Override
                     public void onComplete(String key, DatabaseError error) {
-
+                        finish();
                     }
                 });
     }

@@ -30,12 +30,10 @@
             android:name=".mvp.splashScreen.SplashScreenActivity"
             android:theme="@style/NoActionBar">
 
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
+             <intent-filter>
+             <action android:name="android.intent.action.MAIN" />
+             <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
         </activity>
         <activity
             android:name=".ChooseTypeUserActivity"
@@ -47,15 +45,27 @@
             android:name=".DriverRegisterActivity"
             android:theme="@style/NoActionBar" />
         <activity
+            android:name=".DriverInvitesActivity"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".DriverTripHistoryActivity"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".DriverFeedBackActivity"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".DriverPayStatementActivity"
+            android:theme="@style/NoActionBar" />
+        <activity
             android:name=".DriverTrackingAcitivity"
             android:theme="@style/NoActionBar">
 
-             <intent-filter>
-             <action android:name="android.intent.action.MAIN" />
+             <!--<intent-filter>-->
+             <!--<action android:name="android.intent.action.MAIN" />-->
 
 
-             <category android:name="android.intent.category.LAUNCHER" />
-             </intent-filter>
+             <!--<category android:name="android.intent.category.LAUNCHER" />-->
+             <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".CustomerTrackingActivity"

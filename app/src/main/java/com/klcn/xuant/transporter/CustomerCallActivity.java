@@ -1,6 +1,7 @@
 package com.klcn.xuant.transporter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,6 +67,9 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
     MediaPlayer mediaPlayer;
     int progressStatus = 0;
+    Thread thread;
+    double lat,lng;
+    String destination;
 
 
     @Override
@@ -89,12 +93,12 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         mediaPlayer.start();
 
         final Handler handler = new Handler();
-        mArcProgress.setMax(30);
+        mArcProgress.setMax(15);
         mArcProgress.setProgress(progressStatus);
 
-        new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             public void run() {
-                while (progressStatus < 30) {
+                while (progressStatus < 15) {
 
                     // process some tasks
                     progressStatus++;
@@ -113,18 +117,20 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                         }
                     });
                 }
-                addDriver();
+                addDriverAvailable();
                 finish();
             }
-        }).start();
+        });
+        thread.start();
 
 
-        removeDriver();
+        removeDriverAvailable();
         mService = Common.getGoogleAPI();
         if(getIntent()!=null){
             Toast.makeText(getApplicationContext(),"Got data",Toast.LENGTH_LONG).show();
-            double lat = getIntent().getDoubleExtra("lat",-1.0);
-            double lng = getIntent().getDoubleExtra("lng",-1.0);
+             lat = getIntent().getDoubleExtra("lat",-1.0);
+             lng = getIntent().getDoubleExtra("lng",-1.0);
+             destination = getIntent().getStringExtra("destination");
             getDirection(lat,lng);
         }
 
@@ -132,7 +138,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         mBtnCancel.setOnClickListener(this);
     }
 
-    public void removeDriver() {
+    public void removeDriverAvailable() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
 
@@ -144,7 +150,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         });
     }
 
-    public void addDriver() {
+    public void addDriverAvailable() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
 
@@ -214,10 +220,14 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_cancel_find_driver:
-                addDriver();
+                addDriverAvailable();
+                finish();
             break;
 
             case R.id.btn_accept_pickup_request:
+                Intent intent = new Intent(CustomerCallActivity.this,DriverTrackingAcitivity.class);
+                startActivity(intent);
+                finish();
                 break;
         }
     }

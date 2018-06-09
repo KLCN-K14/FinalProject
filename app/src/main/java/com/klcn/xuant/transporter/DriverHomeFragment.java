@@ -1,26 +1,30 @@
 package com.klcn.xuant.transporter;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.media.MediaPlayer;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,12 +41,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -54,6 +59,8 @@ import com.suke.widget.SwitchButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -78,6 +85,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
 
     static boolean isLoggingOut = false;
     String driverID;
+    static boolean isFirstTime = true;
 
     Marker mMarker;
     SupportMapFragment mapFragment;
@@ -116,12 +124,14 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (isChecked) {
                     slideDown(DriverMainActivity.mBottomNavigationView);
+                    DriverMainActivity.mBottomNavigationView.setVisibility(View.GONE);
                     mTxtStatus.setText("ONLINE");
                     startLocationUpdate();
                     displayLocation();
                     Snackbar.make(getView(), "You are online", Snackbar.LENGTH_SHORT).show();
                 } else {
                     slideUp(DriverMainActivity.mBottomNavigationView);
+                    DriverMainActivity.mBottomNavigationView.setVisibility(View.VISIBLE);
                     stopLocationUpdate();
                     if (mMarker != null) {
                         mMarker.remove();
@@ -133,6 +143,35 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
+        FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        if(dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                            mSwitchButton.setChecked(false);
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
 
 
         networkStateReceiver = new NetworkStateReceiver();
@@ -163,33 +202,118 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         switch (requestCode) {
             case MY_PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getContext(),"have permission",Toast.LENGTH_LONG).show();
                     if (checkPlayService()) {
                         buildGoogleApiClient();
                         createLocationRequest();
                         if (mSwitchButton.isChecked())
                             displayLocation();
                     }
+                }else{
+                    Toast.makeText(getContext(),"not have permission",Toast.LENGTH_LONG).show();
                 }
         }
     }
 
+    public static void displayPromptForEnablingGPS(final Activity activity){
+
+        final AlertDialog.Builder builder =  new AlertDialog.Builder(activity);
+        builder.setTitle("Turn on GPS");
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "Open GPS setting to start?";
+
+        final AlertDialog dialog = builder.setMessage(message)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                activity.startActivity(new Intent(action));
+                                d.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                displayShouldPromptForEnablingGPS(activity);
+                            }
+                        }).create();
+        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+            public void onShow(DialogInterface arg0) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.red));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.rippleEffectColor));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(18);
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(18);
+            }
+        });
+        dialog.setOnCancelListener(
+                new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        displayShouldPromptForEnablingGPS(activity);
+                    }
+                }
+        );
+        dialog.show();
+    }
+
+    public static void displayShouldPromptForEnablingGPS(final Activity activity){
+        final AlertDialog.Builder builder =  new AlertDialog.Builder(activity);
+        builder.setTitle("Turn on GPS");
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "App will not work if GPS disable?";
+
+        final AlertDialog dialog = builder.setMessage(message)
+                .setPositiveButton("Open GPS",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                activity.startActivity(new Intent(action));
+                                d.dismiss();
+                            }
+                        })
+                .setNegativeButton("Quit app",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                activity.finish();
+                            }
+                        }).create();
+        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+            public void onShow(DialogInterface arg0) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.red));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.rippleEffectColor));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(18);
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(18);
+            }
+        });
+
+        dialog.setOnCancelListener(
+                new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        displayShouldPromptForEnablingGPS(activity);
+                    }
+                }
+        );
+        dialog.show();
+    }
+
     // setup permission
     private void setupLocation() {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //Request runtime permission
-            ActivityCompat.requestPermissions(getActivity(), new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, MY_PERMISSION_REQUEST_CODE);
-        } else {
+
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             if (checkPlayService()) {
                 buildGoogleApiClient();
                 createLocationRequest();
                 if (mSwitchButton.isChecked())
                     displayLocation();
             }
+        }else{
+            displayPromptForEnablingGPS(getActivity());
         }
+
     }
 
     // create locationrequest
@@ -268,12 +392,17 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        try{
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onLocationChanged(Location location) {
         Common.mLastLocationDriver = location;
+        Log.e("DRIVERHOME","Change location");
         displayLocation();
     }
 
@@ -364,14 +493,37 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         //Geo Fire
         driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         mGeoFire = new GeoFire(driverAvailable);
-
+        Toast.makeText(getActivity(),"Internet available",Toast.LENGTH_LONG).show();
         updateFireBaseToken();
-
         setupLocation();
     }
 
     @Override
     public void networkUnavailable() {
         Toast.makeText(getActivity(),"Please connect internet !!!",Toast.LENGTH_LONG).show();
+        offlineDriver();
+    }
+
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isFirstTime){
+            isFirstTime = false;
+        }
+        else{
+            LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                if (checkPlayService()) {
+                    buildGoogleApiClient();
+                    createLocationRequest();
+                    if (mSwitchButton.isChecked())
+                        displayLocation();
+                }
+            }else{
+                displayShouldPromptForEnablingGPS(getActivity());
+            }
+        }
     }
 }

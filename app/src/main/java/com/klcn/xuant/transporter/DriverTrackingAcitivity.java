@@ -32,6 +32,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,9 +53,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.DirectionsJSONParser;
+import com.klcn.xuant.transporter.model.FCMResponse;
+import com.klcn.xuant.transporter.model.Notification;
+import com.klcn.xuant.transporter.model.Sender;
+import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
+import com.klcn.xuant.transporter.remote.IFCMService;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
 
 import org.json.JSONException;
@@ -100,11 +113,17 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     Marker mCustomerMarker;
     Circle mCustomerCircle;
     double customerLat = 10.8397849,customerLng = 106.7935081; // Test location
+    String customerID;
     String destination = "Trường Tiểu học Trương Văn Thành";
 
     private List<LatLng> polyLineList;
     private Polyline direction;
     IGoogleAPI mService;
+    IFCMService mFCMService;
+
+    String driverID;
+    DatabaseReference driverWorking;
+    GeoFire mGeoFire;
 
     @BindView(R.id.btn_phone)
     RelativeLayout mBtnCall;
@@ -157,16 +176,22 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         mBtnCancel.setOnClickListener(this);
         mBtnPickup.setOnClickListener(this);
 
+        driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        //Geo Fire
+        driverWorking = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
+        mGeoFire = new GeoFire(driverWorking);
+        Log.e("DRIVERTRACKING","Start");
+
         networkStateReceiver = new NetworkStateReceiver();
         networkStateReceiver.addListener(this);
         this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
-
 
     }
 
     @Override
     public void networkAvailable() {
         mService = Common.getGoogleAPI();
+        mFCMService = Common.getFCMService();
         setupLocation();
     }
 
@@ -293,13 +318,19 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 //Add marker
             if (mDriverMarker != null)
                 mDriverMarker.remove();
-            mDriverMarker = mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
-                    .position(new LatLng(latitude, longitude))
-                    .flat(true)
-                    .anchor(0.5f, 0.5f)
-                    .rotation(bearing)
-                    .title("You"));
+            mGeoFire.setLocation(driverID, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+                    mDriverMarker = mMap.addMarker(new MarkerOptions()
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
+                            .position(new LatLng(latitude, longitude))
+                            .flat(true)
+                            .anchor(0.5f, 0.5f)
+                            .rotation(bearing)
+                            .title("You"));
+                }
+            });
+
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
 
@@ -388,6 +419,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 chatIntent.putExtra("user_name", "thao le");
                 chatIntent.putExtra("from","driver");
                 startActivity(chatIntent);
+
                 break;
             case R.id.btn_cancel:
                 final String[] listCancel = {"Emergency contact","Customer request to cancel trips"};
@@ -530,18 +562,62 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 //        mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.setMyLocationEnabled(true);
 
-//        mCustomerCircle = mMap.addCircle(new CircleOptions()
-//            .center(new LatLng(customerLat,customerLng))
-//            .radius(10)
-//            .strokeColor(Color.BLUE)
-//            .fillColor(0x220000FF)
-//            .strokeWidth(5.0f));
 
         mCustomerMarker = mMap.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pick_up))
                 .position(new LatLng(customerLat, customerLng))
                 .title("Customer"));
 
+        GeoFire geoFire = new GeoFire(FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl));
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(customerLat,customerLng),0.05f);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                sendArrivedNotification(customerID);
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+
+
+
+    }
+
+    private void sendArrivedNotification(String customerID) {
+        Token token = new Token(customerID);
+        Notification notification = new Notification("Arrived","Your driver has arrived here!");
+        Sender sender = new Sender(token.getToken(),notification);
+        mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+            @Override
+            public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override

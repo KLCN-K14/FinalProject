@@ -66,6 +66,7 @@
     <color name="edtRegisterDark">#070716</color>
 
     <color name="colorNavigation">#1B1A2A</color>
+    <color name="colorPayStatement">#212033</color>
     <color name="colorInactiveNavigation">#999A9F</color>
     <color name="colorActiveNavigation">#1FBAD6</color>
     <color name="gray_20_precent">#F0F0F0</color>

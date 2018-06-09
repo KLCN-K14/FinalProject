@@ -1,5 +1,6 @@
 package com.klcn.xuant.transporter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -59,7 +60,8 @@ public class DriverRatingsFragment extends Fragment implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.panel_customer_feedback:
-                Toast.makeText(getContext(),"Panel customer feedback",Toast.LENGTH_LONG).show();
+                Intent intentFeedBack = new Intent(getContext(),DriverFeedBackActivity.class);
+                startActivity(intentFeedBack);
                 break;
             case R.id.panel_pro_tips:
                 Toast.makeText(getContext(),"Panel pro tips",Toast.LENGTH_LONG).show();

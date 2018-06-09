@@ -2,17 +2,23 @@ package com.klcn.xuant.transporter.mvp.home;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -68,6 +74,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.maps.android.SphericalUtil;
+import com.klcn.xuant.transporter.ChooseTypeUserActivity;
+import com.klcn.xuant.transporter.CustomerTrackingActivity;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.Driver;
@@ -98,7 +106,6 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
     private LocationRequest mLocationRequest;
 
     private static final int MY_PERMISSION_REQUEST_CODE = 7000;
@@ -124,6 +131,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     Button btnPickRequest;
 
     boolean isChooseDropOff = false;
+    boolean isFirstTime = true;
     PlaceAutocompleteFragment pickDestination;
     PlaceAutocompleteFragment pickPickupPlace;
     AutocompleteFilter mAutocompleteFilter;
@@ -282,22 +290,107 @@ public class CustomerHomeActivity extends AppCompatActivity
         }
         return true;
     }
+
+    public static void displayPromptForEnablingGPS(final Activity activity){
+
+        final AlertDialog.Builder builder =  new AlertDialog.Builder(activity);
+        builder.setTitle("Turn on GPS");
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "Open GPS setting to start?";
+
+        final AlertDialog dialog = builder.setMessage(message)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                activity.startActivity(new Intent(action));
+                                d.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                displayShouldPromptForEnablingGPS(activity);
+                            }
+                        }).create();
+        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+            public void onShow(DialogInterface arg0) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.red));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.rippleEffectColor));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(18);
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(18);
+            }
+        });
+        dialog.setOnCancelListener(
+                new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        displayShouldPromptForEnablingGPS(activity);
+                    }
+                }
+        );
+        dialog.show();
+    }
+
+    public static void displayShouldPromptForEnablingGPS(final Activity activity){
+        final AlertDialog.Builder builder =  new AlertDialog.Builder(activity);
+        builder.setTitle("Turn on GPS");
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "App will not work if GPS disable?";
+
+        final AlertDialog dialog = builder.setMessage(message)
+                .setPositiveButton("Open GPS",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                activity.startActivity(new Intent(action));
+                                d.dismiss();
+                            }
+                        })
+                .setNegativeButton("Quit app",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                activity.finish();
+                            }
+                        }).create();
+        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+            public void onShow(DialogInterface arg0) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.red));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(activity.getResources().getColor(R.color.rippleEffectColor));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(18);
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(18);
+            }
+        });
+
+        dialog.setOnCancelListener(
+                new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        displayShouldPromptForEnablingGPS(activity);
+                    }
+                }
+        );
+        dialog.show();
+    }
+
+    // setup permission
     private void setupLocation() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            //Request runtime permission
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            },MY_PERMISSION_REQUEST_CODE);
-        }else{
-            if(checkPlayService()){
+
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            if (checkPlayService()) {
                 buildGoogleApiClient();
                 createLocationRequest();
                 displayLocation();
             }
+        }else{
+            displayPromptForEnablingGPS(this);
         }
+
     }
+
     private void startLocationUpdate(){
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
@@ -335,7 +428,7 @@ public class CustomerHomeActivity extends AppCompatActivity
 
             final double latitude = Common.mLastLocationCustomer.getLatitude();
             final double longitude = Common.mLastLocationCustomer.getLongitude();
-            getNameAdress(Common.mLastLocationCustomer);
+            pickPickupPlace.setText(getNameAdress(Common.mLastLocationCustomer));
             //Add marker
             if(mUserMarker!=null)
                 mUserMarker.remove();
@@ -471,6 +564,8 @@ public class CustomerHomeActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_sign_out) {
             mFirebaseAuth.signOut();
+            Intent intent = new Intent(getApplicationContext(),ChooseTypeUserActivity.class);
+            startActivity(intent);
             finish();
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -576,43 +671,20 @@ public class CustomerHomeActivity extends AppCompatActivity
         if (requestCode == REQUEST_CODE_FIND_DRIVER) {
             if(resultCode == Activity.RESULT_OK){
                 String driverID = data.getStringExtra("driverID");
-                if(driverID.equals("0")){
-                    showNotFoundDriverDialog();
-                }else {
-                    showFoundDriverDialog();
-                }
+                Intent intent = new Intent(CustomerHomeActivity.this, CustomerTrackingActivity.class);
+                intent.putExtra("driverID",driverID);
+                intent.putExtra("destination",mPlaceDestination.getName());
+                intent.putExtra("pickup",getNameAdress(Common.mLastLocationCustomer));
+                startActivity(intent);
             }
             if (resultCode == Activity.RESULT_CANCELED) {
+                showNotFoundDriverDialog();
                 Snackbar.make(getCurrentFocus(),"Cancel book",Snackbar.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void showFoundDriverDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View foundDriverLayout = inflater.inflate(R.layout.layout_found_driver,null);
-
-        builder.setView(foundDriverLayout);
-        final AlertDialog dialog;
-        dialog = builder.create();
-
-        final TextView txtNameDriver = foundDriverLayout.findViewById(R.id.txt_name_driver_dialog);
-        final TextView txtNameCar = foundDriverLayout.findViewById(R.id.txt_name_car_dialog);
-        final TextView txtLicensePlate = foundDriverLayout.findViewById(R.id.txt_license_plate_dialog);
-        final RatingBar ratingBar = foundDriverLayout.findViewById(R.id.rating_bar);
-
-        dialog.show();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dialog.dismiss();
-            }
-        },3000);
-    }
 
     private void showNotFoundDriverDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -632,17 +704,17 @@ public class CustomerHomeActivity extends AppCompatActivity
             public void run() {
                 dialog.dismiss();
             }
-        },2000);
+        },3000);
     }
 
-    private void getNameAdress(Location mLastLocation) {
+    private String getNameAdress(Location mLastLocation) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
             if(!addresses.isEmpty()){
                 Address obj = addresses.get(0);
                 String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
-                pickPickupPlace.setText(namePlacePickup);
+                return namePlacePickup;
             }
 
         } catch (IOException e) {
@@ -650,12 +722,33 @@ public class CustomerHomeActivity extends AppCompatActivity
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+        return "";
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         isChooseDropOff = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isFirstTime){
+            isFirstTime = false;
+        }
+        else{
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                if (checkPlayService()) {
+                    buildGoogleApiClient();
+                    createLocationRequest();
+                    displayLocation();
+                }
+            }else{
+                displayShouldPromptForEnablingGPS(this);
+            }
+        }
     }
 
     private void getUserInfo() {

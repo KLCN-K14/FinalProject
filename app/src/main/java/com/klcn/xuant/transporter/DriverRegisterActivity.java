@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -58,6 +59,9 @@ public class DriverRegisterActivity extends AppCompatActivity implements View.On
     @BindView(R.id.spinner_service)
     MaterialSpinner spinnerService;
 
+    @BindView(R.id.edt_invite_code)
+    MaterialEditText edtInviteCode;
+
     @BindView(R.id.edt_name_vehicle)
     MaterialEditText edtNameVehicle;
 
@@ -99,6 +103,7 @@ public class DriverRegisterActivity extends AppCompatActivity implements View.On
 
         spinnerService.setItems("Transport Standard", "Transport Premium");
         spinnerService.setSelectedIndex(0);
+        serviceVehicle = "Transport Standard";
         spinnerService.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
             @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
@@ -120,13 +125,16 @@ public class DriverRegisterActivity extends AppCompatActivity implements View.On
                 finish();
                 break;
             case R.id.img_register:
-                String countryCode = countryCodePicker.getSelectedCountryCode();
-                String phoneNumber = edtPhone.getText().toString().trim();
-                if (phoneNumber.charAt(0) == '0') {
-                    phoneNumber = phoneNumber.substring(1);
-                }
-                String phoneString = "+"+countryCode + phoneNumber;
+
                 String regexStr = "^[+][0-9]{10,13}$";
+                if(!TextUtils.isEmpty(edtPhone.getText().toString())){
+                    String countryCode = countryCodePicker.getSelectedCountryCode();
+                    String phoneNumber = edtPhone.getText().toString().trim();
+                    if (phoneNumber.charAt(0) == '0') {
+                        phoneNumber = phoneNumber.substring(1);
+                    }
+                    phoneString = "+"+countryCode + phoneNumber;
+                }
 
                 if(TextUtils.isEmpty(edtEmail.getText().toString())){
                     Toast.makeText(getApplicationContext(), "Please enter email address",Toast.LENGTH_SHORT)
@@ -200,14 +208,20 @@ public class DriverRegisterActivity extends AppCompatActivity implements View.On
                             driver.setEmail(edtEmail.getText().toString());
                             driver.setName(edtFirstName.getText().toString()+" "+edtLastName.getText().toString());
                             driver.setPhoneNum(phoneString);
-                            driver.setLicensePlate(edtLicensePlate.getText().toString());
-                            driver.setNameVehicle(edtNameVehicle.getText().toString());
+                            driver.setLicensePlate(edtLicensePlate.getText().toString().toUpperCase());
+                            driver.setNameVehicle(edtNameVehicle.getText().toString().toUpperCase());
                             driver.setServiceVehicle(serviceVehicle);
+                            driver.setAvgRatings("5");
+                            driver.setCreadits("100000");
+                            driver.setCashBalance("0");
                             drivers.child(mFirebaseAuth.getCurrentUser().getUid())
                                     .setValue(driver)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
+                                            if(!TextUtils.isEmpty(edtInviteCode.getText())){
+                                                // check if invite code right. add cash to driver invite and send message to driver
+                                            }
                                             Handler handler = new Handler();
                                             handler.postDelayed(new Runnable() {
                                                 @Override

@@ -1,5 +1,6 @@
 package com.klcn.xuant.transporter;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -134,13 +135,16 @@ public class DriverEarningsFragment extends Fragment implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.panel_invites:
-                Snackbar.make(getView(),"Panel trip invites",Snackbar.LENGTH_LONG).show();
+                Intent intentInvites = new Intent(getContext(),DriverInvitesActivity.class);
+                startActivity(intentInvites);
                 break;
             case R.id.panel_pay_statement:
-                Snackbar.make(getView(),"Panel pay statement",Snackbar.LENGTH_LONG).show();
+                Intent intentPayStatement = new Intent(getContext(),DriverPayStatementActivity.class);
+                startActivity(intentPayStatement);
                 break;
             case R.id.panel_trip_history:
-                Snackbar.make(getView(),"Panel trip history",Snackbar.LENGTH_LONG).show();
+                Intent intentTripHistory = new Intent(getContext(),DriverTripHistoryActivity.class);
+                startActivity(intentTripHistory);
                 break;
             default: break;
         }

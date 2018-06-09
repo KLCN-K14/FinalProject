@@ -65,21 +65,21 @@
         android:layout_marginTop="10dp"
         android:layout_alignParentBottom="true"
         android:weightSum="3"
-        android:layout_marginLeft="20dp"
         >
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/panel_trip_history"
-            android:background="@drawable/border_bottom_gray"
+            android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/img_temp"
                 android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_history"/>
+                android:src="@drawable/ic_history_trip"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -111,13 +111,14 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/panel_pay_statement"
-            android:background="@drawable/border_bottom_gray"
+            android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/img_temp2"
                 android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_pay_statement"/>
             <TextView
@@ -156,6 +157,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/img_temp3"
+                android:layout_marginLeft="20dp"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
                 android:src="@drawable/ic_invites"/>

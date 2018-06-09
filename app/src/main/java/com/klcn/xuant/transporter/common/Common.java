@@ -16,11 +16,13 @@ public class Common {
     public static final String driver_working_tbl = "DriverWorking";
     public static final String customers_tbl = "Customers";
     public static final String pickup_request_tbl = "PickupRequest";
+    public static final String ride_info_tbl = "RideInfo";
     public static final String tokens_tbl = "Tokens";
 
 
     public static Location mLastLocationDriver = null;
     public static Location mLastLocationCustomer = null;
+
     public static boolean isDriverOnline = false;
 
     public static final String baseURL = "https://maps.googleapis.com";

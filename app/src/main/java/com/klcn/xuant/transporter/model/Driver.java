@@ -5,12 +5,12 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Driver {
 
-    private String name,email,phoneNum,imgUrl,serviceVehicle,nameVehicle,licensePlate,avgRatings;
+    private String name,email,phoneNum,imgUrl,serviceVehicle,nameVehicle,licensePlate,avgRatings,creadits,cashBalance;
 
     public Driver() {
     }
 
-    public Driver(String name, String email, String phoneNum, String imgUrl, String serviceVehicle, String nameVehicle, String licensePlate, String avgRatings) {
+    public Driver(String name, String email, String phoneNum, String imgUrl, String serviceVehicle, String nameVehicle, String licensePlate, String avgRatings, String creadits, String cashBalance) {
         this.name = name;
         this.email = email;
         this.phoneNum = phoneNum;
@@ -19,6 +19,8 @@ public class Driver {
         this.nameVehicle = nameVehicle;
         this.licensePlate = licensePlate;
         this.avgRatings = avgRatings;
+        this.creadits = creadits;
+        this.cashBalance = cashBalance;
     }
 
     public String getName() {
@@ -83,5 +85,21 @@ public class Driver {
 
     public void setAvgRatings(String avgRatings) {
         this.avgRatings = avgRatings;
+    }
+
+    public String getCreadits() {
+        return creadits;
+    }
+
+    public void setCreadits(String creadits) {
+        this.creadits = creadits;
+    }
+
+    public String getCashBalance() {
+        return cashBalance;
+    }
+
+    public void setCashBalance(String cashBalance) {
+        this.cashBalance = cashBalance;
     }
 }

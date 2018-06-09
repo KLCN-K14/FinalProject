@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/message_single_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="&quot;Fantastic driver. Nicest driver I've had.&quot;"
+            android:maxLines="3"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/black"
+            android:id="@+id/txt_content_feedback"
+            android:textSize="18sp"/>
+
+        <RatingBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:rating="5"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/txt_content_feedback"
+            android:progressTint="@color/colorYellow"
+            android:id="@+id/rating_bar"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="22 Mar 2017, 10:53PM"
+            android:maxLines="3"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorGray"
+            android:layout_below="@id/rating_bar"
+            android:textSize="16sp"/>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
