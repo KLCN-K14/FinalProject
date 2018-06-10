@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -85,6 +86,7 @@ import com.klcn.xuant.transporter.helper.CustomInfoWindow;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
 import com.klcn.xuant.transporter.mvp.profile.CustomerProfileActivity;
+import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -101,9 +103,9 @@ public class CustomerHomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         com.google.android.gms.location.LocationListener, PlaceSelectionListener,
-        View.OnClickListener{
+        View.OnClickListener,NetworkStateReceiver.NetworkStateReceiverListener{
 
-
+    private NetworkStateReceiver networkStateReceiver;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -126,6 +128,8 @@ public class CustomerHomeActivity extends AppCompatActivity
     Customer customerModel;
 
     Driver currentDriver = null;
+    float bearing = 0;
+    GeoLocation oldLocationDriver;
 
     @BindView(R.id.btn_pick_request)
     Button btnPickRequest;
@@ -143,6 +147,8 @@ public class CustomerHomeActivity extends AppCompatActivity
     CircleImageView mAvatar;
 
     HashMap<String,Marker> hashMapMarker = new HashMap<>();
+    HashMap<String,GeoLocation> hashMapLocation = new HashMap<>();
+    HashMap<String,Float> hashMapBearing = new HashMap<>();
 
 
 
@@ -188,13 +194,10 @@ public class CustomerHomeActivity extends AppCompatActivity
         btnPickRequest.setOnClickListener(this);
 //        ref = FirebaseDatabase.getInstance().getReference("Drivers");
 //        geoFire = new GeoFire(ref);
-
-        setupLocation();
+        networkStateReceiver = new NetworkStateReceiver();
+        networkStateReceiver.addListener(this);
+        getApplicationContext().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 //        getUserInfo();
-
-
-
-        updateFireBaseToken();
     }
 
 
@@ -260,12 +263,17 @@ public class CustomerHomeActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case MY_PERMISSION_REQUEST_CODE:
-                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if(checkPlayService()){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (checkPlayService()) {
                         buildGoogleApiClient();
                         createLocationRequest();
                         displayLocation();
                     }
+                }else{
+                    ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, MY_PERMISSION_REQUEST_CODE);
                 }
         }
     }
@@ -375,20 +383,32 @@ public class CustomerHomeActivity extends AppCompatActivity
         dialog.show();
     }
 
-    // setup permission
-    private void setupLocation() {
-
+    private void setupGPS() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            setupPermissionLocation();
+        }else{
+            displayPromptForEnablingGPS(this);
+        }
+
+    }
+    // setup permission
+    private void setupPermissionLocation() {
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                ) {
+            //Request runtime permission
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, MY_PERMISSION_REQUEST_CODE);
+        } else {
             if (checkPlayService()) {
                 buildGoogleApiClient();
                 createLocationRequest();
                 displayLocation();
             }
-        }else{
-            displayPromptForEnablingGPS(this);
         }
-
     }
 
     private void startLocationUpdate(){
@@ -396,7 +416,11 @@ public class CustomerHomeActivity extends AppCompatActivity
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             return;
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest, this);
+        try{
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -433,9 +457,10 @@ public class CustomerHomeActivity extends AppCompatActivity
             if(mUserMarker!=null)
                 mUserMarker.remove();
             mUserMarker = mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_vitri))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
                     .position(new LatLng(latitude,longitude))
                     .title("You"));
+            mUserMarker.setZIndex(1);
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
 
             // load drivers available in map
@@ -462,14 +487,20 @@ public class CustomerHomeActivity extends AppCompatActivity
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Driver driver = dataSnapshot.getValue(Driver.class);
                                 Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                if(hashMapBearing.get(dataSnapshot.getKey())!=null)
+                                    bearing = hashMapBearing.get(dataSnapshot.getKey());
                                 if(mMarker==null){
                                     mMarker = mMap.addMarker(new MarkerOptions()
                                             .position(new LatLng(location.latitude,location.longitude))
                                             .snippet(driver.getPhoneNum())
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
                                             .title(driver.getName())
-                                            .flat(true));
+                                            .flat(true)
+                                            .anchor(0.5f, 0.5f)
+                                            .rotation(bearing));
+                                    bearing = 0;
                                     hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                    hashMapLocation.put(dataSnapshot.getKey(),location);
                                 }
                                 Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
                             }
@@ -492,12 +523,54 @@ public class CustomerHomeActivity extends AppCompatActivity
             }
 
             @Override
-            public void onKeyMoved(String key, GeoLocation location) {
+            public void onKeyMoved(final String key,final GeoLocation location) {
                 Marker marker = hashMapMarker.get(key);
                 if(marker!=null){
                     marker.remove();
                     hashMapMarker.remove(key);
-                    Log.e("REMOVE",key+"  out hashMapMarker");
+                    FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                            .child(key)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Driver driver = dataSnapshot.getValue(Driver.class);
+                                    Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                    oldLocationDriver = hashMapLocation.get(key);
+                                    hashMapLocation.remove(key);
+                                    if(oldLocationDriver!=null){
+                                        Location startingLocation = new Location("starting point");
+                                        startingLocation.setLatitude(oldLocationDriver.latitude);
+                                        startingLocation.setLongitude(oldLocationDriver.longitude);
+
+                                        //Get the target location
+                                        Location endingLocation = new Location("ending point");
+                                        endingLocation.setLatitude(location.latitude);
+                                        endingLocation.setLongitude(location.longitude);
+
+                                        bearing = startingLocation.bearingTo(endingLocation);
+                                    }
+
+                                    if(mMarker==null){
+                                        mMarker = mMap.addMarker(new MarkerOptions()
+                                                .position(new LatLng(location.latitude,location.longitude))
+                                                .snippet(driver.getPhoneNum())
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
+                                                .title(driver.getName())
+                                                .flat(true)
+                                                .anchor(0.5f, 0.5f)
+                                                .rotation(bearing));
+                                        hashMapBearing.put(dataSnapshot.getKey(),bearing);
+                                        hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                        hashMapLocation.put(dataSnapshot.getKey(),location);
+                                    }
+                                    Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
                 }
             }
 
@@ -726,9 +799,19 @@ public class CustomerHomeActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
+        if(mGoogleApiClient!=null)
+            mGoogleApiClient.disconnect();
+        // Remove driver when driver not available
         isChooseDropOff = false;
+
+    }
+
+    @Override
+    public void onStart() {
+        buildGoogleApiClient();
+        super.onStart();
     }
 
     @Override
@@ -740,11 +823,7 @@ public class CustomerHomeActivity extends AppCompatActivity
         else{
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                if (checkPlayService()) {
-                    buildGoogleApiClient();
-                    createLocationRequest();
-                    displayLocation();
-                }
+                setupPermissionLocation();
             }else{
                 displayShouldPromptForEnablingGPS(this);
             }
@@ -780,4 +859,30 @@ public class CustomerHomeActivity extends AppCompatActivity
         });
 
     }
+
+    @Override
+    public void networkAvailable() {
+        updateFireBaseToken();
+        setupGPS();
+    }
+
+    @Override
+    public void networkUnavailable() {
+        Toast.makeText(getApplicationContext(),"Please connect internet !!!",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //stop location updates when Activity is no longer active
+        if (mGoogleApiClient != null) {
+            try{
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }

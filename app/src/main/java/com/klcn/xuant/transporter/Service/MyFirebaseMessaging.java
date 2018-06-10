@@ -5,8 +5,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -24,6 +27,13 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //        LatLng customer_location = new Gson().fromJson(remoteMessage.getNotification().getBody(),LatLng.class);
 
         if(remoteMessage.getNotification().getTitle().equals("Arrived")){
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(MyFirebaseMessaging.this,"Your driver near here!",Toast.LENGTH_LONG).show();
+                }
+            });
             showNotificationArrived(remoteMessage.getNotification().getBody());
         }else if(remoteMessage.getNotification().getTitle().equals("Request")){
             String[] list = remoteMessage.getNotification().getBody().split(Common.keySplit);
@@ -31,6 +41,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             intent.putExtra("lat",list[0]);
             intent.putExtra("lng",list[1]);
             intent.putExtra("destination",list[2]);
+            intent.putExtra("customerId",list[3]);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }

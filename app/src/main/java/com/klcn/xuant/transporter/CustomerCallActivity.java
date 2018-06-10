@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,11 +22,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Driver;
+import com.klcn.xuant.transporter.model.RideInfo;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
 import com.skyfishjy.library.RippleBackground;
 
@@ -70,6 +76,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     Thread thread;
     double lat,lng;
     String destination;
+    String customerId;
 
 
     @Override
@@ -127,10 +134,10 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         removeDriverAvailable();
         mService = Common.getGoogleAPI();
         if(getIntent()!=null){
-            Toast.makeText(getApplicationContext(),"Got data",Toast.LENGTH_LONG).show();
-             lat = getIntent().getDoubleExtra("lat",-1.0);
-             lng = getIntent().getDoubleExtra("lng",-1.0);
+             lat = Double.parseDouble(getIntent().getStringExtra("lat").toString());
+             lng = Double.parseDouble(getIntent().getStringExtra("lng").toString());
              destination = getIntent().getStringExtra("destination");
+             customerId = getIntent().getStringExtra("customerId");
             getDirection(lat,lng);
         }
 
@@ -191,7 +198,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                                 JSONObject distace = legsObject.getJSONObject("distance");
                                 mTxtDistance.setText(distace.getString("text"));
 
-                                Double price = (Double.valueOf(mTxtDistance.getText().toString())*8);
+                                Double price = (Double.valueOf(mTxtDistance.getText().toString().replace(" km",""))*8000);
                                 mTxtPrice.setText("VND "+String.valueOf(price.intValue())+"K");
 
                                 JSONObject time = legsObject.getJSONObject("duration");
@@ -225,9 +232,28 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
             break;
 
             case R.id.btn_accept_pickup_request:
-                Intent intent = new Intent(CustomerCallActivity.this,DriverTrackingAcitivity.class);
-                startActivity(intent);
-                finish();
+                DatabaseReference rideInfos = FirebaseDatabase.getInstance().getReference(Common.ride_info_tbl);
+                RideInfo rideInfo = new RideInfo();
+                rideInfo.setLatPickup(String.valueOf(lat));
+                rideInfo.setLngPickup(String.valueOf(lng));
+                rideInfo.setDestination(destination);
+                rideInfo.setCustomerId(customerId);
+                rideInfos.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .setValue(rideInfo)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                finish();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull final Exception e) {
+                                e.printStackTrace();
+                                // send cancel to customer
+                            }
+                        });
+
                 break;
         }
     }

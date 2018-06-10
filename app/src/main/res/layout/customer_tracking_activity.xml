@@ -16,31 +16,33 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorYellow"
         app:contentInsetStart="0dp">
-
-        <ImageView
-            android:id="@+id/toolbar_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:minHeight="?attr/actionBarSize"
-            android:scaleType="centerInside"
-            app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/toolbar_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:minHeight="?attr/actionBarSize"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
+
+
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:layout_gravity="center"
                 android:text="Customer Tracking"
+                android:id="@+id/txt_name_toolbar"
                 android:textColor="@color/Gray1"
                 android:textSize="@dimen/dimen_title_20_sp"
                 android:textStyle="bold" />
-        </LinearLayout>
+        </RelativeLayout>
+
+
 
     </android.support.v7.widget.Toolbar>
 

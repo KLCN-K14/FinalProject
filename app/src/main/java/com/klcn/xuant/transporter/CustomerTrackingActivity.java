@@ -105,6 +105,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     @BindView(R.id.txt_place_destination)
     TextView mTxtPlaceDestination;
 
+    @BindView(R.id.txt_name_toolbar)
+    TextView mTxtNameToolbar;
+
     @BindView(R.id.btn_cancel_book)
     Button mBtnCancelBook;
 
@@ -128,7 +131,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
     String ressonCancelTrip = "";
     float bearing = 0;
-    Location oldLocationDriver;
+    GeoLocation oldLocationDriver;
 
     DatabaseReference driverFound;
 
@@ -177,6 +180,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                     mTxtLicensePlate.setText(mDriver.getLicensePlate());
                     mTxtPlaceLocation.setText(mPickUp);
                     mTxtPlaceDestination.setText(mDestination);
+
+                    mTxtNameToolbar.setText(mDriver.getName().toUpperCase()+" is coming . . .");
 
                     showFoundDriverDialog();
                 }
@@ -229,7 +234,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 startActivityForResult(intent, PICK_REQUEST);
                 break;
             case R.id.img_ic_chat:
-
                 Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
                 chatIntent.putExtra("user_id", "VxE53ShAMWOdkKbTOQ6KT6J3ZII2");
                 chatIntent.putExtra("user_name", "test");
@@ -237,6 +241,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
                 break;
             case R.id.img_ic_phone:
+                Log.e("PHONE",mDriver.getPhoneNum());
                 call(mDriver.getPhoneNum());
                 break;
         }
@@ -270,7 +275,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             public void run() {
                 dialog.dismiss();
             }
-        }, 3000);
+        }, 2000);
     }
 
     @Override
@@ -322,20 +327,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     }
 
     private void loadDriverFound() {
-        mMap.clear();
-        mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_vitri))
-                .position(new LatLng(Common.mLastLocationCustomer.getLatitude(), Common.mLastLocationCustomer.getLongitude()))
-                .flat(true)
-                .title("You"));
-
-        mCustomerCircle = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
-                .radius(10)
-                .strokeColor(Color.BLUE)
-                .fillColor(0x220000FF)
-                .strokeWidth(5.0f));
-
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
         GeoFire gfDriverAvailable = new GeoFire(driverAvailable);
 
@@ -351,23 +342,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                             .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                    if(oldLocationDriver!=null){
-                                        Location startingLocation = new Location("starting point");
-                                        startingLocation.setLatitude(oldLocationDriver.getLatitude());
-                                        startingLocation.setLongitude(oldLocationDriver.getLongitude());
-
-                                        //Get the target location
-                                        Location endingLocation = new Location("ending point");
-                                        endingLocation.setLatitude(location.latitude);
-                                        endingLocation.setLongitude(location.longitude);
-
-                                        bearing = startingLocation.bearingTo(endingLocation);
-                                    }
-
                                     Driver driver = dataSnapshot.getValue(Driver.class);
                                     Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
-
                                     if(mMarker==null){
                                         mMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(new LatLng(location.latitude,location.longitude))
@@ -378,9 +354,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                                                 .anchor(0.5f, 0.5f)
                                                 .rotation(bearing));
                                         hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                        oldLocationDriver = location;
                                     }
-                                    oldLocationDriver.setLatitude(location.latitude);
-                                    oldLocationDriver.setLongitude(location.longitude);
+                                    Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
                                 }
 
                                 @Override
@@ -402,13 +378,52 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             }
 
             @Override
-            public void onKeyMoved(String key, GeoLocation location) {
-//                Marker marker = hashMapMarker.get(key);
-//                if(marker!=null){
-//                    marker.remove();
-//                    hashMapMarker.remove(key);
-//                    Log.e("REMOVE",key+"  out hashMapMarker");
-//                }
+            public void onKeyMoved(final String key,final GeoLocation location) {
+                Marker marker = hashMapMarker.get(key);
+                if(marker!=null){
+                    marker.remove();
+                    hashMapMarker.remove(key);
+                    FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                            .child(key)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Driver driver = dataSnapshot.getValue(Driver.class);
+                                    Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                    if(oldLocationDriver!=null){
+                                        Location startingLocation = new Location("starting point");
+                                        startingLocation.setLatitude(oldLocationDriver.latitude);
+                                        startingLocation.setLongitude(oldLocationDriver.longitude);
+
+                                        //Get the target location
+                                        Location endingLocation = new Location("ending point");
+                                        endingLocation.setLatitude(location.latitude);
+                                        endingLocation.setLongitude(location.longitude);
+
+                                        bearing = startingLocation.bearingTo(endingLocation);
+                                    }
+
+                                    if(mMarker==null){
+                                        mMarker = mMap.addMarker(new MarkerOptions()
+                                                .position(new LatLng(location.latitude,location.longitude))
+                                                .snippet(driver.getPhoneNum())
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
+                                                .title(driver.getName())
+                                                .flat(true)
+                                                .anchor(0.5f, 0.5f)
+                                                .rotation(bearing));
+                                        hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                        oldLocationDriver = location;
+                                    }
+                                    Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                }
             }
 
             @Override
@@ -438,7 +453,11 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        try{
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     // setup permission
@@ -511,25 +530,11 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             final double latitude = Common.mLastLocationCustomer.getLatitude();
             final double longitude = Common.mLastLocationCustomer.getLongitude();
 
-
-            driverFound = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
-            driverFound.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    loadDriverFound();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
             //Add marker
             if (mCustomerMarker != null)
                 mCustomerMarker.remove();
             mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_vitri))
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
                             .position(new LatLng(latitude, longitude))
                             .flat(true)
                             .title("You"));
@@ -539,6 +544,34 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         } else {
             Log.e("ERROR", "Can't get your location");
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //stop location updates when Activity is no longer active
+        if (mGoogleApiClient != null) {
+            try{
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mGoogleApiClient!=null)
+            mGoogleApiClient.disconnect();
+        // Remove driver when driver not available
+
+    }
+
+    @Override
+    public void onStart() {
+        buildGoogleApiClient();
+        super.onStart();
     }
 
     @Override

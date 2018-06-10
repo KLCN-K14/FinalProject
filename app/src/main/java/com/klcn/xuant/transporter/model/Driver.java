@@ -5,16 +5,17 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Driver {
 
-    private String name,email,phoneNum,imgUrl,serviceVehicle,nameVehicle,licensePlate,avgRatings,creadits,cashBalance;
+    private String name,email,phoneNum,imgUrl,imgVehicle,serviceVehicle,nameVehicle,licensePlate,avgRatings,creadits,cashBalance;
 
     public Driver() {
     }
 
-    public Driver(String name, String email, String phoneNum, String imgUrl, String serviceVehicle, String nameVehicle, String licensePlate, String avgRatings, String creadits, String cashBalance) {
+    public Driver(String name, String email, String phoneNum, String imgUrl, String imgVehicle, String serviceVehicle, String nameVehicle, String licensePlate, String avgRatings, String creadits, String cashBalance) {
         this.name = name;
         this.email = email;
         this.phoneNum = phoneNum;
         this.imgUrl = imgUrl;
+        this.imgVehicle = imgVehicle;
         this.serviceVehicle = serviceVehicle;
         this.nameVehicle = nameVehicle;
         this.licensePlate = licensePlate;
@@ -53,6 +54,14 @@ public class Driver {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public String getImgVehicle() {
+        return imgVehicle;
+    }
+
+    public void setImgVehicle(String imgVehicle) {
+        this.imgVehicle = imgVehicle;
     }
 
     public String getServiceVehicle() {

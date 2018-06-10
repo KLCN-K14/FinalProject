@@ -214,6 +214,8 @@ public class DriverRegisterActivity extends AppCompatActivity implements View.On
                             driver.setAvgRatings("5");
                             driver.setCreadits("100000");
                             driver.setCashBalance("0");
+                            driver.setImgUrl("https://firebasestorage.googleapis.com/v0/b/transporter-80ff6.appspot.com/o/images%2Fdriver_ava.png?alt=media&token=7d9384d4-962d-4d91-b0a0-4dc0091d4e7f");
+                            driver.setImgVehicle("https://firebasestorage.googleapis.com/v0/b/transporter-80ff6.appspot.com/o/images%2Fcar_ava.jpg?alt=media&token=d54d727d-387d-459f-8be2-7c909346e2db");
                             drivers.child(mFirebaseAuth.getCurrentUser().getUid())
                                     .setValue(driver)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {

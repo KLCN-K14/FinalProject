@@ -36,6 +36,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class DriverMainActivity extends AppCompatActivity {
 
 //    @BindView(R.id.navigation)
+    private static Context context;
 
     public static BottomNavigationView mBottomNavigationView;
 
@@ -71,9 +72,11 @@ public class DriverMainActivity extends AppCompatActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/Arkhip_font.ttf")
                 .setFontAttrId(R.attr.fontPath)
@@ -89,6 +92,10 @@ public class DriverMainActivity extends AppCompatActivity {
         transaction.commit();
 
         disableShiftMode(mBottomNavigationView);
+    }
+
+    public static Context getContext() {
+        return context;
     }
 
 

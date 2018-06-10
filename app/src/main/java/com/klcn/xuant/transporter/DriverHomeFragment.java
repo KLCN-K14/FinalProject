@@ -3,6 +3,7 @@ package com.klcn.xuant.transporter;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -83,9 +85,13 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
     DatabaseReference driverAvailable;
     GeoFire mGeoFire;
 
+    float bearing = 0;
+    Location oldLocation;
+
     static boolean isLoggingOut = false;
     String driverID;
     static boolean isFirstTime = true;
+    static boolean onTrip = false;
 
     Marker mMarker;
     SupportMapFragment mapFragment;
@@ -96,6 +102,9 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
     @BindView(R.id.txt_status)
     TextView mTxtStatus;
 
+    Activity mActivity;
+    Context mContext;
+
     public static DriverHomeFragment newInstance() {
         DriverHomeFragment fragment = new DriverHomeFragment();
         return fragment;
@@ -104,7 +113,20 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        buildGoogleApiClient();
+    }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mActivity =(Activity) context;
+        mContext = context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
     }
 
 
@@ -194,7 +216,11 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                 ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        try{
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -202,7 +228,6 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         switch (requestCode) {
             case MY_PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getContext(),"have permission",Toast.LENGTH_LONG).show();
                     if (checkPlayService()) {
                         buildGoogleApiClient();
                         createLocationRequest();
@@ -210,7 +235,10 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                             displayLocation();
                     }
                 }else{
-                    Toast.makeText(getContext(),"not have permission",Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, MY_PERMISSION_REQUEST_CODE);
                 }
         }
     }
@@ -299,21 +327,33 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         dialog.show();
     }
 
-    // setup permission
-    private void setupLocation() {
-
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+    private void setupGPS() {
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            setupPermissionLocation();
+        }else{
+            displayPromptForEnablingGPS(getActivity());
+        }
+    }
+    // setup permission
+    private void setupPermissionLocation() {
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                ) {
+            //Request runtime permission
+            ActivityCompat.requestPermissions(getActivity(), new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, MY_PERMISSION_REQUEST_CODE);
+        } else {
             if (checkPlayService()) {
                 buildGoogleApiClient();
                 createLocationRequest();
                 if (mSwitchButton.isChecked())
                     displayLocation();
             }
-        }else{
-            displayPromptForEnablingGPS(getActivity());
         }
-
     }
 
     // create locationrequest
@@ -370,12 +410,26 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                         new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
                             @Override
                             public void onComplete(String key, DatabaseError error) {
+                                if(oldLocation!=null){
+                                    Location startingLocation = new Location("starting point");
+                                    startingLocation.setLatitude(oldLocation.getLatitude());
+                                    startingLocation.setLongitude(oldLocation.getLongitude());
+
+                                    //Get the target location
+                                    Location endingLocation = new Location("ending point");
+                                    endingLocation.setLatitude(latitude);
+                                    endingLocation.setLongitude(longitude);
+
+                                    bearing = startingLocation.bearingTo(endingLocation);
+                                }
                                 //Add marker
                                 if (mMarker != null)
                                     mMarker.remove();
                                 mMarker = mMap.addMarker(new MarkerOptions()
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
                                         .position(new LatLng(latitude, longitude))
+                                        .anchor(0.5f, 0.5f)
+                                        .rotation(bearing)
                                         .title("You"));
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15.0f));
                             }
@@ -401,9 +455,11 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
-        Common.mLastLocationDriver = location;
-        Log.e("DRIVERHOME","Change location");
-        displayLocation();
+        if(!onTrip){
+            oldLocation = Common.mLastLocationDriver;
+            Common.mLastLocationDriver = location;
+            displayLocation();
+        }
     }
 
 
@@ -442,16 +498,23 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         mMap.setIndoorEnabled(false);
         mMap.setBuildingsEnabled(false);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.setMyLocationEnabled(true);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        if(mGoogleApiClient!=null)
+            mGoogleApiClient.disconnect();
         // Remove driver when driver not available
         if(isLoggingOut){
             offlineDriver();
         }
+    }
+
+    @Override
+    public void onStart() {
+        buildGoogleApiClient();
+        super.onStart();
     }
 
     public void offlineDriver() {
@@ -489,13 +552,13 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void networkAvailable() {
+        Log.e("networkAvailable","networkAvailable");
         driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Geo Fire
         driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         mGeoFire = new GeoFire(driverAvailable);
-        Toast.makeText(getActivity(),"Internet available",Toast.LENGTH_LONG).show();
         updateFireBaseToken();
-        setupLocation();
+        setupGPS();
     }
 
     @Override
@@ -504,25 +567,80 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         offlineDriver();
     }
 
-
-
     @Override
     public void onResume() {
         super.onResume();
+
+        FirebaseDatabase.getInstance().getReference(Common.ride_info_tbl)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        if(dataSnapshot.getKey().equals(driverID)){
+                            onTrip = true;
+                            mSwitchButton.setChecked(false);
+                            slideUp(DriverMainActivity.mBottomNavigationView);
+                            DriverMainActivity.mBottomNavigationView.setVisibility(View.VISIBLE);
+                            stopLocationUpdate();
+                            if (mMarker != null) {
+                                mMarker.remove();
+                                offlineDriver();
+                            }
+                            Snackbar.make(getView(), "You are offline", Snackbar.LENGTH_SHORT).show();
+                            mTxtStatus.setText("OFFLINE");
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(getContext(),DriverTrackingAcitivity.class);
+                                    startActivity(intent);
+                                }
+                            },1000);
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
         if (isFirstTime){
             isFirstTime = false;
         }
         else{
             LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                if (checkPlayService()) {
-                    buildGoogleApiClient();
-                    createLocationRequest();
-                    if (mSwitchButton.isChecked())
-                        displayLocation();
-                }
+                setupPermissionLocation();
             }else{
                 displayShouldPromptForEnablingGPS(getActivity());
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //stop location updates when Activity is no longer active
+        if (mGoogleApiClient != null) {
+            try{
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
     }

@@ -54,13 +54,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.DirectionsJSONParser;
+import com.klcn.xuant.transporter.model.Customer;
+import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
+import com.klcn.xuant.transporter.model.RideInfo;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
@@ -75,6 +80,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -152,6 +158,11 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     @BindView(R.id.txt_name_location)
     TextView mTxtNameLocation;
 
+    DatabaseReference mRideInfoDatabase;
+    DatabaseReference mCustomerDatabase;
+    RideInfo mRideInfo;
+    Customer mCustomer;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -179,13 +190,75 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Geo Fire
         driverWorking = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
+        mRideInfoDatabase = FirebaseDatabase.getInstance().getReference(Common.ride_info_tbl);
+        mCustomerDatabase = FirebaseDatabase.getInstance().getReference(Common.customers_tbl);
         mGeoFire = new GeoFire(driverWorking);
         Log.e("DRIVERTRACKING","Start");
+
+        mRideInfoDatabase.child(driverID)
+                .addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mRideInfo = dataSnapshot.getValue(RideInfo.class);
+                customerLat = Double.valueOf(mRideInfo.getLatPickup());
+                customerLng = Double.valueOf(mRideInfo.getLngPickup());
+                destination = mRideInfo.getDestination();
+                mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                        .position(new LatLng(customerLat, customerLng))
+                        .title("Customer"));
+                mTxtNameLocation.setText(getNameAdress(customerLat,customerLng));
+                getInfoCustomer(mRideInfo.getCustomerId());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("ERROR", "Failed to read value.", error.toException());
+            }
+        });
+
+
 
         networkStateReceiver = new NetworkStateReceiver();
         networkStateReceiver.addListener(this);
         this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
+    }
+
+    private void getInfoCustomer(String id) {
+        mCustomerDatabase.child(id)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        mCustomer = dataSnapshot.getValue(Customer.class);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        // Failed to read value
+                        Log.w("ERROR", "Failed to read value.", error.toException());
+                    }
+                });
+    }
+
+    private String getNameAdress(double lat,double lng) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat,lng, 1);
+            if(!addresses.isEmpty()){
+                Address obj = addresses.get(0);
+                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+                return namePlacePickup;
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return "";
     }
 
     @Override
@@ -220,6 +293,34 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        //stop location updates when Activity is no longer active
+        if (mGoogleApiClient != null) {
+            try{
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mGoogleApiClient!=null)
+            mGoogleApiClient.disconnect();
+        // Remove driver when driver not available
+
+    }
+
+    @Override
+    public void onStart() {
+        buildGoogleApiClient();
+        super.onStart();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSION_REQUEST_CODE:
@@ -229,20 +330,21 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                         createLocationRequest();
                         displayLocation();
                     }
+                }else{
+                    ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.CALL_PHONE,
+                            Manifest.permission.READ_PHONE_STATE
+                    }, MY_PERMISSION_REQUEST_CODE);
                 }
         }
     }
 
     // setup permission
     private void setupLocation() {
-        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED &&
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             //Request runtime permission
             ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.CALL_PHONE,
                     Manifest.permission.READ_PHONE_STATE
             }, MY_PERMISSION_REQUEST_CODE);
@@ -303,24 +405,26 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
             final double latitude = Common.mLastLocationDriver.getLatitude();
             final double longitude = Common.mLastLocationDriver.getLongitude();
 
-            if(oldLocation!=null){
-                Location startingLocation = new Location("starting point");
-                startingLocation.setLatitude(oldLocation.getLatitude());
-                startingLocation.setLongitude(oldLocation.getLongitude());
 
-                //Get the target location
-                Location endingLocation = new Location("ending point");
-                endingLocation.setLatitude(latitude);
-                endingLocation.setLongitude(longitude);
-
-                bearing = startingLocation.bearingTo(endingLocation);
-            }
-                //Add marker
-            if (mDriverMarker != null)
-                mDriverMarker.remove();
             mGeoFire.setLocation(driverID, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
                 @Override
                 public void onComplete(String key, DatabaseError error) {
+
+                    if(oldLocation!=null){
+                        Location startingLocation = new Location("starting point");
+                        startingLocation.setLatitude(oldLocation.getLatitude());
+                        startingLocation.setLongitude(oldLocation.getLongitude());
+
+                        //Get the target location
+                        Location endingLocation = new Location("ending point");
+                        endingLocation.setLatitude(latitude);
+                        endingLocation.setLongitude(longitude);
+
+                        bearing = startingLocation.bearingTo(endingLocation);
+                    }
+                    //Add marker
+                    mMap.clear();
+
                     mDriverMarker = mMap.addMarker(new MarkerOptions()
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
                             .position(new LatLng(latitude, longitude))
@@ -328,19 +432,22 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                             .anchor(0.5f, 0.5f)
                             .rotation(bearing)
                             .title("You"));
+                    getDirection();
+                    mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                            .position(new LatLng(customerLat, customerLng))
+                            .title("Customer"));
+                    mTxtNameLocation.setText(getNameAdress(customerLat,customerLng));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
+//                    if(direction!=null){
+//                        direction.remove();
+//                        Log.e("REMOVE","REMOVE DIRECTION");
+//                    }
                 }
             });
 
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
 
-
-            if(direction!=null){
-                direction.remove();
-                Log.e("REMOVE","REMOVE DIRECTION");
-            }
-
-            getDirection();
 
         } else {
             Log.e("ERROR", "Can't get your location");
@@ -357,7 +464,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                     "origin="+ Common.mLastLocationDriver.getLatitude()+","+Common.mLastLocationDriver.getLongitude()+"&"+
                     "destination="+customerLat+","+customerLng+"&"+
                     "key="+getResources().getString(R.string.google_direction_api);
-            Log.d("TRANSPORT",requestApi);
+            Log.e("TRANSPORT",requestApi);
             mService.getPath(requestApi)
                     .enqueue(new Callback<String>() {
                         @Override
@@ -387,7 +494,11 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        try{
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private class PhoneCallListener extends PhoneStateListener {
@@ -410,8 +521,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_phone:
-//                call();
-
+                call(mCustomer.getPhoneNum());
                 break;
             case R.id.btn_chat:
                 Intent chatIntent = new Intent(DriverTrackingAcitivity.this, ChatActivity.class);
@@ -467,13 +577,10 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                         public void run() {
                                             isPickup = false;
 
+                                            mTxtNameLocation.setText(destination);
                                             mImgLocation.setImageResource(R.drawable.ic_drop_off);
-                                            if(mCustomerMarker!=null)
-                                                mCustomerMarker.remove();
-
-                                            if(direction!=null)
-                                                direction.remove();
-
+                                            mMap.clear();
+                                            displayLocation();
 
                                             LatLng dropOffLocation = getLocationFromAddress(getApplicationContext(),destination);
                                             customerLat = dropOffLocation.latitude;
@@ -534,46 +641,30 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(getApplicationContext(),"Location change",Toast.LENGTH_LONG).show();
-        Log.e("LOCATION",customerLat+"---"+customerLng);
         oldLocation = Common.mLastLocationDriver;
         Common.mLastLocationDriver = location;
+        // remove any driveravailable
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
+
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+            }
+        });
+
+        checkDriverNear();
         displayLocation();
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-//        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-//        mMap.setTrafficEnabled(false);
-//        mMap.setIndoorEnabled(false);
-//        mMap.setBuildingsEnabled(false);
-//        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.setMyLocationEnabled(true);
-
-
-        mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pick_up))
-                .position(new LatLng(customerLat, customerLng))
-                .title("Customer"));
-
+    private void checkDriverNear() {
         GeoFire geoFire = new GeoFire(FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl));
         GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(customerLat,customerLng),0.05f);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                sendArrivedNotification(customerID);
+                sendArrivedNotification(mRideInfo.getCustomerId());
             }
 
             @Override
@@ -596,6 +687,29 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
             }
         });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+//        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+//        mMap.setTrafficEnabled(false);
+//        mMap.setIndoorEnabled(false);
+//        mMap.setBuildingsEnabled(false);
+//        mMap.getUiSettings().setZoomControlsEnabled(true);
+
+
 
 
 
@@ -608,9 +722,10 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
             @Override
             public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
-                if(!response.isSuccessful()){
+                if(response.body().success == 1)
+                    Toast.makeText(getApplicationContext(),"Request sent",Toast.LENGTH_LONG).show();
+                else
                     Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
-                }
             }
 
             @Override

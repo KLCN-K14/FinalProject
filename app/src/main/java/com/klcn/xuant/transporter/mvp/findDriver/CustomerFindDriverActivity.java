@@ -218,9 +218,11 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 //                            String json_lat_lng = new Gson().toJson(new LatLng(lat,lng));
                             String data = "";
                             if(destination!=null){
-                                data = lat+Common.keySplit+lng+
-                                        Common.keySplit+destination;
+                                data = Common.mLastLocationCustomer.getLatitude()+Common.keySplit+Common.mLastLocationCustomer.getLongitude()+
+                                        Common.keySplit+destination+Common.keySplit+FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                String[] list = data.split(Common.keySplit);
                             }
+
 
                             Notification notification = new Notification("Request",data);
                             Sender content = new Sender(token.getToken(),notification);
