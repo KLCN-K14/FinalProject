@@ -357,7 +357,7 @@ public class TestVerifyActivity extends AppCompatActivity implements
             mStatusText.setText(R.string.signed_out);;
         } else {
             // Signed in
-            postRef.orderByChild("phoneNum").equalTo(phoneNum).addListenerForSingleValueEvent(new ValueEventListener() {
+            postRef.orderByChild("phoneNum").equalTo(phone).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){

@@ -171,12 +171,14 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
             final Uri imgFile = data.getData();
             filePath = imgFile;
             mAvatar.setImageURI(filePath);
+            uploadImage();
 
         } else if (requestCode == REQUEST_CAMERA) {
             onCaptureImageResult(data);
             final Uri imgFileCam = data.getData();
             filePath = imgFileCam;
             mAvatar.setImageURI(filePath);
+            uploadImage();
         }
 
     }
@@ -217,7 +219,7 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-//        mAvatar.setImageBitmap(bitmap);
+        mAvatar.setImageBitmap(bitmap);
         encodedString = myBitMap.getStringFromBitmap(bitmap);
 
     }
@@ -242,6 +244,7 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
                                 isNameChange = true;
                                 mTxtName.setText(userInputDialogEditText.getText().toString());
                                 newName = userInputDialogEditText.getText().toString();
+                                customers.child("name").setValue(mTxtName.getText().toString());
                             }
                         })
 
@@ -257,40 +260,41 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
 
                 break;
             case R.id.toolbar_back:
-                Log.e("Customer name::", customers.child("name").toString());
-                Log.e("Customer name2::", mTxtName.getText().toString());
-                if (!isNameChange && filePath == null) {
-                    finish();
-                } else {
-                    AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-                    builder1.setMessage("Bạn có muốn lưu những thay đổi?");
-                    builder1.setCancelable(true);
-                    builder1.setPositiveButton(
-                            "Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Log.e("CustomerProfile::", newName);
-                                    Log.e("profile filePath::::::", filePath + "");
-                                    customers.child("name").setValue(mTxtName.getText().toString());
-                                    uploadImage();
-                                    finish();
-                                }
-                            });
-
-                    builder1.setNegativeButton(
-                            "No",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                    finish();
-                                }
-                            });
-
-                    AlertDialog alert11 = builder1.create();
-                    alert11.show();
-
-
-                }
+//                Log.e("Customer name::", customers.child("name").toString());
+//                Log.e("Customer name2::", mTxtName.getText().toString());
+//                if (!isNameChange && filePath == null) {
+//                    finish();
+//                } else {
+//                    AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+//                    builder1.setMessage("Bạn có muốn lưu những thay đổi?");
+//                    builder1.setCancelable(true);
+//                    builder1.setPositiveButton(
+//                            "Yes",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int id) {
+//                                    Log.e("CustomerProfile::", newName);
+//                                    Log.e("profile filePath::::::", filePath + "");
+//                                    customers.child("name").setValue(mTxtName.getText().toString());
+//                                    uploadImage();
+//                                    finish();
+//                                }
+//                            });
+//
+//                    builder1.setNegativeButton(
+//                            "No",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int id) {
+//                                    dialog.cancel();
+//                                    finish();
+//                                }
+//                            });
+//
+//                    AlertDialog alert11 = builder1.create();
+//                    alert11.show();
+//
+//
+//                }
+                finish();
                 break;
 
         }
