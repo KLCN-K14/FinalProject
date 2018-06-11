@@ -44,6 +44,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             intent.putExtra("customerId",list[3]);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+        }else if(remoteMessage.getNotification().getTitle().equals("Pickup")){
+
         }
     }
 

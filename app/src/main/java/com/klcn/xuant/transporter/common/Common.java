@@ -20,10 +20,18 @@ public class Common {
     public static final String tokens_tbl = "Tokens";
 
 
+    public static final String ride_info_status_1 = "driver coming";
+    public static final String ride_info_status_2 = "on trip";
+    public static final String ride_info_status_3 = "drop off";
+
+
+    public static final String ride_status_1 = "completed";
+    public static final String ride_status_2 = "customer cancel";
+    public static final String ride_status_3 = "driver cancel";
+
+
     public static Location mLastLocationDriver = null;
     public static Location mLastLocationCustomer = null;
-
-    public static boolean isDriverOnline = false;
 
     public static final String baseURL = "https://maps.googleapis.com";
     public static final String keySplit = "TRANSPORT";

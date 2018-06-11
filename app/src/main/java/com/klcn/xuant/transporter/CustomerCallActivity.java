@@ -198,7 +198,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                                 JSONObject distace = legsObject.getJSONObject("distance");
                                 mTxtDistance.setText(distace.getString("text"));
 
-                                Double price = (Double.valueOf(mTxtDistance.getText().toString().replace(" km",""))*8000);
+                                Double price = (Double.valueOf(mTxtDistance.getText().toString().replaceAll("[^0-9.,]+",""))*8000);
                                 mTxtPrice.setText("VND "+String.valueOf(price.intValue())+"K");
 
                                 JSONObject time = legsObject.getJSONObject("duration");
@@ -238,6 +238,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                 rideInfo.setLngPickup(String.valueOf(lng));
                 rideInfo.setDestination(destination);
                 rideInfo.setCustomerId(customerId);
+                rideInfo.setStatus(Common.ride_info_status_1);
                 rideInfos.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .setValue(rideInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {

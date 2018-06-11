@@ -69,6 +69,10 @@
     <color name="colorPayStatement">#212033</color>
     <color name="colorInactiveNavigation">#999A9F</color>
     <color name="colorActiveNavigation">#1FBAD6</color>
+    <color name="colorFillMarkerPickup">#220000FF</color>
+    <color name="colorStrokeMarkerPickup">#440000ff</color>
+    <color name="colorFillMarkerDestination">#11ff1a00</color>
+    <color name="colorStrokeMarkerDestination">#3dff1a00</color>
     <color name="gray_20_precent">#F0F0F0</color>
 
 </resources>

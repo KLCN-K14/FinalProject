@@ -58,11 +58,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.DirectionsJSONParser;
 import com.klcn.xuant.transporter.model.Customer;
-import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.RideInfo;
@@ -81,6 +81,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -111,6 +112,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     private static int DISPLACEMENT = 10;
 
     Boolean isPickup = true;
+    Boolean isSendNotification = false;
     String ressonCancelTrip = "";
     float bearing = 0;
     Location oldLocation;
@@ -575,6 +577,12 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                     mLayoutPickup.animate().alpha(0.0f).setDuration(500).withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
+                                            HashMap<String, Object> timePickup = new HashMap<>();
+                                            timePickup.put("timePickup",ServerValue.TIMESTAMP);
+                                            timePickup.put("status",Common.ride_info_status_2);
+                                            mRideInfoDatabase.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                    .updateChildren(timePickup);
+
                                             isPickup = false;
 
                                             mTxtNameLocation.setText(destination);
@@ -643,7 +651,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     public void onLocationChanged(Location location) {
         oldLocation = Common.mLastLocationDriver;
         Common.mLastLocationDriver = location;
-        // remove any driveravailable
+        // remove any driveravailabled
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
 
@@ -653,8 +661,10 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
             public void onComplete(String key, DatabaseError error) {
             }
         });
+        // Don't send notification again when sent
+        if(!isSendNotification)
+            checkDriverNear();
 
-        checkDriverNear();
         displayLocation();
     }
 
@@ -716,23 +726,44 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     private void sendArrivedNotification(String customerID) {
-        Token token = new Token(customerID);
-        Notification notification = new Notification("Arrived","Your driver has arrived here!");
-        Sender sender = new Sender(token.getToken(),notification);
-        mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
-            @Override
-            public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
-                if(response.body().success == 1)
-                    Toast.makeText(getApplicationContext(),"Request sent",Toast.LENGTH_LONG).show();
-                else
-                    Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
-            }
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
-            @Override
-            public void onFailure(Call<FCMResponse> call, Throwable t) {
+        tokens.orderByKey().equalTo(customerID)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("Arrived","Your driver has arrived here!");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        isSendNotification = true;
+                                        Toast.makeText(getApplicationContext(),"Request sent",Toast.LENGTH_LONG).show();
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("ERROR",response.message());
+                                        Log.e("ERROR",response.errorBody().toString());
+                                    }
+                                }
 
-            }
-        });
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
     }
 
     @Override

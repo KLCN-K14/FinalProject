@@ -61,6 +61,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.CustomInfoWindow;
 import com.klcn.xuant.transporter.model.Driver;
+import com.klcn.xuant.transporter.model.RideInfo;
 import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
 
@@ -111,10 +112,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     @BindView(R.id.btn_cancel_book)
     Button mBtnCancelBook;
 
-    @BindView(R.id.img_ic_chat)
     ImageView mImgChat;
-
-    @BindView(R.id.img_ic_phone)
     ImageView mImgPhone;
 
     private GoogleMap mMap;
@@ -184,6 +182,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                     mTxtNameToolbar.setText(mDriver.getName().toUpperCase()+" is coming . . .");
 
                     showFoundDriverDialog();
+
+                    checkIsOnTrip();
                 }
 
                 @Override
@@ -198,7 +198,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
         //Bottom sheet
         View llBottomSheet = (View) findViewById(R.id.bottom_sheet);
-
+        mImgPhone = llBottomSheet.findViewById(R.id.img_ic_phone);
+        mImgChat = llBottomSheet.findViewById(R.id.img_ic_chat);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
 
         // set callback for changes
@@ -224,6 +225,30 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         networkStateReceiver = new NetworkStateReceiver();
         networkStateReceiver.addListener(this);
         this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void checkIsOnTrip() {
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference(Common.ride_info_tbl).child(mDriverID);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                RideInfo rideInfo = dataSnapshot.getValue(RideInfo.class);
+                if(rideInfo.getStatus().equals(Common.ride_info_status_2)){
+                    Toast.makeText(getApplicationContext(),"On Trip",Toast.LENGTH_LONG).show();
+                    setupOnTrip();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setupOnTrip() {
+
     }
 
     @Override
@@ -318,12 +343,19 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             return;
         }
 
+//        mCustomerCircle = mMap.addCircle(new CircleOptions()
+//            .center(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
+//            .radius(10)
+//            .strokeColor(Color.BLUE)
+//            .fillColor(0x220000FF)
+//            .strokeWidth(10.0f));
         mCustomerCircle = mMap.addCircle(new CircleOptions()
-            .center(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
-            .radius(10)
-            .strokeColor(Color.BLUE)
-            .fillColor(0x220000FF)
-            .strokeWidth(5.0f));
+                .center(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
+                .radius(10)
+                .strokeColor(R.color.colorStrokeMarkerDestination)
+                .fillColor(R.color.colorFillMarkerDestination)
+                .strokeWidth(10.0f));
+
     }
 
     private void loadDriverFound() {
@@ -445,6 +477,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     public void networkAvailable() {
         mService = Common.getGoogleAPI();
         setupLocation();
+
+
     }
 
     // Update location driver
