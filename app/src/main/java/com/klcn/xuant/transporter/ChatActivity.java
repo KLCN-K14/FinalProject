@@ -105,7 +105,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     // Storage Firebase
     private StorageReference mImageStorage;
 
-
+    Boolean fromCustomer = false;
     //New Solution
     private int itemPos = 0;
 
@@ -132,6 +132,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mCurrentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         mChatUser = getIntent().getStringExtra("user_id");
+        if(getIntent().getStringExtra("customer")!=null){
+            // Chat này đến từ customer
+            fromCustomer = true;
+        }else if(getIntent().getStringExtra("driver")!=null){
+            // Chat này đến từ driver
+            fromCustomer = false;
+        }
 //        mChatUser = "VxE53ShAMWOdkKbTOQ6KT6J3ZII2";
         userName = getIntent().getStringExtra("user_name");
 

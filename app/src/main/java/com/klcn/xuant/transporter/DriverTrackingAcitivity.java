@@ -530,6 +530,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 Intent chatIntent = new Intent(DriverTrackingAcitivity.this, ChatActivity.class);
                 chatIntent.putExtra("user_id", mRideInfo.getCustomerId());
                 chatIntent.putExtra("user_name", mCustomer.getName());
+                chatIntent.putExtra("driver", mCustomer.getName());
                 startActivity(chatIntent);
 
                 break;

@@ -310,6 +310,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
                 chatIntent.putExtra("user_id", mDriverID);
                 chatIntent.putExtra("user_name", mDriver.getName());
+                chatIntent.putExtra("customer", mDriver.getName());
                 startActivity(chatIntent);
 
                 break;
