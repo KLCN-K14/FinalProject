@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
@@ -35,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -133,6 +135,8 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     @BindView(R.id.btn_pick_request)
     Button btnPickRequest;
+    @BindView(R.id.img_double_up_down)
+    ImageView mImgUpDown;
 
     boolean isChooseDropOff = false;
     boolean isFirstTime = true;
@@ -197,6 +201,29 @@ public class CustomerHomeActivity extends AppCompatActivity
         networkStateReceiver = new NetworkStateReceiver();
         networkStateReceiver.addListener(this);
         getApplicationContext().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+
+        //Bottom sheet
+        View llBottomSheet = (View) findViewById(R.id.bottom_sheet_home);
+
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+
+        // set callback for changes
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED){
+                    mImgUpDown.setImageResource(R.drawable.ic_double_up);
+
+                }
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+//                fab.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
+                mImgUpDown.setImageResource(R.drawable.ic_double_down);
+            }
+        });
 //        getUserInfo();
     }
 

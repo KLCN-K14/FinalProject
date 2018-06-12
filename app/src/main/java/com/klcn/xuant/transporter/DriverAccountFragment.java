@@ -192,17 +192,19 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
                 break;
             case R.id.txt_edit_car:
                 LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-                View view1 = layoutInflater.inflate(R.layout.input_dialog, null);
+                View view1 = layoutInflater.inflate(R.layout.dialog_change_car, null);
                 AlertDialog.Builder alertDialogBuilderUserInput1 = new AlertDialog.Builder(getContext());
                 alertDialogBuilderUserInput1.setView(view1);
 
                 final EditText userInputDialogEditText1 = (EditText) view1.findViewById(R.id.userInputDialog);
+                final EditText licensePlateInput= (EditText) view1.findViewById(R.id.edit_license_plate);
                 alertDialogBuilderUserInput1
                         .setCancelable(false)
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogBox, int id) {
                                 mTxtNameCar.setText(userInputDialogEditText1.getText().toString());
                                 drivers.child("nameVehicle").setValue(mTxtNameCar.getText().toString());
+                                drivers.child("licensePlate").setValue(licensePlateInput.getText().toString());
                             }
                         })
 

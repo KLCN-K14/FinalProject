@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,78 +16,80 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".mvp.home.CustomerMapsActivity" />
+    <!--<include layout="@layout/bottom_sheet"/>-->
 
 
 
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:gravity="bottom"
         android:layout_gravity="bottom"
         android:foregroundGravity="bottom"
-        android:background="@drawable/btn_choose_type_car"
         android:layout_marginBottom="70dp"
         android:layout_marginRight="15dp"
         android:layout_marginLeft="15dp"
         >
-    </LinearLayout>
+        <include layout="@layout/bottom_sheet"/>
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_gravity="bottom"
-        android:layout_height="65dp"
-        android:layout_marginBottom="80dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
-        android:elevation="10dp">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-            <ImageView
-                android:id="@+id/img_type_driver"
-                android:layout_width="25dp"
-                android:layout_height="55dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/ic_type_motobike_x"
-                />
+    </android.support.design.widget.CoordinatorLayout>
 
-            <TextView
-                android:id="@+id/txt_name_type_driver"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Transport Standard"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/img_type_driver"
-                android:textColor="@color/btnRegisterDriver"
-                android:layout_centerVertical="true"
-                android:textSize="14sp"
-                />
+    <!--<android.support.v7.widget.CardView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_gravity="bottom"-->
+    <!--android:layout_height="65dp"-->
+    <!--android:layout_marginBottom="80dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:elevation="10dp">-->
+    <!--<RelativeLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--&gt;-->
+    <!--<ImageView-->
+    <!--android:id="@+id/img_type_driver"-->
+    <!--android:layout_width="25dp"-->
+    <!--android:layout_height="55dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:src="@drawable/ic_type_motobike_x"-->
+    <!--/>-->
 
-            <TextView
-                android:id="@+id/txt_price_time_driver"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2 min"
-                android:textColor="@color/btnRegisterDriver"
-                android:layout_centerVertical="true"
-                android:textSize="12sp"
-                android:layout_marginRight="20dp"
-                android:layout_alignParentRight="true"/>
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    <!--<TextView-->
+    <!--android:id="@+id/txt_name_type_driver"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Transport Standard"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_toRightOf="@id/img_type_driver"-->
+    <!--android:textColor="@color/btnRegisterDriver"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textSize="14sp"-->
+    <!--/>-->
 
-    <RelativeLayout
-        android:id="@+id/panel_info_driver"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_gravity="bottom"
-        android:visibility="invisible"
-        android:background="@drawable/btn_choose_type_car"
-        >
+    <!--<TextView-->
+    <!--android:id="@+id/txt_price_time_driver"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="2 min"-->
+    <!--android:textColor="@color/btnRegisterDriver"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textSize="12sp"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:layout_alignParentRight="true"/>-->
+    <!--</RelativeLayout>-->
+    <!--</android.support.v7.widget.CardView>-->
 
-    </RelativeLayout>
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/panel_info_driver"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="150dp"-->
+    <!--android:layout_gravity="bottom"-->
+    <!--android:visibility="invisible"-->
+    <!--android:background="@drawable/btn_choose_type_car"-->
+    <!--&gt;-->
+
+    <!--</RelativeLayout>-->
 
     <Button
         android:id="@+id/btn_pick_request"
@@ -165,4 +167,4 @@
 
     </LinearLayout>
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>
