@@ -129,7 +129,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
 //        mCurrentUserId = mAuth.getCurrentUser().getUid();
 //        mCurrentUserId = "VdlChGocK2bqNsnK1K8Jv0c2wXu2";
-        mCurrentUserId = "V9W9DeH6Nia8uqs9qRDq8JSEe0e2";
+        mCurrentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         mChatUser = getIntent().getStringExtra("user_id");
 //        mChatUser = "VxE53ShAMWOdkKbTOQ6KT6J3ZII2";

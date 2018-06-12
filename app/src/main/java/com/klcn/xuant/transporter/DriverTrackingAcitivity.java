@@ -528,9 +528,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 break;
             case R.id.btn_chat:
                 Intent chatIntent = new Intent(DriverTrackingAcitivity.this, ChatActivity.class);
-                chatIntent.putExtra("user_id", "VdlChGocK2bqNsnK1K8Jv0c2wXu2");
-                chatIntent.putExtra("user_name", "thao le");
-                chatIntent.putExtra("from","driver");
+                chatIntent.putExtra("user_id", mRideInfo.getCustomerId());
+                chatIntent.putExtra("user_name", mCustomer.getName());
                 startActivity(chatIntent);
 
                 break;

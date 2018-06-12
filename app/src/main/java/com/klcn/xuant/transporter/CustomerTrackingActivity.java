@@ -308,8 +308,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 break;
             case R.id.img_ic_chat:
                 Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
-                chatIntent.putExtra("user_id", "VxE53ShAMWOdkKbTOQ6KT6J3ZII2");
-                chatIntent.putExtra("user_name", "test");
+                chatIntent.putExtra("user_id", mDriverID);
+                chatIntent.putExtra("user_name", mDriver.getName());
                 startActivity(chatIntent);
 
                 break;
