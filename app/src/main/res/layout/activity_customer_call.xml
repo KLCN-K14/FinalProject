@@ -36,8 +36,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:id="@+id/lnl_panel_price"
             android:background="@drawable/btn_circle_gray"
             android:layout_below="@+id/lnl_panel">
@@ -83,8 +83,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginLeft="35dp"
-            android:layout_marginRight="35dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/btn_circle_white"
             android:layout_below="@+id/lnl_panel_price">
             <TextView

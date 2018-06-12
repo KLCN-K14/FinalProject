@@ -25,12 +25,19 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Driver;
+import com.klcn.xuant.transporter.model.FCMResponse;
+import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.RideInfo;
+import com.klcn.xuant.transporter.model.Sender;
+import com.klcn.xuant.transporter.model.Token;
+import com.klcn.xuant.transporter.remote.IFCMService;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
 import com.skyfishjy.library.RippleBackground;
 
@@ -78,6 +85,8 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     String destination;
     String customerId;
 
+    IFCMService mFCMService;
+
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -93,7 +102,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                 .build());
         setContentView(R.layout.activity_customer_call);
         ButterKnife.bind(this);
-
+        mFCMService = Common.getFCMService();
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.notification);
         mediaPlayer.setLooping(true);
@@ -198,7 +207,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                                 JSONObject distace = legsObject.getJSONObject("distance");
                                 mTxtDistance.setText(distace.getString("text"));
 
-                                Double price = (Double.valueOf(mTxtDistance.getText().toString().replaceAll("[^0-9.,]+",""))*8000);
+                                Double price = (Double.valueOf(mTxtDistance.getText().toString().replaceAll("[^0-9.,]+",""))*8);
                                 mTxtPrice.setText("VND "+String.valueOf(price.intValue())+"K");
 
                                 JSONObject time = legsObject.getJSONObject("duration");
@@ -227,6 +236,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_cancel_find_driver:
+                sendMessageCancelRequest();
                 addDriverAvailable();
                 finish();
             break;
@@ -238,7 +248,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                 rideInfo.setLngPickup(String.valueOf(lng));
                 rideInfo.setDestination(destination);
                 rideInfo.setCustomerId(customerId);
-                rideInfo.setStatus(Common.ride_info_status_1);
+                rideInfo.setStatus(Common.ride_info_status_driver_coming);
                 rideInfos.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .setValue(rideInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -257,6 +267,45 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
                 break;
         }
+    }
+
+    private void sendMessageCancelRequest() {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(customerId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("Cancel","Your driver denied your request!");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessageCancelRequest","Success");
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("MessageCancelRequest",response.message());
+                                        Log.e("MessageCancelRequest",response.errorBody().toString());
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
 

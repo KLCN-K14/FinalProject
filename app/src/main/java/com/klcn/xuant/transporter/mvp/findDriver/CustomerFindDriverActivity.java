@@ -1,7 +1,10 @@
 package com.klcn.xuant.transporter.mvp.findDriver;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -42,6 +46,7 @@ import com.klcn.xuant.transporter.remote.IFCMService;
 import com.skyfishjy.library.RippleBackground;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,6 +72,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     @BindView(R.id.txt_price)
     TextView mTxtPrice;
 
+    @BindView(R.id.txt_name_driver_found)
+    TextView mTxtNameDriverFound;
+
     @BindView(R.id.btn_cancel_find_driver)
     Button mBtnCancel;
 
@@ -77,6 +85,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     IFCMService mService;
     String driverID = "";
     String destination = "";
+    BroadcastReceiver mReceiver;
+    Driver mDriver;
+    HashMap<String,String> hashDriverFound = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +98,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
         mService = Common.getFCMService();
         destination = getIntent().getStringExtra("destination");
+        mTxtDestination.setText(destination);
 
         getNameAdress(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
         findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
@@ -117,10 +129,23 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, GeoLocation location) {
-                if(!isDriverFound){
+                if(!isDriverFound && hashDriverFound.get(key)==null){
                     Toast.makeText(getApplicationContext(),"Start send request to dirver",Toast.LENGTH_SHORT).show();
                     isDriverFound = true;
                     sendRequestToDriver(key);
+                    DatabaseReference mDriversDatabase = FirebaseDatabase.getInstance().getReference(Common.drivers_tbl);
+                    mDriversDatabase.child(key).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            mDriver = dataSnapshot.getValue(Driver.class);
+                            mTxtNameDriverFound.setText("Driver "+mDriver.getName()+" is responding. . .");
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            // Failed to read value
+                            Log.w("ERROR", "Failed to read value.", error.toException());
+                        }
+                    });
                     driverID = key;
                 }
             }
@@ -155,10 +180,10 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                         handlerWaitRequest.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                setResult(RESULT_CANCELED, resultIntent);
-                                finish();
+                            setResult(RESULT_CANCELED, resultIntent);
+                            finish();
                             }
-                        },20000);
+                        },18000);
                         // if driver response
                         FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl)
                                 .addChildEventListener(new ChildEventListener() {
@@ -218,11 +243,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 //                            String json_lat_lng = new Gson().toJson(new LatLng(lat,lng));
                             String data = "";
                             if(destination!=null){
-                                data = Common.mLastLocationCustomer.getLatitude()+Common.keySplit+Common.mLastLocationCustomer.getLongitude()+
-                                        Common.keySplit+destination+Common.keySplit+FirebaseAuth.getInstance().getCurrentUser().getUid();
-                                String[] list = data.split(Common.keySplit);
+                                data = Common.mLastLocationCustomer.getLatitude()+Common.keySplit+
+                                        Common.mLastLocationCustomer.getLongitude()+Common.keySplit+destination+Common.keySplit+FirebaseAuth.getInstance().getCurrentUser().getUid();
                             }
-
 
                             Notification notification = new Notification("Request",data);
                             Sender content = new Sender(token.getToken(),notification);
@@ -288,7 +311,43 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         super.onStop();
         cancelPickupRequest();
         finish();
+        this.unregisterReceiver(mReceiver);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(
+                "android.intent.action.MAIN");
+
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent.getStringExtra("Cancel")!=null){
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTxtNameDriverFound.setText("Driver "+mDriver.getName()+" denied your request");
+                        }
+                    },1000);
+                    mTxtNameDriverFound.setText("Finding another dirver. . .");
+                    isDriverFound = false;
+                    hashDriverFound.put(driverID,driverID);
+                    driverID = "";
+                    mDriver = null;
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
+                        }
+                    },2000);
+                }
+
+            }
+        };
+        //registering our receiver
+        this.registerReceiver(mReceiver, intentFilter);
+    }
 
 }

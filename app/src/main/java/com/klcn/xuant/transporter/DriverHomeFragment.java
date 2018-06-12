@@ -72,7 +72,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
     private NetworkStateReceiver networkStateReceiver;
     private GoogleMap mMap;
 
-    private static final int MY_PERMISSION_REQUEST_CODE = 7000;
+
     private static final int PLAY_SERVICE_RES_REQUEST = 7001;
 
     private LocationRequest mLocationRequest;
@@ -90,7 +90,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
 
     static boolean isLoggingOut = false;
     String driverID;
-    static boolean isFirstTime = true;
+
     static boolean onTrip = false;
 
     Marker mMarker;
@@ -102,8 +102,6 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
     @BindView(R.id.txt_status)
     TextView mTxtStatus;
 
-    Activity mActivity;
-    Context mContext;
 
     public static DriverHomeFragment newInstance() {
         DriverHomeFragment fragment = new DriverHomeFragment();
@@ -114,19 +112,6 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         buildGoogleApiClient();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mActivity =(Activity) context;
-        mContext = context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mContext = null;
     }
 
 
@@ -200,6 +185,8 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         networkStateReceiver.addListener(this);
         getContext().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
+        setupInit();
+
         return view;
     }
 
@@ -223,138 +210,15 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSION_REQUEST_CODE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (checkPlayService()) {
-                        buildGoogleApiClient();
-                        createLocationRequest();
-                        if (mSwitchButton.isChecked())
-                            displayLocation();
-                    }
-                }else{
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                    }, MY_PERMISSION_REQUEST_CODE);
-                }
+    private void setupInit() {
+        if (checkPlayService()) {
+            buildGoogleApiClient();
+            createLocationRequest();
+            if (mSwitchButton.isChecked())
+                displayLocation();
         }
     }
 
-    public static void displayPromptForEnablingGPS(final Activity activity){
-
-        final AlertDialog.Builder builder =  new AlertDialog.Builder(activity);
-        builder.setTitle("Turn on GPS");
-        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
-        final String message = "Open GPS setting to start?";
-
-        final AlertDialog dialog = builder.setMessage(message)
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface d, int id) {
-                                activity.startActivity(new Intent(action));
-                                d.dismiss();
-                            }
-                        })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface d, int id) {
-                                displayShouldPromptForEnablingGPS(activity);
-                            }
-                        }).create();
-        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
-            public void onShow(DialogInterface arg0) {
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(activity.getResources().getColor(R.color.red));
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setTextColor(activity.getResources().getColor(R.color.rippleEffectColor));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(18);
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(18);
-            }
-        });
-        dialog.setOnCancelListener(
-                new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        displayShouldPromptForEnablingGPS(activity);
-                    }
-                }
-        );
-        dialog.show();
-    }
-
-    public static void displayShouldPromptForEnablingGPS(final Activity activity){
-        final AlertDialog.Builder builder =  new AlertDialog.Builder(activity);
-        builder.setTitle("Turn on GPS");
-        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
-        final String message = "App will not work if GPS disable?";
-
-        final AlertDialog dialog = builder.setMessage(message)
-                .setPositiveButton("Open GPS",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface d, int id) {
-                                activity.startActivity(new Intent(action));
-                                d.dismiss();
-                            }
-                        })
-                .setNegativeButton("Quit app",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface d, int id) {
-                                activity.finish();
-                            }
-                        }).create();
-        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
-            public void onShow(DialogInterface arg0) {
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(activity.getResources().getColor(R.color.red));
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setTextColor(activity.getResources().getColor(R.color.rippleEffectColor));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(18);
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(18);
-            }
-        });
-
-        dialog.setOnCancelListener(
-                new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        displayShouldPromptForEnablingGPS(activity);
-                    }
-                }
-        );
-        dialog.show();
-    }
-
-    private void setupGPS() {
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            setupPermissionLocation();
-        }else{
-            displayPromptForEnablingGPS(getActivity());
-        }
-    }
-    // setup permission
-    private void setupPermissionLocation() {
-
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                ) {
-            //Request runtime permission
-            ActivityCompat.requestPermissions(getActivity(), new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, MY_PERMISSION_REQUEST_CODE);
-        } else {
-            if (checkPlayService()) {
-                buildGoogleApiClient();
-                createLocationRequest();
-                if (mSwitchButton.isChecked())
-                    displayLocation();
-            }
-        }
-    }
 
     // create locationrequest
     private void createLocationRequest() {
@@ -558,7 +422,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
         driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         mGeoFire = new GeoFire(driverAvailable);
         updateFireBaseToken();
-        setupGPS();
+        setupInit();
     }
 
     @Override
@@ -619,17 +483,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                     }
                 });
 
-        if (isFirstTime){
-            isFirstTime = false;
-        }
-        else{
-            LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                setupPermissionLocation();
-            }else{
-                displayShouldPromptForEnablingGPS(getActivity());
-            }
-        }
+
     }
 
     @Override

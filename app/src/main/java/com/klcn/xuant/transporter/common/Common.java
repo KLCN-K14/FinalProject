@@ -20,15 +20,21 @@ public class Common {
     public static final String tokens_tbl = "Tokens";
 
 
-    public static final String ride_info_status_1 = "driver coming";
-    public static final String ride_info_status_2 = "on trip";
-    public static final String ride_info_status_3 = "drop off";
+    public static final String ride_info_status_driver_coming = "1";
+    public static final String ride_info_status_on_trip = "2";
+    public static final String ride_info_status_customer_cancel = "3";
+    public static final String ride_info_status_driver_cancel = "4";
+    public static final String ride_info_status_complete = "5";
 
 
-    public static final String ride_status_1 = "completed";
-    public static final String ride_status_2 = "customer cancel";
-    public static final String ride_status_3 = "driver cancel";
+    public static final Double base_fare = 10.;
+    public static final Double cost_per_km = 10.;
+    public static final Double cost_per_minute_standard = 5.;
+    public static final Double cost_per_minute_premium = 10.;
+    public static final Double transport_fee = 0.15;
 
+    public static final String service_vehicle_standard = "Transport Standard";
+    public static final String service_vehicle_premium = "Transport Premium";
 
     public static Location mLastLocationDriver = null;
     public static Location mLastLocationCustomer = null;

@@ -38,6 +38,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,6 +90,11 @@ import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
 import com.klcn.xuant.transporter.mvp.profile.CustomerProfileActivity;
 import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
+import com.klcn.xuant.transporter.remote.IGoogleAPI;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -99,6 +105,9 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class CustomerHomeActivity extends AppCompatActivity
@@ -128,6 +137,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     FirebaseAuth mFirebaseAuth;
     DatabaseReference customers;
     Customer customerModel;
+    IGoogleAPI mService;
 
     Driver currentDriver = null;
     float bearing = 0;
@@ -135,8 +145,29 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     @BindView(R.id.btn_pick_request)
     Button btnPickRequest;
-    @BindView(R.id.img_double_up_down)
+
+    @BindView(R.id.img_current_service)
+    ImageView imgCurrentService;
+
+    @BindView(R.id.txt_name_current_service)
+    TextView txtNameCurrentService;
+
+    @BindView(R.id.txt_current_service_price)
+    TextView txtPriceCurrentService;
+
+    @BindView(R.id.txt_current_service_time)
+    TextView txtTimeCurrentService;
+
+    @BindView(R.id.rlt_layout_transport_current)
+    RelativeLayout mRltTransportCurrent;
+
     ImageView mImgUpDown;
+    RelativeLayout mRltRoot;
+    RelativeLayout mRltStandard;
+    RelativeLayout mRltPremium;
+    TextView mTxtPriceStandard,mTxtPricePremium,mTxtTimeStandard,mTxtTimePremium;
+
+    String currentService = Common.service_vehicle_standard;
 
     boolean isChooseDropOff = false;
     boolean isFirstTime = true;
@@ -203,28 +234,94 @@ public class CustomerHomeActivity extends AppCompatActivity
         getApplicationContext().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
         //Bottom sheet
-        View llBottomSheet = (View) findViewById(R.id.bottom_sheet_home);
+        final View llBottomSheet = (View) findViewById(R.id.bottom_sheet_home);
 
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        mRltRoot = llBottomSheet.findViewById(R.id.bottom_sheet_home);
+        mRltStandard = llBottomSheet.findViewById(R.id.rlt_layout_transport_standard);
+        mRltPremium = llBottomSheet.findViewById(R.id.rlt_layout_transport_premium);
+        mImgUpDown = llBottomSheet.findViewById(R.id.img_double_up_down);
+        mTxtPriceStandard = llBottomSheet.findViewById(R.id.txt_price_standard);
+        mTxtPricePremium = llBottomSheet.findViewById(R.id.txt_price_premium);
+        mTxtTimePremium = llBottomSheet.findViewById(R.id.txt_time_premium);
+        mTxtTimeStandard = llBottomSheet.findViewById(R.id.txt_time_standard);
 
+        mRltStandard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    mImgUpDown.setImageResource(R.drawable.ic_double_up);
+                    mRltTransportCurrent.setVisibility(View.VISIBLE);
+                    txtPriceCurrentService.setText(mTxtPriceStandard.getText());
+                    currentService = Common.service_vehicle_standard;
+                }
+            }
+        });
+        mRltPremium.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    mImgUpDown.setImageResource(R.drawable.ic_double_up);
+                    mRltTransportCurrent.setVisibility(View.VISIBLE);
+                    txtPriceCurrentService.setText(mTxtPricePremium.getText());
+                    currentService = Common.service_vehicle_premium;
+                    setupCurrentService();
+                }
+            }
+        });
+        mImgUpDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    mImgUpDown.setImageResource(R.drawable.ic_double_up);
+                    mRltTransportCurrent.setVisibility(View.VISIBLE);
+                }else if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_COLLAPSED){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    mImgUpDown.setImageResource(R.drawable.ic_double_down);
+                    mRltTransportCurrent.setVisibility(View.GONE);
+                }
+            }
+        });
         // set callback for changes
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState == BottomSheetBehavior.STATE_COLLAPSED){
-                    mImgUpDown.setImageResource(R.drawable.ic_double_up);
-
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        mImgUpDown.setImageResource(R.drawable.ic_double_up);
+                        mRltTransportCurrent.setVisibility(View.VISIBLE);
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        break;
                 }
 
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-//                fab.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
                 mImgUpDown.setImageResource(R.drawable.ic_double_down);
+                mRltTransportCurrent.setVisibility(View.GONE);
             }
         });
-//        getUserInfo();
+    }
+
+    private void setupCurrentService() {
+        txtNameCurrentService.setText(currentService);
+        if(currentService.equals(Common.service_vehicle_standard)){
+            imgCurrentService.setImageResource(R.drawable.ic_type_motobike_x);
+        }else if(currentService.equals(Common.service_vehicle_premium)){
+            imgCurrentService.setImageResource(R.drawable.ic_type_motobike_y);
+
+        }
     }
 
 
@@ -269,6 +366,7 @@ public class CustomerHomeActivity extends AppCompatActivity
             public void onPlaceSelected(Place place) {
                 mPlaceDestination = place;
                 isChooseDropOff = true;
+                setupPriceTrip();
                 btnPickRequest.setText("BOOK");
                 Log.e("CustomerHomeActivity"," "+place.getName());
             }
@@ -279,11 +377,31 @@ public class CustomerHomeActivity extends AppCompatActivity
             }
         });
 
+        pickDestination.getView().findViewById(R.id.place_autocomplete_clear_button)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        pickDestination.setText("");
+                        view.setVisibility(View.GONE);
+                        clearFare();
+                    }
+                });
+
+
         mAutocompleteFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
                 .setTypeFilter(3)
                 .build();
 
+    }
+
+    private void clearFare() {
+        mTxtPriceStandard.setText("");
+        mTxtPricePremium.setText("");
+        mTxtTimePremium.setText("");
+        mTxtTimeStandard.setText("");
+        txtTimeCurrentService.setText("");
+        txtPriceCurrentService.setText("");
     }
 
     @Override
@@ -501,60 +619,13 @@ public class CustomerHomeActivity extends AppCompatActivity
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         GeoFire gfDriverAvailable = new GeoFire(driverAvailable);
 
-        GeoQuery geoQuery = gfDriverAvailable.queryAtLocation(new GeoLocation(Common.mLastLocationCustomer.getLatitude(),
-                Common.mLastLocationCustomer.getLongitude()),distance);
-        geoQuery.removeAllListeners();
-        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-            @Override
-            public void onKeyEntered(String key, final GeoLocation location) {
-                FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
-                        .child(key)
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Driver driver = dataSnapshot.getValue(Driver.class);
-                                Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
-                                if(hashMapBearing.get(dataSnapshot.getKey())!=null)
-                                    bearing = hashMapBearing.get(dataSnapshot.getKey());
-                                if(mMarker==null){
-                                    mMarker = mMap.addMarker(new MarkerOptions()
-                                            .position(new LatLng(location.latitude,location.longitude))
-                                            .snippet(driver.getPhoneNum())
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
-                                            .title(driver.getName())
-                                            .flat(true)
-                                            .anchor(0.5f, 0.5f)
-                                            .rotation(bearing));
-                                    bearing = 0;
-                                    hashMapMarker.put(dataSnapshot.getKey(),mMarker);
-                                    hashMapLocation.put(dataSnapshot.getKey(),location);
-                                }
-                                Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-            }
-
-            @Override
-            public void onKeyExited(String key) {
-                Marker marker = hashMapMarker.get(key);
-                if(marker!=null){
-                    marker.remove();
-                    hashMapMarker.remove(key);
-                    Log.e("REMOVE",key+"  out hashMapMarker");
-                }
-            }
-
-            @Override
-            public void onKeyMoved(final String key,final GeoLocation location) {
-                Marker marker = hashMapMarker.get(key);
-                if(marker!=null){
-                    marker.remove();
-                    hashMapMarker.remove(key);
+        if(Common.mLastLocationCustomer!=null){
+            GeoQuery geoQuery = gfDriverAvailable.queryAtLocation(new GeoLocation(Common.mLastLocationCustomer.getLatitude(),
+                    Common.mLastLocationCustomer.getLongitude()),distance);
+            geoQuery.removeAllListeners();
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                @Override
+                public void onKeyEntered(String key, final GeoLocation location) {
                     FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
                             .child(key)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -562,21 +633,8 @@ public class CustomerHomeActivity extends AppCompatActivity
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     Driver driver = dataSnapshot.getValue(Driver.class);
                                     Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
-                                    oldLocationDriver = hashMapLocation.get(key);
-                                    hashMapLocation.remove(key);
-                                    if(oldLocationDriver!=null){
-                                        Location startingLocation = new Location("starting point");
-                                        startingLocation.setLatitude(oldLocationDriver.latitude);
-                                        startingLocation.setLongitude(oldLocationDriver.longitude);
-
-                                        //Get the target location
-                                        Location endingLocation = new Location("ending point");
-                                        endingLocation.setLatitude(location.latitude);
-                                        endingLocation.setLongitude(location.longitude);
-
-                                        bearing = startingLocation.bearingTo(endingLocation);
-                                    }
-
+                                    if(hashMapBearing.get(dataSnapshot.getKey())!=null)
+                                        bearing = hashMapBearing.get(dataSnapshot.getKey());
                                     if(mMarker==null){
                                         mMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(new LatLng(location.latitude,location.longitude))
@@ -586,7 +644,7 @@ public class CustomerHomeActivity extends AppCompatActivity
                                                 .flat(true)
                                                 .anchor(0.5f, 0.5f)
                                                 .rotation(bearing));
-                                        hashMapBearing.put(dataSnapshot.getKey(),bearing);
+                                        bearing = 0;
                                         hashMapMarker.put(dataSnapshot.getKey(),mMarker);
                                         hashMapLocation.put(dataSnapshot.getKey(),location);
                                     }
@@ -599,21 +657,83 @@ public class CustomerHomeActivity extends AppCompatActivity
                                 }
                             });
                 }
-            }
 
-            @Override
-            public void onGeoQueryReady() {
-                if(distance<=LIMIT_RANGE){
-                    distance++;
-                    loadAllDriverAvailable();
+                @Override
+                public void onKeyExited(String key) {
+                    Marker marker = hashMapMarker.get(key);
+                    if(marker!=null){
+                        marker.remove();
+                        hashMapMarker.remove(key);
+                        Log.e("REMOVE",key+"  out hashMapMarker");
+                    }
                 }
-            }
 
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
+                @Override
+                public void onKeyMoved(final String key,final GeoLocation location) {
+                    Marker marker = hashMapMarker.get(key);
+                    if(marker!=null){
+                        marker.remove();
+                        hashMapMarker.remove(key);
+                        FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                                .child(key)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Driver driver = dataSnapshot.getValue(Driver.class);
+                                        Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                        oldLocationDriver = hashMapLocation.get(key);
+                                        hashMapLocation.remove(key);
+                                        if(oldLocationDriver!=null){
+                                            Location startingLocation = new Location("starting point");
+                                            startingLocation.setLatitude(oldLocationDriver.latitude);
+                                            startingLocation.setLongitude(oldLocationDriver.longitude);
 
-            }
-        });
+                                            //Get the target location
+                                            Location endingLocation = new Location("ending point");
+                                            endingLocation.setLatitude(location.latitude);
+                                            endingLocation.setLongitude(location.longitude);
+
+                                            bearing = startingLocation.bearingTo(endingLocation);
+                                        }
+
+                                        if(mMarker==null){
+                                            mMarker = mMap.addMarker(new MarkerOptions()
+                                                    .position(new LatLng(location.latitude,location.longitude))
+                                                    .snippet(driver.getPhoneNum())
+                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
+                                                    .title(driver.getName())
+                                                    .flat(true)
+                                                    .anchor(0.5f, 0.5f)
+                                                    .rotation(bearing));
+                                            hashMapBearing.put(dataSnapshot.getKey(),bearing);
+                                            hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                            hashMapLocation.put(dataSnapshot.getKey(),location);
+                                        }
+                                        Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                    }
+                }
+
+                @Override
+                public void onGeoQueryReady() {
+                    if(distance<=LIMIT_RANGE){
+                        distance++;
+                        loadAllDriverAvailable();
+                    }
+                }
+
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+
+                }
+            });
+        }
     }
 
     private void buildGoogleApiClient() {
@@ -779,7 +899,6 @@ public class CustomerHomeActivity extends AppCompatActivity
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 showNotFoundDriverDialog();
-                Snackbar.make(getCurrentFocus(),"Cancel book",Snackbar.LENGTH_SHORT).show();
             }
         }
     }
@@ -889,6 +1008,7 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     @Override
     public void networkAvailable() {
+        mService = Common.getGoogleAPI();
         updateFireBaseToken();
         setupGPS();
     }
@@ -909,6 +1029,84 @@ public class CustomerHomeActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
+    }
+
+    private void setupPriceTrip() {
+        String requestApi = null;
+        try{
+            requestApi = "https://maps.googleapis.com/maps/api/directions/json?"+
+                    "mode=driving&"+
+                    "transit_routing_preference=less_driving&"+
+                    "origin="+ Common.mLastLocationCustomer.getLatitude()+","+Common.mLastLocationCustomer.getLongitude()+"&"+
+                    "destination="+mPlaceDestination.getName()+"&"+
+                    "key="+getResources().getString(R.string.google_direction_api);
+            Log.d("TRANSPORT",requestApi);
+            mService.getPath(requestApi)
+                    .enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response.body().toString());
+                                JSONArray routes = jsonObject.getJSONArray("routes");
+
+                                JSONObject object = routes.getJSONObject(0);
+
+                                JSONArray legs = object.getJSONArray("legs");
+
+                                JSONObject legsObject = legs.getJSONObject(0);
+
+                                JSONObject distanceJS = legsObject.getJSONObject("distance");
+
+                                Double distance = distanceJS.getDouble("value");
+
+                                JSONObject timeJS = legsObject.getJSONObject("duration");
+                                Double time = timeJS.getDouble("value");
+
+                                calculateFare(distance,time);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+
+                        }
+                    });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void calculateFare(Double distance, Double time) {
+        Double realDistance = (distance/1000);
+        Double realTime = time/60;
+        Double hour = realTime%60;
+        Double minute = realTime - hour*60;
+        String timeArrived;
+        if(realTime<60.){
+            timeArrived = realTime.intValue() + " min";
+        }else{
+            timeArrived = hour.intValue() + " h "+minute.intValue()+" min";
+        }
+
+        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_standard*realTime;
+        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
+        String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
+        String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
+        Toast.makeText(getApplicationContext(),currentService,Toast.LENGTH_LONG).show();
+        if(currentService.equals(Common.service_vehicle_standard)){
+            txtPriceCurrentService.setText(textFareStandard);
+        }else{
+            txtPriceCurrentService.setText(textFarePremium);
+        }
+        txtTimeCurrentService.setText(timeArrived);
+        mTxtTimeStandard.setText(timeArrived);
+        mTxtTimePremium.setText(timeArrived);
+        mTxtPricePremium.setText(textFarePremium);
+        mTxtPriceStandard.setText(textFareStandard);
     }
 
 

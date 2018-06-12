@@ -17,6 +17,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
     public NetworkStateReceiver() {
         listeners = new HashSet<NetworkStateReceiverListener>();
         connected = null;
+
     }
 
     public void onReceive(Context context, Intent intent) {

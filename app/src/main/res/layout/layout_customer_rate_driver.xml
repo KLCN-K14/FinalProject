@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorYellow"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="THANK YOU"
+        android:layout_marginTop="100dp"
+        android:textSize="48sp"
+        android:id="@+id/temp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Rate your driver"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/temp"
+        android:id="@+id/txt_status_rate"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        />
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:rating="4"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/txt_status_rate"
+        android:layout_marginTop="20dp"
+        android:progressTint="@color/white"
+        android:id="@+id/rating_bar"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:inputType="textMultiLine"
+        android:hint="Comment about your trip"
+        android:id="@+id/edt_comment"
+        android:gravity="center"
+        android:maxLines="10"
+        android:minLines="2"
+        android:layout_below="@id/rating_bar"
+        android:scrollbars="vertical" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_confirm"
+        android:layout_margin="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/btn_cancel_find_driver"
+        android:textSize="20sp"
+        android:text="CONFIRM"
+        />
+
+</RelativeLayout>

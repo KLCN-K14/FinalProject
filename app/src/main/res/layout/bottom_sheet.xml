@@ -1,100 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet_home"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#fff"
     android:orientation="vertical"
-    android:layout_marginBottom="20dp"
     android:gravity="center"
     app:behavior_hideable="false"
     app:behavior_peekHeight="70dp"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
-    <!--<ListView-->
-    <!--android:id="@+id/lv_car"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"/>-->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="70dp"
         android:gravity="bottom"
+        android:background="@drawable/btn_choose_type_car"
+        android:id="@+id/rlt_layout_transport_standard"
         android:layout_gravity="bottom"
         android:foregroundGravity="bottom"
         >
         <ImageView
-            android:id="@+id/img_double_up_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_double_up"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"/>
-        <ImageView
-            android:id="@+id/img_type_driver3"
+            android:id="@+id/img_type_standard"
             android:layout_width="35dp"
             android:layout_height="55dp"
             android:layout_marginLeft="10dp"
             android:src="@drawable/ic_type_motobike_x"
             />
         <TextView
-            android:id="@+id/txt_name_type_driver3"
+            android:id="@+id/txt_name_standard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TransportBike"
+            android:text="Transport Standard"
             android:textColor="@color/black"
             android:layout_marginLeft="10dp"
             android:layout_centerVertical="true"
-            android:textSize="14sp"
-            android:layout_toRightOf="@id/img_type_driver3"/>
+            android:textSize="16sp"
+            android:layout_toRightOf="@id/img_type_standard"/>
 
         <TextView
-            android:id="@+id/txt_price_time_driver3"
+            android:id="@+id/txt_price_standard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2 min"
+            android:text=""
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true"/>
+        <TextView
+            android:id="@+id/txt_time_standard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
             android:textColor="@color/black"
             android:layout_centerVertical="true"
             android:textSize="12sp"
             android:layout_marginRight="10dp"
             android:layout_alignParentRight="true"/>
     </RelativeLayout>
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="70dp"
         android:gravity="bottom"
+        android:background="@drawable/btn_choose_type_car"
         android:layout_gravity="bottom"
+        android:id="@+id/rlt_layout_transport_premium"
+        android:layout_below="@id/rlt_layout_transport_standard"
         android:layout_marginBottom="10dp"
         android:foregroundGravity="bottom"
         >
         <ImageView
-            android:id="@+id/img_type_driver2"
+            android:id="@+id/img_type_premium"
             android:layout_width="35dp"
             android:layout_height="55dp"
             android:layout_marginLeft="10dp"
             android:src="@drawable/ic_type_motobike_y"
             />
         <TextView
-            android:id="@+id/txt_name_type_driver2"
+            android:id="@+id/txt_name_premium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TransportBike Premium"
+            android:text="Transport Premium"
             android:textColor="@color/black"
             android:layout_marginLeft="10dp"
             android:layout_centerVertical="true"
-            android:textSize="14sp"
-            android:layout_toRightOf="@id/img_type_driver2"/>
+            android:textSize="16sp"
+            android:layout_toRightOf="@id/img_type_premium"/>
 
         <TextView
-            android:id="@+id/txt_price_time_driver2"
+            android:id="@+id/txt_price_premium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2 min"
+            android:text=""
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true"/>
+        <TextView
+            android:id="@+id/txt_time_premium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
             android:textColor="@color/black"
             android:layout_centerVertical="true"
             android:textSize="12sp"
             android:layout_marginRight="10dp"
             android:layout_alignParentRight="true"/>
     </RelativeLayout>
-
-</LinearLayout>
+    <ImageView
+        android:id="@+id/img_double_up_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_double_up"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+</RelativeLayout>

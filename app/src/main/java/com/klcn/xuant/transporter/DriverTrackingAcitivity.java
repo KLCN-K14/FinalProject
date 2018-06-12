@@ -119,10 +119,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
     Marker mDriverMarker;
     Marker mCustomerMarker;
-    Circle mCustomerCircle;
-    double customerLat = 10.8397849,customerLng = 106.7935081; // Test location
-    String customerID;
-    String destination = "Trường Tiểu học Trương Văn Thành";
+    double customerLat = 0,customerLng = 0; // Test location
+    String destination = "";
 
     private List<LatLng> polyLineList;
     private Polyline direction;
@@ -195,21 +193,22 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         mRideInfoDatabase = FirebaseDatabase.getInstance().getReference(Common.ride_info_tbl);
         mCustomerDatabase = FirebaseDatabase.getInstance().getReference(Common.customers_tbl);
         mGeoFire = new GeoFire(driverWorking);
-        Log.e("DRIVERTRACKING","Start");
 
         mRideInfoDatabase.child(driverID)
                 .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mRideInfo = dataSnapshot.getValue(RideInfo.class);
-                customerLat = Double.valueOf(mRideInfo.getLatPickup());
-                customerLng = Double.valueOf(mRideInfo.getLngPickup());
-                destination = mRideInfo.getDestination();
-                mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
-                        .position(new LatLng(customerLat, customerLng))
-                        .title("Customer"));
-                mTxtNameLocation.setText(getNameAdress(customerLat,customerLng));
+                if(isPickup){
+                    customerLat = Double.valueOf(mRideInfo.getLatPickup());
+                    customerLng = Double.valueOf(mRideInfo.getLngPickup());
+                    destination = mRideInfo.getDestination();
+                    mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                            .position(new LatLng(customerLat, customerLng))
+                            .title("Customer"));
+                    mTxtNameLocation.setText(getNameAdress(customerLat,customerLng).toUpperCase());
+                }
                 getInfoCustomer(mRideInfo.getCustomerId());
             }
 
@@ -394,6 +393,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
     // Show location driver on map
     private void displayLocation() {
+
         try{
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -435,21 +435,23 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                             .rotation(bearing)
                             .title("You"));
                     getDirection();
-                    mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
-                            .position(new LatLng(customerLat, customerLng))
-                            .title("Customer"));
-                    mTxtNameLocation.setText(getNameAdress(customerLat,customerLng));
+
+                    if(isPickup){
+                        mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                                .position(new LatLng(customerLat, customerLng))
+                                .title("Customer"));
+                    }else{
+                        mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
+                                .position(new LatLng(customerLat, customerLng))
+                                .title("Customer"));
+                    }
+
+                    mTxtNameLocation.setText(getNameAdress(customerLat,customerLng).toUpperCase());
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
-//                    if(direction!=null){
-//                        direction.remove();
-//                        Log.e("REMOVE","REMOVE DIRECTION");
-//                    }
                 }
             });
-
-
-
 
         } else {
             Log.e("ERROR", "Can't get your location");
@@ -457,7 +459,6 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     private void getDirection() {
-        Toast.makeText(getApplicationContext(),"New direction",Toast.LENGTH_LONG).show();
         String requestApi = null;
         try{
             requestApi = "https://maps.googleapis.com/maps/api/directions/json?"+
@@ -466,7 +467,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                     "origin="+ Common.mLastLocationDriver.getLatitude()+","+Common.mLastLocationDriver.getLongitude()+"&"+
                     "destination="+customerLat+","+customerLng+"&"+
                     "key="+getResources().getString(R.string.google_direction_api);
-            Log.e("TRANSPORT",requestApi);
+            Log.e("getDirection",requestApi);
             mService.getPath(requestApi)
                     .enqueue(new Callback<String>() {
                         @Override
@@ -577,27 +578,26 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                     mLayoutPickup.animate().alpha(0.0f).setDuration(500).withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
-                                            HashMap<String, Object> timePickup = new HashMap<>();
-                                            timePickup.put("timePickup",ServerValue.TIMESTAMP);
-                                            timePickup.put("status",Common.ride_info_status_2);
-                                            mRideInfoDatabase.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                                    .updateChildren(timePickup);
 
                                             isPickup = false;
-
-                                            mTxtNameLocation.setText(destination);
-                                            mImgLocation.setImageResource(R.drawable.ic_drop_off);
-                                            mMap.clear();
-                                            displayLocation();
+                                            sendMessagePickupToCustomer();
 
                                             LatLng dropOffLocation = getLocationFromAddress(getApplicationContext(),destination);
                                             customerLat = dropOffLocation.latitude;
                                             customerLng = dropOffLocation.longitude;
-                                            mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
-                                                    .position(dropOffLocation)
-                                                    .title("Customer"));
-                                            getDirection();
+
+                                            HashMap<String, Object> timePickup = new HashMap<>();
+                                            timePickup.put("timePickup",ServerValue.TIMESTAMP);
+                                            timePickup.put("status",Common.ride_info_status_on_trip);
+                                            mRideInfoDatabase.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                    .updateChildren(timePickup);
+
+                                            mTxtNameLocation.setText(destination);
+                                            mImgLocation.setImageResource(R.drawable.ic_drop_off);
+
+                                            mMap.clear();
+                                            displayLocation();
+
                                             mLayoutPickup.setVisibility(View.GONE);
                                             mBtnPickup.setBackground(getResources().getDrawable(R.drawable.btn_sign_in_driver));
                                             mBtnPickup.setText("DROP-OFF");
@@ -622,6 +622,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                 @Override
                                 public void onClick(final DialogInterface dialog, int which) {
                                     showPaymentDialog();
+                                    sendMessageDropOffToCustomer();
                                 }
                             })
                             .show();
@@ -629,6 +630,82 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
                 break;
         }
+    }
+
+    private void sendMessagePickupToCustomer() {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(mRideInfo.getCustomerId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("Pickup","You on the trip now!");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessagePickup","Sucess");
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("MessagePickup",response.message());
+                                        Log.e("MessagePickup",response.errorBody().toString());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    private void sendMessageDropOffToCustomer() {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(mRideInfo.getCustomerId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("DropOff","Completed trip!");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessageDropOff","Sucess");
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("MessageDropOff",response.message());
+                                        Log.e("MessageDropOff",response.errorBody().toString());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     @Override
@@ -741,12 +818,12 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                 public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
                                     if(response.body().success == 1){
                                         isSendNotification = true;
-                                        Toast.makeText(getApplicationContext(),"Request sent",Toast.LENGTH_LONG).show();
+                                        Log.e("ArrivedNotification","Success");
                                     }
                                     else{
                                         Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
-                                        Log.e("ERROR",response.message());
-                                        Log.e("ERROR",response.errorBody().toString());
+                                        Log.e("ArrivedNotification",response.message());
+                                        Log.e("ArrivedNotification",response.errorBody().toString());
                                     }
                                 }
 

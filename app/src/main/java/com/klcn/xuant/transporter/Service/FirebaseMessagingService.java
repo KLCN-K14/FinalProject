@@ -1,4 +1,4 @@
-package com.klcn.xuant.transporter.Service;
+package com.klcn.xuant.transporter.service;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;

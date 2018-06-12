@@ -21,11 +21,18 @@
             android:layout_height="match_parent"
             android:background="@color/colorNavigation"
             android:layout_weight="1">
+            <ImageView
+                android:layout_toRightOf="@id/temp1"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_your_place"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="PICK-UP"
                 android:textSize="18sp"
+                android:id="@+id/temp1"
                 android:textStyle="bold"
                 android:layout_centerInParent="true"
                 android:textColor="@color/rippleEffectColor"/>
@@ -34,11 +41,19 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1">
+            <ImageView
+                android:layout_toRightOf="@id/temp2"
+                android:layout_centerVertical="true"
+                android:id="@+id/img_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_drop_off"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="DROP-OFF"
                 android:textSize="18sp"
+                android:id="@+id/temp2"
                 android:textStyle="bold"
                 android:layout_centerInParent="true"
                 android:textColor="@color/colorActiveNavigation"/>
@@ -62,19 +77,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ngã tư thủ đức"
-            android:textSize="24sp"
+            android:textSize="18sp"
+            android:gravity="center"
             android:textColor="@color/white"
             android:layout_centerInParent="true"
             android:layout_margin="15dp"
             android:id="@+id/txt_name_location"
             />
-        <ImageView
-            android:layout_toLeftOf="@id/txt_name_location"
-            android:layout_centerVertical="true"
-            android:id="@+id/img_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_your_place"/>
+
     </RelativeLayout>
 
     <fragment
