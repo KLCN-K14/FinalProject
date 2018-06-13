@@ -1,7 +1,9 @@
 package com.klcn.xuant.transporter;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,9 +34,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.helper.ArcProgressAnimation;
 import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
+import com.klcn.xuant.transporter.model.PickupRequest;
 import com.klcn.xuant.transporter.model.RideInfo;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
@@ -79,14 +84,12 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     IGoogleAPI mService;
 
     MediaPlayer mediaPlayer;
-    int progressStatus = 0;
-    Thread thread;
     double lat,lng;
     String destination;
     String customerId;
 
     IFCMService mFCMService;
-
+    private BroadcastReceiver mReceiver;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -108,37 +111,27 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         mediaPlayer.setLooping(true);
         mediaPlayer.start();
 
-        final Handler handler = new Handler();
         mArcProgress.setMax(15);
-        mArcProgress.setProgress(progressStatus);
+        ArcProgressAnimation anim = new ArcProgressAnimation(mArcProgress, 0, 15);
+        anim.setDuration(15000);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
 
-        thread = new Thread(new Runnable() {
-            public void run() {
-                while (progressStatus < 15) {
+            }
 
-                    // process some tasks
-                    progressStatus++;
-
-                    // your computer is too fast, sleep 1 second
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    // Update the progress bar
-                    handler.post(new Runnable() {
-                        public void run() {
-                            mArcProgress.setProgress(progressStatus);
-                        }
-                    });
-                }
+            @Override
+            public void onAnimationEnd(Animation animation) {
                 addDriverAvailable();
                 finish();
             }
-        });
-        thread.start();
 
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mArcProgress.startAnimation(anim);
 
         removeDriverAvailable();
         mService = Common.getGoogleAPI();
@@ -242,15 +235,14 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
             break;
 
             case R.id.btn_accept_pickup_request:
-                DatabaseReference rideInfos = FirebaseDatabase.getInstance().getReference(Common.ride_info_tbl);
-                RideInfo rideInfo = new RideInfo();
-                rideInfo.setLatPickup(String.valueOf(lat));
-                rideInfo.setLngPickup(String.valueOf(lng));
-                rideInfo.setDestination(destination);
-                rideInfo.setCustomerId(customerId);
-                rideInfo.setStatus(Common.ride_info_status_driver_coming);
-                rideInfos.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .setValue(rideInfo)
+                DatabaseReference pickupRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
+                PickupRequest pickupRequest1 = new PickupRequest();
+                pickupRequest1.setLatPickup(String.valueOf(lat));
+                pickupRequest1.setLngPickup(String.valueOf(lng));
+                pickupRequest1.setDestination(destination);
+                pickupRequest1.setCustomerId(customerId);
+                pickupRequest.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .setValue(pickupRequest1)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -312,12 +304,37 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         mediaPlayer.start();
+        IntentFilter intentFilter = new IntentFilter(
+                "android.intent.action.MAIN");
+
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //extract our message from intent
+                if(intent.getStringExtra("CancelTrip")!=null){
+                    mBtnAccept.setEnabled(false);
+                    mBtnCancel.setEnabled(false);
+                    Toast.makeText(getApplicationContext(),"Customer cancel request!!!",Toast.LENGTH_LONG).show();
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    },2000);
+                }
+            }
+        };
+        //registering our receiver
+        this.registerReceiver(mReceiver, intentFilter);
         super.onResume();
     }
 
     @Override
     protected void onStop() {
         mediaPlayer.release();
+        this.unregisterReceiver(mReceiver);
         super.onStop();
     }
 

@@ -65,6 +65,7 @@ import com.klcn.xuant.transporter.helper.DirectionsJSONParser;
 import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
+import com.klcn.xuant.transporter.model.PickupRequest;
 import com.klcn.xuant.transporter.model.RideInfo;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
@@ -158,9 +159,9 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     @BindView(R.id.txt_name_location)
     TextView mTxtNameLocation;
 
-    DatabaseReference mRideInfoDatabase;
+    DatabaseReference mPickupRequestDatabase;
     DatabaseReference mCustomerDatabase;
-    RideInfo mRideInfo;
+    PickupRequest mPickupRequest;
     Customer mCustomer;
 
     @Override
@@ -190,26 +191,26 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Geo Fire
         driverWorking = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
-        mRideInfoDatabase = FirebaseDatabase.getInstance().getReference(Common.ride_info_tbl);
+        mPickupRequestDatabase = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
         mCustomerDatabase = FirebaseDatabase.getInstance().getReference(Common.customers_tbl);
         mGeoFire = new GeoFire(driverWorking);
 
-        mRideInfoDatabase.child(driverID)
+        mPickupRequestDatabase.child(driverID)
                 .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                mRideInfo = dataSnapshot.getValue(RideInfo.class);
+                mPickupRequest = dataSnapshot.getValue(PickupRequest.class);
                 if(isPickup){
-                    customerLat = Double.valueOf(mRideInfo.getLatPickup());
-                    customerLng = Double.valueOf(mRideInfo.getLngPickup());
-                    destination = mRideInfo.getDestination();
+                    customerLat = Double.valueOf(mPickupRequest.getLatPickup());
+                    customerLng = Double.valueOf(mPickupRequest.getLngPickup());
+                    destination = mPickupRequest.getDestination();
                     mCustomerMarker = mMap.addMarker(new MarkerOptions()
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
                             .position(new LatLng(customerLat, customerLng))
                             .title("Customer"));
                     mTxtNameLocation.setText(getNameAdress(customerLat,customerLng).toUpperCase());
                 }
-                getInfoCustomer(mRideInfo.getCustomerId());
+                getInfoCustomer(mPickupRequest.getCustomerId());
             }
 
             @Override
@@ -528,7 +529,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 break;
             case R.id.btn_chat:
                 Intent chatIntent = new Intent(DriverTrackingAcitivity.this, ChatActivity.class);
-                chatIntent.putExtra("user_id", mRideInfo.getCustomerId());
+                chatIntent.putExtra("user_id", mPickupRequest.getCustomerId());
                 chatIntent.putExtra("user_name", mCustomer.getName());
                 chatIntent.putExtra("driver", mCustomer.getName());
                 startActivity(chatIntent);
@@ -588,9 +589,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
                                             HashMap<String, Object> timePickup = new HashMap<>();
                                             timePickup.put("timePickup",ServerValue.TIMESTAMP);
-                                            timePickup.put("status",Common.ride_info_status_on_trip);
-                                            mRideInfoDatabase.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                                    .updateChildren(timePickup);
+                                            // Delete pickup Request and create Ride info
 
                                             mTxtNameLocation.setText(destination);
                                             mImgLocation.setImageResource(R.drawable.ic_drop_off);
@@ -635,7 +634,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     private void sendMessagePickupToCustomer() {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
-        tokens.orderByKey().equalTo(mRideInfo.getCustomerId())
+        tokens.orderByKey().equalTo(mPickupRequest.getCustomerId())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -673,7 +672,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     private void sendMessageDropOffToCustomer() {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
-        tokens.orderByKey().equalTo(mRideInfo.getCustomerId())
+        tokens.orderByKey().equalTo(mPickupRequest.getCustomerId())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -751,7 +750,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                sendArrivedNotification(mRideInfo.getCustomerId());
+                sendArrivedNotification(mPickupRequest.getCustomerId());
             }
 
             @Override

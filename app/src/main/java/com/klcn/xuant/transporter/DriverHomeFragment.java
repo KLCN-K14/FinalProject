@@ -53,6 +53,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Token;
@@ -270,32 +271,46 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
                 final double longitude = Common.mLastLocationDriver.getLongitude();
 
                 // save location driver to firebase to comunicate with customer
-                mGeoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                        new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+                FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl)
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onComplete(String key, DatabaseError error) {
-                                if(oldLocation!=null){
-                                    Location startingLocation = new Location("starting point");
-                                    startingLocation.setLatitude(oldLocation.getLatitude());
-                                    startingLocation.setLongitude(oldLocation.getLongitude());
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(!dataSnapshot.exists() && mGeoFire!=null){
+                                    mGeoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                                            new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+                                                @Override
+                                                public void onComplete(String key, DatabaseError error) {
+                                                    if(oldLocation!=null){
+                                                        Location startingLocation = new Location("starting point");
+                                                        startingLocation.setLatitude(oldLocation.getLatitude());
+                                                        startingLocation.setLongitude(oldLocation.getLongitude());
 
-                                    //Get the target location
-                                    Location endingLocation = new Location("ending point");
-                                    endingLocation.setLatitude(latitude);
-                                    endingLocation.setLongitude(longitude);
+                                                        //Get the target location
+                                                        Location endingLocation = new Location("ending point");
+                                                        endingLocation.setLatitude(latitude);
+                                                        endingLocation.setLongitude(longitude);
 
-                                    bearing = startingLocation.bearingTo(endingLocation);
+                                                        bearing = startingLocation.bearingTo(endingLocation);
+                                                    }
+                                                    //Add marker
+                                                    if (mMarker != null)
+                                                        mMarker.remove();
+                                                    mMarker = mMap.addMarker(new MarkerOptions()
+                                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
+                                                            .position(new LatLng(latitude, longitude))
+                                                            .anchor(0.5f, 0.5f)
+                                                            .rotation(bearing)
+                                                            .title("You"));
+                                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15.0f));
+                                                }
+                                            });
                                 }
-                                //Add marker
-                                if (mMarker != null)
-                                    mMarker.remove();
-                                mMarker = mMap.addMarker(new MarkerOptions()
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
-                                        .position(new LatLng(latitude, longitude))
-                                        .anchor(0.5f, 0.5f)
-                                        .rotation(bearing)
-                                        .title("You"));
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15.0f));
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
                             }
                         });
             }
@@ -435,7 +450,7 @@ public class DriverHomeFragment extends Fragment implements OnMapReadyCallback,
     public void onResume() {
         super.onResume();
 
-        FirebaseDatabase.getInstance().getReference(Common.ride_info_tbl)
+        FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {

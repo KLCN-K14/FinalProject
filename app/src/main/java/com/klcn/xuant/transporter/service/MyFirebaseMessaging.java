@@ -53,6 +53,9 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         }else if(remoteMessage.getNotification().getTitle().equals("DropOff")){
             Intent i = new Intent("android.intent.action.MAIN").putExtra("DropOff", remoteMessage.getNotification().getBody().toString());
             this.sendBroadcast(i);
+        }else if(remoteMessage.getNotification().getTitle().equals("CancelTrip")){
+            Intent i = new Intent("android.intent.action.MAIN").putExtra("CancelTrip", remoteMessage.getNotification().getBody().toString());
+            this.sendBroadcast(i);
         }
     }
 
