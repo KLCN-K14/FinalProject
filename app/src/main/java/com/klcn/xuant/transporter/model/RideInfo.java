@@ -7,8 +7,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class RideInfo {
 
-    private String latPickup,lngPickup,destination,customerId,status;
-    private Long timePickup,timeDropOff;
+    private String latPickup,lngPickup,destination,customerId;
 
     public RideInfo() {
     }
@@ -45,38 +44,11 @@ public class RideInfo {
         this.customerId = customerId;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Long getTimePickup() {
-        return timePickup;
-    }
-
-    public void setTimePickup(Long timePickup) {
-        this.timePickup = timePickup;
-    }
-
-    public Long getTimeDropOff() {
-        return timeDropOff;
-    }
-
-    public void setTimeDropOff(Long timeDropOff) {
-        this.timeDropOff = timeDropOff;
-    }
-
-    public RideInfo(String latPickup, String lngPickup, String destination, String customerId, String status, Long timePickup, Long timeDropOff) {
+    public RideInfo(String latPickup, String lngPickup, String destination, String customerId) {
 
         this.latPickup = latPickup;
         this.lngPickup = lngPickup;
         this.destination = destination;
         this.customerId = customerId;
-        this.status = status;
-        this.timePickup = timePickup;
-        this.timeDropOff = timeDropOff;
     }
 }

@@ -857,17 +857,6 @@ public class CustomerHomeActivity extends AppCompatActivity
     }
 
     private void requestPickUpHere() {
-        DatabaseReference dbRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
-        GeoFire mGeoFire = new GeoFire(dbRequest);
-        mGeoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                new GeoLocation(Common.mLastLocationCustomer.getLatitude(),
-                        Common.mLastLocationCustomer.getLongitude()), new GeoFire.CompletionListener() {
-                    @Override
-                    public void onComplete(String key, DatabaseError error) {
-
-                    }
-                });
-
         if(mUserMarker.isVisible())
             mUserMarker.remove();
         mUserMarker = mMap.addMarker(new MarkerOptions()

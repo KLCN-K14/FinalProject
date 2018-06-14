@@ -19,13 +19,9 @@ public class Common {
     public static final String ride_info_tbl = "RideInfo";
     public static final String tokens_tbl = "Tokens";
 
-
-    public static final String ride_info_status_driver_coming = "1";
-    public static final String ride_info_status_on_trip = "2";
     public static final String ride_info_status_customer_cancel = "3";
     public static final String ride_info_status_driver_cancel = "4";
     public static final String ride_info_status_complete = "5";
-
 
     public static final Double base_fare = 10.;
     public static final Double cost_per_km = 10.;

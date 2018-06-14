@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
+import android.nfc.cardemulation.HostNfcFService;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -14,7 +15,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +25,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.github.lzyzsd.circleprogress.ArcProgress;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +39,7 @@ import com.google.gson.Gson;
 import com.klcn.xuant.transporter.DriverMainActivity;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.helper.ArcProgressAnimation;
 import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
@@ -75,8 +80,11 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     @BindView(R.id.txt_name_driver_found)
     TextView mTxtNameDriverFound;
 
-    @BindView(R.id.btn_cancel_find_driver)
-    Button mBtnCancel;
+    @BindView(R.id.rlt_layout_cancel)
+    RelativeLayout mRltCancel;
+
+    @BindView(R.id.arc_progress)
+    ArcProgress mArcProgress;
 
     Double  lat, lng;
     int radius = 1;
@@ -88,6 +96,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     BroadcastReceiver mReceiver;
     Driver mDriver;
     HashMap<String,String> hashDriverFound = new HashMap<>();
+    GeoQuery geoQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +112,28 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         getNameAdress(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
         findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
 
-        mBtnCancel.setOnClickListener(this);
+        mArcProgress.setMax(5);
+        ArcProgressAnimation anim = new ArcProgressAnimation(mArcProgress, 5, 0);
+        anim.setDuration(5000);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mRltCancel.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mArcProgress.startAnimation(anim);
+
+        mRltCancel.setOnClickListener(this);
     }
 
     private void getNameAdress(Double lat, Double lng) {
@@ -124,7 +154,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
         GeoFire gfDrivers = new GeoFire(driverAvailable);
 
-        GeoQuery geoQuery = gfDrivers.queryAtLocation(new GeoLocation(lat,lng), radius);
+        geoQuery = gfDrivers.queryAtLocation(new GeoLocation(lat,lng), radius);
         geoQuery.removeAllListeners();
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
@@ -172,8 +202,14 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
                     // finish when don't have any driver available
                     if(driverID.equals("")){
-                        setResult(RESULT_CANCELED, resultIntent);
-                        finish();
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                setResult(RESULT_CANCELED, resultIntent);
+                                finish();
+                            }
+                        },2000);
                     }else{
                         // auto finish when driver not response after 15s
                         final Handler handlerWaitRequest = new Handler();
@@ -276,6 +312,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
     @Override
     public void onBackPressed() {
+        geoQuery.removeAllListeners();
         finish();
         super.onBackPressed();
     }
@@ -283,23 +320,55 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.btn_cancel_find_driver:
-                cancelPickupRequest();
+            case R.id.rlt_layout_cancel:
+                // send cancel to driver
+                if(!driverID.equals("")){
+                    sendMessageCancel();
+                }
+                geoQuery.removeAllListeners();
+                finish();
                 break;
         }
     }
 
-    private void cancelPickupRequest() {
-        DatabaseReference dbRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
-        GeoFire mGeoFire = new GeoFire(dbRequest);
-        mGeoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                new GeoFire.CompletionListener() {
+    private void sendMessageCancel() {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(driverID)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(String key, DatabaseError error) {
-                        finish();
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("CancelTrip","You cancel request!");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessageCancel","Sucess");
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("MessageCancel",response.message());
+                                        Log.e("MessageCancel",response.errorBody().toString());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
                 });
     }
+
 
     @Override
     protected void onStart() {
@@ -309,9 +378,15 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     @Override
     protected void onStop() {
         super.onStop();
-        cancelPickupRequest();
+        geoQuery.removeAllListeners();
         finish();
         this.unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        geoQuery.removeAllListeners();
+        super.onDestroy();
     }
 
     @Override

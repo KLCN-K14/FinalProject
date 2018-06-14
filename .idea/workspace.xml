@@ -6,16 +6,27 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
+<<<<<<< HEAD
+=======
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="CustomerCall" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
     <option name="TOOL_WINDOW_LOG_LEVEL" value="error" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="5d6ba892-6da2-4221-84cf-1acbdbeceff5" name="Default" comment="">
+=======
+    <list default="true" id="ee948b84-d746-40f6-8cc3-edec49a7cb0d" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/ArcProgressAnimation.java" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/PickupRequest.java" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
@@ -113,6 +124,22 @@
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/suggest_driver_dialog.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/suggest_driver_dialog.xml" />
       <change beforePath="$PROJECT_DIR$/local.properties" afterPath="$PROJECT_DIR$/local.properties" />
+=======
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTrackingAcitivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTrackingAcitivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/Service/MyFirebaseMessaging.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/Service/MyFirebaseMessaging.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/common/Common.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/common/Common.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/RideInfo.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/RideInfo.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/findDriver/CustomerFindDriverActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/findDriver/CustomerFindDriverActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_find_driver.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_find_driver.xml" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -135,16 +162,93 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+<<<<<<< HEAD
       <file leaf-file-name="ChatActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="15">
               <caret line="606" column="22" lean-forward="false" selection-start-line="606" selection-start-column="22" selection-end-line="606" selection-end-column="22" />
               <folding />
+=======
+      <file leaf-file-name="DriverTrackingAcitivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTrackingAcitivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="403">
+              <caret line="668" column="19" lean-forward="false" selection-start-line="634" selection-start-column="8" selection-end-line="668" selection-end-column="19" />
+              <folding>
+                <element signature="method#sendMessageDropOffToCustomer#0;class#DriverTrackingAcitivity#0" expanded="false" />
+                <element signature="method#onConnected#0;class#DriverTrackingAcitivity#0" expanded="false" />
+                <element signature="method#onConnectionSuspended#0;class#DriverTrackingAcitivity#0" expanded="false" />
+                <element signature="method#onConnectionFailed#0;class#DriverTrackingAcitivity#0" expanded="false" />
+                <element signature="method#onLocationChanged#0;class#DriverTrackingAcitivity#0" expanded="false" />
+                <element signature="method#checkDriverNear#0;class#DriverTrackingAcitivity#0" expanded="false" />
+                <element signature="method#onMapReady#0;class#DriverTrackingAcitivity#0" expanded="false" />
+                <element signature="method#sendArrivedNotification#0;class#DriverTrackingAcitivity#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="CustomerHomeActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="437">
+              <caret line="913" column="13" lean-forward="false" selection-start-line="913" selection-start-column="13" selection-end-line="913" selection-end-column="13" />
+              <folding>
+                <element signature="e#8239#8270#0" expanded="true" />
+                <element signature="e#8272#8304#0" expanded="true" />
+                <element signature="e#10181#10788#0" expanded="true" />
+                <element signature="e#10787#10788#0" expanded="true" />
+                <element signature="e#10830#11478#0" expanded="true" />
+                <element signature="e#11477#11478#0" expanded="true" />
+                <element signature="e#11519#12299#0" expanded="true" />
+                <element signature="e#12298#12299#0" expanded="true" />
+                <element signature="class#12393:13482" expanded="false" />
+                <element signature="e#16231#16527#0" expanded="true" />
+                <element signature="e#16526#16527#0" expanded="true" />
+                <element signature="e#19227#19520#0" expanded="true" />
+                <element signature="e#19519#19520#0" expanded="true" />
+                <element signature="e#19591#19840#0" expanded="true" />
+                <element signature="e#19839#19840#0" expanded="true" />
+                <element signature="e#19886#20471#0" expanded="true" />
+                <element signature="e#20470#20471#0" expanded="true" />
+                <element signature="e#20526#20772#0" expanded="true" />
+                <element signature="e#20771#20772#0" expanded="true" />
+                <element signature="e#21293#21586#0" expanded="true" />
+                <element signature="e#21585#21586#0" expanded="true" />
+                <element signature="e#21659#21882#0" expanded="true" />
+                <element signature="e#21881#21882#0" expanded="true" />
+                <element signature="e#21928#22513#0" expanded="true" />
+                <element signature="e#22512#22513#0" expanded="true" />
+                <element signature="e#22569#22815#0" expanded="true" />
+                <element signature="e#22814#22815#0" expanded="true" />
+                <element signature="e#39165#39293#0" expanded="true" />
+                <element signature="method#getUserInfo#0;class#CustomerHomeActivity#0" expanded="false" />
+                <element signature="method#networkAvailable#0;class#CustomerHomeActivity#0" expanded="false" />
+                <element signature="method#onPause#0;class#CustomerHomeActivity#0" expanded="false" />
+                <element signature="method#setupPriceTrip#0;class#CustomerHomeActivity#0" expanded="false" />
+                <element signature="e#43399#43454#0" expanded="true" />
+                <element signature="method#calculateFare#0;class#CustomerHomeActivity#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CustomerTrackingActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="182">
+              <caret line="167" column="4" lean-forward="false" selection-start-line="167" selection-start-column="4" selection-end-line="167" selection-end-column="40" />
+              <folding>
+                <element signature="e#31739#31999#0" expanded="true" />
+                <element signature="e#31998#31999#0" expanded="true" />
+              </folding>
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
+            </state>
+          </provider>
+        </entry>
+      </file>
+<<<<<<< HEAD
       <file leaf-file-name="pop_up_driver_menu.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/pop_up_driver_menu.xml">
           <provider selected="true" editor-type-id="text-editor">
@@ -168,6 +272,89 @@
           </provider>
           <provider editor-type-id="android-designer2">
             <state />
+=======
+      <file leaf-file-name="DriverHomeFragment.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="191">
+              <caret line="284" column="48" lean-forward="true" selection-start-line="284" selection-start-column="48" selection-end-line="284" selection-end-column="48" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CustomerFindDriverActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/findDriver/CustomerFindDriverActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="237">
+              <caret line="348" column="60" lean-forward="false" selection-start-line="348" selection-start-column="47" selection-end-line="348" selection-end-column="60" />
+              <folding>
+                <element signature="class#4143:4513" expanded="false" />
+                <element signature="e#4359#4360#0" expanded="true" />
+                <element signature="e#4399#4400#0" expanded="true" />
+                <element signature="e#7731#8005#0" expanded="true" />
+                <element signature="e#8004#8005#0" expanded="true" />
+                <element signature="e#15327#15328#0" expanded="true" />
+                <element signature="e#15358#15359#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MyFirebaseMessaging.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/service/MyFirebaseMessaging.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="340">
+              <caret line="56" column="84" lean-forward="false" selection-start-line="56" selection-start-column="84" selection-end-line="56" selection-end-column="84" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ArcProgressAnimation.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/ArcProgressAnimation.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="8" column="33" lean-forward="false" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="33" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CustomerCallActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="291">
+              <caret line="319" column="56" lean-forward="true" selection-start-line="319" selection-start-column="56" selection-end-line="319" selection-end-column="56" />
+              <folding>
+                <element signature="e#5960#6179#0" expanded="true" />
+                <element signature="e#6178#6179#0" expanded="true" />
+                <element signature="e#6677#6732#0" expanded="true" />
+                <element signature="e#9521#9752#0" expanded="true" />
+                <element signature="e#9751#9752#0" expanded="true" />
+                <element signature="e#9800#10111#0" expanded="true" />
+                <element signature="e#10110#10111#0" expanded="true" />
+                <element signature="e#12357#13124#0" expanded="true" />
+                <element signature="e#13074#13075#0" expanded="true" />
+                <element signature="e#13123#13124#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="activity_customer_call.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_customer_call.xml">
+          <provider editor-type-id="android-designer2">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="493">
+              <caret line="29" column="49" lean-forward="false" selection-start-line="13" selection-start-column="12" selection-end-line="29" selection-end-column="49" />
+              <folding />
+            </state>
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
           </provider>
         </entry>
       </file>
@@ -176,10 +363,35 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+<<<<<<< HEAD
         <option value="resourceFile" />
         <option value="layoutResourceFile" />
       </list>
     </option>
+=======
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>mImgUpDown</find>
+      <find>2 min</find>
+      <find>call()</find>
+      <find>setupPriceTrip</find>
+      <find>currentService =</find>
+      <find>btn_chat</find>
+      <find>mRideInfoDatabase</find>
+      <find>ride_info_status_on_trip</find>
+      <find>PickupRequest</find>
+      <find>pickup_request_tbl</find>
+      <find>ride_info_status</find>
+      <find>ride_info</find>
+      <find>showNo</find>
+      <find>ride_info_tbl</find>
+      <find>send</find>
+    </findStrings>
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -2220,6 +2432,7 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/adapter/ChatRecyclerAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/suggest_driver_dialog.xml" />
@@ -2228,7 +2441,26 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/update.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/menu/drop_up_menu.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/menu/pop_up_customer_menu.xml" />
+=======
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/ServiceVehicle.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/content_customer_home.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
         <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/RideInfo.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/PickupRequest.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTrackingAcitivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/common/Common.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_find_driver.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/ProgressBarAnimation.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/ArcProgressAnimation.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/service/MyFirebaseMessaging.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/findDriver/CustomerFindDriverActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java" />
       </list>
     </option>
   </component>
@@ -2255,7 +2487,10 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+<<<<<<< HEAD
       <pane id="Scratches" />
+=======
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <pane id="AndroidView">
         <subPane>
           <expand>
@@ -2266,13 +2501,78 @@
             <path>
               <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
+<<<<<<< HEAD
               <item name="res" type="d4f16f75:AndroidResFolderNode" />
+=======
+              <item name="manifests" type="f94875db:AndroidManifestsGroupNode" />
             </path>
             <path>
               <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="helper" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="model" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="mvp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="mvp" type="462c0819:PsiDirectoryNode" />
+              <item name="findDriver" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="mvp" type="462c0819:PsiDirectoryNode" />
+              <item name="home" type="462c0819:PsiDirectoryNode" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
+            </path>
+            <path>
+              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+<<<<<<< HEAD
               <item name="res" type="d4f16f75:AndroidResFolderNode" />
               <item name="drawable" type="ddeffd01:AndroidResFolderTypeNode" />
+=======
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
             </path>
             <path>
               <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
@@ -2291,17 +2591,28 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+<<<<<<< HEAD
       <pane id="ProjectPane" />
       <pane id="Scope" />
+=======
+      <pane id="Scope" />
+      <pane id="ProjectPane" />
+      <pane id="Scratches" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="android.sdk.path" value="$USER_HOME$/Library/Android/sdk" />
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
+<<<<<<< HEAD
     <property name="settings.editor.selected.configurable" value="android.sdk-updates" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="device.picker.selection" value="3300116cc6b7a357" />
+=======
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../Test Form/BottomSheetExample-master" />
+    <property name="device.picker.selection" value="BISSJ7Z999999999 3300116cc6b7a357" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -2490,12 +2801,17 @@
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="729" extended-state="0" />
     <layout>
+<<<<<<< HEAD
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+=======
+      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+<<<<<<< HEAD
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2511,6 +2827,24 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+=======
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936507" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4464" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -2518,7 +2852,10 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+<<<<<<< HEAD
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32956383" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+=======
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -2530,7 +2867,158 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTrackingAcitivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7531">
+          <caret line="532" column="43" lean-forward="false" selection-start-line="532" selection-start-column="37" selection-end-line="532" selection-end-column="43" />
+          <folding>
+            <element signature="method#sendMessageDropOffToCustomer#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onConnected#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onConnectionSuspended#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onConnectionFailed#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onLocationChanged#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#checkDriverNear#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onMapReady#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#sendArrivedNotification#0;class#DriverTrackingAcitivity#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6545">
+          <caret line="385" column="36" lean-forward="true" selection-start-line="385" selection-start-column="36" selection-end-line="385" selection-end-column="36" />
+          <folding>
+            <element signature="e#8239#8270#0" expanded="true" />
+            <element signature="e#8272#8304#0" expanded="true" />
+            <element signature="e#10181#10788#0" expanded="true" />
+            <element signature="e#10787#10788#0" expanded="true" />
+            <element signature="e#10830#11478#0" expanded="true" />
+            <element signature="e#11477#11478#0" expanded="true" />
+            <element signature="e#11519#12299#0" expanded="true" />
+            <element signature="e#12298#12299#0" expanded="true" />
+            <element signature="class#12393:13482" expanded="false" />
+            <element signature="e#16231#16527#0" expanded="true" />
+            <element signature="e#16526#16527#0" expanded="true" />
+            <element signature="e#19227#19520#0" expanded="true" />
+            <element signature="e#19519#19520#0" expanded="true" />
+            <element signature="e#19591#19840#0" expanded="true" />
+            <element signature="e#19839#19840#0" expanded="true" />
+            <element signature="e#19886#20471#0" expanded="true" />
+            <element signature="e#20470#20471#0" expanded="true" />
+            <element signature="e#20526#20772#0" expanded="true" />
+            <element signature="e#20771#20772#0" expanded="true" />
+            <element signature="e#21293#21586#0" expanded="true" />
+            <element signature="e#21585#21586#0" expanded="true" />
+            <element signature="e#21659#21882#0" expanded="true" />
+            <element signature="e#21881#21882#0" expanded="true" />
+            <element signature="e#21928#22513#0" expanded="true" />
+            <element signature="e#22512#22513#0" expanded="true" />
+            <element signature="e#22569#22815#0" expanded="true" />
+            <element signature="e#22814#22815#0" expanded="true" />
+            <element signature="e#39165#39293#0" expanded="true" />
+            <element signature="method#getUserInfo#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="method#networkAvailable#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="method#onPause#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="method#setupPriceTrip#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="e#43399#43454#0" expanded="true" />
+            <element signature="method#calculateFare#0;class#CustomerHomeActivity#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5304">
+          <caret line="312" column="16" lean-forward="false" selection-start-line="312" selection-start-column="16" selection-end-line="312" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/content_customer_home.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1462">
+          <caret line="86" column="17" lean-forward="true" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_customer_home.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="36" lean-forward="false" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/app_bar_customer_home.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="38" column="37" lean-forward="false" selection-start-line="38" selection-start-column="37" selection-end-line="38" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="39" column="47" lean-forward="false" selection-start-line="39" selection-start-column="29" selection-end-line="39" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3570">
+          <caret line="210" column="88" lean-forward="false" selection-start-line="210" selection-start-column="72" selection-end-line="210" selection-end-column="88" />
+          <folding>
+            <element signature="e#5960#6179#0" expanded="true" />
+            <element signature="e#6178#6179#0" expanded="true" />
+            <element signature="e#6677#6732#0" expanded="true" />
+            <element signature="e#9521#9752#0" expanded="true" />
+            <element signature="e#9751#9752#0" expanded="true" />
+            <element signature="e#9800#10111#0" expanded="true" />
+            <element signature="e#10110#10111#0" expanded="true" />
+            <element signature="e#12357#13124#0" expanded="true" />
+            <element signature="e#13074#13075#0" expanded="true" />
+            <element signature="e#13123#13124#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/common/Common.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="33" column="52" lean-forward="false" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2737">
+          <caret line="161" column="0" lean-forward="true" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/border_bottom_gray_layout_white.xml">
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -2549,7 +3037,12 @@
         <state />
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml">
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/BodyData.java" />
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/Sender.java">
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="25" lean-forward="false" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
@@ -2560,7 +3053,11 @@
         <state />
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/Notification.java">
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -2568,16 +3065,29 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/suggest_driver_dialog.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="780">
           <caret line="52" column="0" lean-forward="false" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/ServiceVehicle.java" />
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="39" column="47" lean-forward="false" selection-start-line="39" selection-start-column="29" selection-end-line="39" selection-end-column="47" />
+          <folding />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
         </state>
       </provider>
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2895">
@@ -2589,16 +3099,47 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_customer_home.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="36" lean-forward="false" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/app_bar_customer_home.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="38" column="37" lean-forward="false" selection-start-line="38" selection-start-column="37" selection-end-line="38" selection-end-column="37" />
+          <folding />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
         </state>
       </provider>
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/pop_up_driver_menu.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="29" lean-forward="false" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/content_customer_home.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1462">
+          <caret line="86" column="17" lean-forward="false" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
           <folding />
         </state>
       </provider>
@@ -2606,44 +3147,65 @@
         <state />
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values/colors.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="690">
           <caret line="46" column="27" lean-forward="false" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="27" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="181" column="13" lean-forward="true" selection-start-line="181" selection-start-column="13" selection-end-line="181" selection-end-column="13" />
+          <folding />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml">
+<<<<<<< HEAD
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="25" lean-forward="false" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
           <folding />
         </state>
       </provider>
+=======
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+=======
+        <state relative-caret-position="119">
+          <caret line="7" column="26" lean-forward="true" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/suggest_driver_dialog.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="780">
           <caret line="52" column="0" lean-forward="true" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
         </state>
       </provider>
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_recv.xml">
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="1590">
           <caret line="193" column="25" lean-forward="true" selection-start-line="193" selection-start-column="25" selection-end-line="193" selection-end-column="25" />
         </state>
@@ -2655,23 +3217,75 @@
           <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
         </state>
       </provider>
+=======
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CancelBookActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="18" column="49" lean-forward="false" selection-start-line="18" selection-start-column="49" selection-end-line="18" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_cancel_book.xml">
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/pop_up_driver_menu.xml">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="60">
           <caret line="4" column="29" lean-forward="true" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
           <folding />
         </state>
       </provider>
+=======
+        <state relative-caret-position="136">
+          <caret line="8" column="40" lean-forward="true" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/PickupRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/RideInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="46" column="93" lean-forward="false" selection-start-line="46" selection-start-column="93" selection-end-line="46" selection-end-column="93" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/common/Common.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="27" column="61" lean-forward="false" selection-start-line="27" selection-start-column="61" selection-end-line="27" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_customer_call.xml">
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values/colors.xml">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="690">
           <caret line="46" column="27" lean-forward="false" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="27" />
         </state>
@@ -2681,6 +3295,21 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="25" lean-forward="false" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+=======
+        <state relative-caret-position="493">
+          <caret line="29" column="49" lean-forward="false" selection-start-line="13" selection-start-column="12" selection-end-line="29" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_find_driver.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="174" column="57" lean-forward="false" selection-start-line="174" selection-start-column="46" selection-end-line="174" selection-end-column="57" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
           <folding />
         </state>
       </provider>
@@ -2695,15 +3324,69 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values/colors.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="690">
           <caret line="46" column="27" lean-forward="false" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="27" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/ArcProgressAnimation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="8" column="33" lean-forward="false" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="33" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="437">
+          <caret line="913" column="13" lean-forward="false" selection-start-line="913" selection-start-column="13" selection-end-line="913" selection-end-column="13" />
+          <folding>
+            <element signature="e#8239#8270#0" expanded="true" />
+            <element signature="e#8272#8304#0" expanded="true" />
+            <element signature="e#10181#10788#0" expanded="true" />
+            <element signature="e#10787#10788#0" expanded="true" />
+            <element signature="e#10830#11478#0" expanded="true" />
+            <element signature="e#11477#11478#0" expanded="true" />
+            <element signature="e#11519#12299#0" expanded="true" />
+            <element signature="e#12298#12299#0" expanded="true" />
+            <element signature="class#12393:13482" expanded="false" />
+            <element signature="e#16231#16527#0" expanded="true" />
+            <element signature="e#16526#16527#0" expanded="true" />
+            <element signature="e#19227#19520#0" expanded="true" />
+            <element signature="e#19519#19520#0" expanded="true" />
+            <element signature="e#19591#19840#0" expanded="true" />
+            <element signature="e#19839#19840#0" expanded="true" />
+            <element signature="e#19886#20471#0" expanded="true" />
+            <element signature="e#20470#20471#0" expanded="true" />
+            <element signature="e#20526#20772#0" expanded="true" />
+            <element signature="e#20771#20772#0" expanded="true" />
+            <element signature="e#21293#21586#0" expanded="true" />
+            <element signature="e#21585#21586#0" expanded="true" />
+            <element signature="e#21659#21882#0" expanded="true" />
+            <element signature="e#21881#21882#0" expanded="true" />
+            <element signature="e#21928#22513#0" expanded="true" />
+            <element signature="e#22512#22513#0" expanded="true" />
+            <element signature="e#22569#22815#0" expanded="true" />
+            <element signature="e#22814#22815#0" expanded="true" />
+            <element signature="e#39165#39293#0" expanded="true" />
+            <element signature="method#getUserInfo#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="method#networkAvailable#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="method#onPause#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="method#setupPriceTrip#0;class#CustomerHomeActivity#0" expanded="false" />
+            <element signature="e#43399#43454#0" expanded="true" />
+            <element signature="method#calculateFare#0;class#CustomerHomeActivity#0" expanded="false" />
+          </folding>
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="15">
           <caret line="193" column="25" lean-forward="false" selection-start-line="193" selection-start-column="25" selection-end-line="193" selection-end-column="25" />
         </state>
@@ -2736,6 +3419,14 @@
         <state relative-caret-position="240">
           <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
           <folding />
+=======
+        <state relative-caret-position="182">
+          <caret line="167" column="4" lean-forward="false" selection-start-line="167" selection-start-column="4" selection-end-line="167" selection-end-column="40" />
+          <folding>
+            <element signature="e#31739#31999#0" expanded="true" />
+            <element signature="e#31998#31999#0" expanded="true" />
+          </folding>
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
         </state>
       </provider>
       <provider editor-type-id="android-designer2">
@@ -2744,8 +3435,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="105">
           <caret line="7" column="25" lean-forward="false" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+=======
+        <state relative-caret-position="403">
+          <caret line="668" column="19" lean-forward="false" selection-start-line="634" selection-start-column="8" selection-end-line="668" selection-end-column="19" />
+          <folding>
+            <element signature="method#sendMessageDropOffToCustomer#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onConnected#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onConnectionSuspended#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onConnectionFailed#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onLocationChanged#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#checkDriverNear#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#onMapReady#0;class#DriverTrackingAcitivity#0" expanded="false" />
+            <element signature="method#sendArrivedNotification#0;class#DriverTrackingAcitivity#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/service/MyFirebaseMessaging.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="56" column="84" lean-forward="false" selection-start-line="56" selection-start-column="84" selection-end-line="56" selection-end-column="84" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
           <folding />
         </state>
       </provider>
@@ -2773,10 +3486,50 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/findDriver/CustomerFindDriverActivity.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="348" column="60" lean-forward="false" selection-start-line="348" selection-start-column="47" selection-end-line="348" selection-end-column="60" />
+          <folding>
+            <element signature="class#4143:4513" expanded="false" />
+            <element signature="e#4359#4360#0" expanded="true" />
+            <element signature="e#4399#4400#0" expanded="true" />
+            <element signature="e#7731#8005#0" expanded="true" />
+            <element signature="e#8004#8005#0" expanded="true" />
+            <element signature="e#15327#15328#0" expanded="true" />
+            <element signature="e#15358#15359#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="319" column="56" lean-forward="true" selection-start-line="319" selection-start-column="56" selection-end-line="319" selection-end-column="56" />
+          <folding>
+            <element signature="e#5960#6179#0" expanded="true" />
+            <element signature="e#6178#6179#0" expanded="true" />
+            <element signature="e#6677#6732#0" expanded="true" />
+            <element signature="e#9521#9752#0" expanded="true" />
+            <element signature="e#9751#9752#0" expanded="true" />
+            <element signature="e#9800#10111#0" expanded="true" />
+            <element signature="e#10110#10111#0" expanded="true" />
+            <element signature="e#12357#13124#0" expanded="true" />
+            <element signature="e#13074#13075#0" expanded="true" />
+            <element signature="e#13123#13124#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="15">
           <caret line="606" column="22" lean-forward="false" selection-start-line="606" selection-start-column="22" selection-end-line="606" selection-end-column="22" />
+=======
+        <state relative-caret-position="191">
+          <caret line="284" column="48" lean-forward="true" selection-start-line="284" selection-start-column="48" selection-end-line="284" selection-end-column="48" />
+>>>>>>> 0d4adaff54e03f71c99d394f2339929e0e05103b
           <folding />
         </state>
       </provider>
