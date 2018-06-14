@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
-        android:text="Where are you?"
+        android:text="Ok"
         android:textSize="16sp" />
 
     <View
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="15dp"
-        android:text="I'm on my way"
+        android:text="I'm here"
         android:textSize="16sp" />
 
     <View
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="15dp"
-        android:text="Can you wait 5 mins?"
+        android:text="I'll arrive in 2 minutes"
         android:textSize="16sp" />
 
     <View
@@ -56,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:text="Are you nearby?"
+        android:text="Stuck in traffic"
         android:textSize="16sp" />
 
 

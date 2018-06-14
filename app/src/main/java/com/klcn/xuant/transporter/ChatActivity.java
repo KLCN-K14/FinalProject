@@ -13,25 +13,22 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,11 +51,10 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.klcn.xuant.transporter.adapter.ChatRecyclerAdapter;
-import com.klcn.xuant.transporter.adapter.MessageAdapter;
-import com.klcn.xuant.transporter.model.Chat;
+import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Customer;
+import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.Messages;
-import com.klcn.xuant.transporter.mvp.profile.CustomerProfileActivity;
-import com.klcn.xuant.transporter.utils.GetTimeAgo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,8 +62,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -92,7 +86,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
-    private ChatRecyclerAdapter mAdapter;
+    private ChatRecyclerAdapter mAdapter = null;
     private TextView mText1, mText2, mText3, mText4;
 
     private Dialog dialog;
@@ -112,6 +106,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private String mLastKey = "";
     private String mPrevKey = "";
     String userName = "";
+    String imgUrl = "";
 
 
     @Override
@@ -135,9 +130,61 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if(getIntent().getStringExtra("customer")!=null){
             // Chat này đến từ customer
             fromCustomer = true;
+            FirebaseDatabase.getInstance().getReference(Common.drivers_tbl).child(mChatUser)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                                Driver driver = dataSnapshot.getValue(Driver.class);
+                                imgUrl = driver.getImgUrl();
+                                mAdapter = new ChatRecyclerAdapter(messagesList,imgUrl);
+                                mMessagesList.setAdapter(mAdapter);
+                                mAdapter.notifyDataSetChanged();
+
+                                mMessagesList.scrollToPosition(messagesList.size() - 1);
+
+                                mRefreshLayout.setRefreshing(false);
+                                Log.e("ChatActivity",imgUrl);
+
+                            }else{
+                                Log.e("ChatActivity","Not exists---"+mChatUser);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
         }else if(getIntent().getStringExtra("driver")!=null){
             // Chat này đến từ driver
             fromCustomer = false;
+            FirebaseDatabase.getInstance().getReference(Common.customers_tbl).child(mChatUser)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                                Customer customer = dataSnapshot.getValue(Customer.class);
+                                imgUrl = customer.getImgUrl();
+                                mAdapter = new ChatRecyclerAdapter(messagesList,imgUrl);
+                                mMessagesList.setAdapter(mAdapter);
+                                mAdapter.notifyDataSetChanged();
+
+                                mMessagesList.scrollToPosition(messagesList.size() - 1);
+
+                                mRefreshLayout.setRefreshing(false);
+                                Log.e("ChatActivity",imgUrl);
+
+                            }else{
+                                Log.e("ChatActivity","Not exists---"+mChatUser);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
         }
 //        mChatUser = "VxE53ShAMWOdkKbTOQ6KT6J3ZII2";
         userName = getIntent().getStringExtra("user_name");
@@ -149,7 +196,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
         mBtnBack = (ImageView) findViewById(R.id.toolbar_back);
 
-        mAdapter = new ChatRecyclerAdapter(messagesList);
 
         mMessagesList = (RecyclerView) findViewById(R.id.messages_list);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
@@ -242,7 +288,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -539,45 +584,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.chat_add_btn:
 
-                dialog = new Dialog(ChatActivity.this);
-//                if(!getIntent().getStringExtra("from").equals("driver"))
-//                    dialog.setContentView(R.layout.suggest_driver_dialog);
-                dialog.setContentView(R.layout.suggest_customer_dialog);
+                //Creating the instance of PopupMenu
+                PopupMenu popup = new PopupMenu(ChatActivity.this, mChatAddBtn);
+                if(fromCustomer)
+                    popup.getMenuInflater()
+                            .inflate(R.menu.pop_up_customer_menu, popup.getMenu());
+                else
+                    popup.getMenuInflater()
+                            .inflate(R.menu.pop_up_driver_menu, popup.getMenu());
 
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        mChatMessageView.setText(item.getTitle());
+                        return true;
+                    }
+                });
 
-                dialog.show();
-                mText1 = (TextView) dialog.findViewById(R.id.text1);
-                mText2 = (TextView) dialog.findViewById(R.id.text2);
-                mText3 = (TextView) dialog.findViewById(R.id.text3);
-                mText4 = (TextView) dialog.findViewById(R.id.text4);
-                mText1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mChatMessageView.setText(mText1.getText().toString());
-                        dialog.dismiss();
-                    }
-                });
-                mText2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mChatMessageView.setText(mText2.getText().toString());
-                        dialog.dismiss();
-                    }
-                });
-                mText3.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mChatMessageView.setText(mText3.getText().toString());
-                        dialog.dismiss();
-                    }
-                });
-                mText4.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mChatMessageView.setText(mText4.getText().toString());
-                        dialog.dismiss();
-                    }
-                });
+                popup.show();
                 break;
             case R.id.chat_send_btn:
                 sendMessage();

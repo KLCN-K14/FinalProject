@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/text1"
+        android:title="Ok"/>
+
+    <item
+        android:id="@+id/text2"
+        android:title="I'm here"/>
+
+    <item
+        android:id="@+id/text3"
+        android:title="I'll arrive in 2 minutes"/>
+    <item
+        android:id="@+id/text4"
+        android:title="Stuck in traffic"/>
+
+</menu>

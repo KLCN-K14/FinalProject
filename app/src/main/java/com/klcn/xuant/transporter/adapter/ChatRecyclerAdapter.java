@@ -3,9 +3,12 @@ package com.klcn.xuant.transporter.adapter;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -24,6 +27,10 @@ import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Chat;
 import com.klcn.xuant.transporter.model.Messages;
 
+import java.security.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -34,11 +41,13 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int VIEW_TYPE_OTHER = 2;
 
     private List<Messages> mChats;
-    private DatabaseReference mUserDatabase;
+    final String imgUrl;
 
 
-    public ChatRecyclerAdapter(List<Messages> chats) {
+    public ChatRecyclerAdapter(List<Messages> chats, String imgUrl) {
         mChats = chats;
+        this.imgUrl = imgUrl;
+        Log.e("INIT",imgUrl);
     }
 
     public void add(Messages chat) {
@@ -66,7 +75,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         if (TextUtils.equals(mChats.get(position).getFrom(),
-                "V9W9DeH6Nia8uqs9qRDq8JSEe0e2")) {
+                FirebaseAuth.getInstance().getCurrentUser().getUid())) {
             configureMyChatViewHolder((MyChatViewHolder) holder, position);
         } else {
             configureOtherChatViewHolder((OtherChatViewHolder) holder, position);
@@ -80,12 +89,39 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
         myChatViewHolder.txtChatMessage.setText(chat.getMessage());
+
+        Date currentTime = Calendar.getInstance().getTime();
+        long milliseconds = currentTime.getTime();
+        final String strTimeFormate = "h:mm aa";
+        Log.e(" time::",milliseconds +"");
+        Log.e("Message time ::",chat.getTime() +"");
+//        String mTime= DateFormat.format("dd-MM-yyyy", chat.getTime());
+//        String cTime= DateFormat.format("dd-MM-yyyy", chat.getTime());
+
+        if(DateFormat.format("dd-MM-yyyy", chat.getTime())==DateFormat.format("dd-MM-yyyy", currentTime)){
+            if((milliseconds - chat.getTime())<= 3000)
+                myChatViewHolder.mMessageTime.setText("Just now");
+            else
+                myChatViewHolder.mMessageTime.setText(DateFormat.format(strTimeFormate, chat.getTime()));
+        }
+        myChatViewHolder.mMessageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", chat.getTime()));
     }
 
-    private void configureOtherChatViewHolder(OtherChatViewHolder otherChatViewHolder, int position) {
+    private void configureOtherChatViewHolder(final OtherChatViewHolder otherChatViewHolder, int position) {
         Messages chat = mChats.get(position);
 
         otherChatViewHolder.txtChatMessage.setText(chat.getMessage());
+
+        Log.e("ADAPTER",imgUrl);
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.default_avatar)
+                .error(R.drawable.default_avatar)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH);
+        Glide.with(otherChatViewHolder.profileImage.getContext()).load(imgUrl).apply(options).into(otherChatViewHolder.profileImage);
+
+
     }
 
     @Override
@@ -98,7 +134,8 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        if (TextUtils.equals(mChats.get(position).getFrom(), "V9W9DeH6Nia8uqs9qRDq8JSEe0e2")) {
+        if (TextUtils.equals(mChats.get(position).getFrom(),
+                FirebaseAuth.getInstance().getCurrentUser().getUid())) {
             return VIEW_TYPE_ME;
         } else {
             return VIEW_TYPE_OTHER;
@@ -106,44 +143,26 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private static class MyChatViewHolder extends RecyclerView.ViewHolder {
-        private BubbleTextView txtChatMessage, txtUserAlphabet;
+        private BubbleTextView txtChatMessage;
+        private TextView mMessageTime;
 
         public MyChatViewHolder(View itemView) {
             super(itemView);
             txtChatMessage = (BubbleTextView) itemView.findViewById(R.id.text_message);
+
+            mMessageTime = (TextView) itemView.findViewById(R.id.message_time);
         }
     }
 
     private static class OtherChatViewHolder extends RecyclerView.ViewHolder {
         private BubbleTextView txtChatMessage;
-        private CircleImageView profileImage;
-        private DatabaseReference mUserDatabase;
+        public CircleImageView profileImage;
 
         public OtherChatViewHolder(View itemView) {
             super(itemView);
             txtChatMessage = (BubbleTextView) itemView.findViewById(R.id.text_message_recv);
             profileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_layout);
 
-            mUserDatabase = FirebaseDatabase.getInstance().getReference().child(Common.customers_tbl).child("VdlChGocK2bqNsnK1K8Jv0c2wXu2");
-            mUserDatabase.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String image = dataSnapshot.child("imgUrl").getValue().toString();
-                    RequestOptions options = new RequestOptions()
-                            .centerCrop()
-                            .placeholder(R.drawable.default_avatar)
-                            .error(R.drawable.default_avatar)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .priority(Priority.HIGH);
-                    Glide.with(profileImage.getContext()).load(image).apply(options).into(profileImage);
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
 
         }
     }

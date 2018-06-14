@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
@@ -24,6 +23,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+
+//        LatLng customer_location = new Gson().fromJson(remoteMessage.getNotification().getBody(),LatLng.class);
 
         if(remoteMessage.getNotification().getTitle().equals("Arrived")){
             Handler handler = new Handler(Looper.getMainLooper());
@@ -43,16 +44,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             intent.putExtra("customerId",list[3]);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-
         }else if(remoteMessage.getNotification().getTitle().equals("Pickup")){
-            Intent i = new Intent("android.intent.action.MAIN").putExtra("Pickup", remoteMessage.getNotification().getBody().toString());
-            this.sendBroadcast(i);
-        }else if(remoteMessage.getNotification().getTitle().equals("Cancel")){
-            Intent i = new Intent("android.intent.action.MAIN").putExtra("Cancel", remoteMessage.getNotification().getBody().toString());
-            this.sendBroadcast(i);
-        }else if(remoteMessage.getNotification().getTitle().equals("DropOff")){
-            Intent i = new Intent("android.intent.action.MAIN").putExtra("DropOff", remoteMessage.getNotification().getBody().toString());
-            this.sendBroadcast(i);
+
         }
     }
 
