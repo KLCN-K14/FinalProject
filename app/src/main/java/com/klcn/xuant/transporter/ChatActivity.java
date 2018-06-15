@@ -553,9 +553,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             mChatMessageView.setText("");
 
+            mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("onstate").setValue(true);
             mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
             mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
+            mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("onstate").setValue(false);
             mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("seen").setValue(false);
             mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
@@ -636,5 +638,34 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("onstate").setValue(true);
+        Toast.makeText(getBaseContext(),"ON START",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("onstate").setValue(false);
+        Toast.makeText(getBaseContext(),"ON STOP",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("onstate").setValue(false);
+        Toast.makeText(getBaseContext(),"ON DESTROY",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("onstate").setValue(false);
+        Toast.makeText(getBaseContext(),"ON BACKPRESSED",Toast.LENGTH_LONG).show();
     }
 }

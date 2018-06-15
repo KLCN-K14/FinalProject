@@ -92,12 +92,12 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         Date currentTime = Calendar.getInstance().getTime();
         long milliseconds = currentTime.getTime();
-        final String strTimeFormate = "h:mm";
+        final String strTimeFormate = "HH:mm";
         if((DateFormat.format("dd-MM-yyyy", chat.getTime())).equals(DateFormat.format("dd-MM-yyyy", currentTime))){
             if((milliseconds - chat.getTime())<= 3000)
                 myChatViewHolder.mMessageTime.setText("Just now");
             else
-                myChatViewHolder.mMessageTime.setText(DateFormat.format(strTimeFormate, chat.getTime()));
+                myChatViewHolder.mMessageTime.setText("Today " + DateFormat.format(strTimeFormate, chat.getTime()));
         }else
             myChatViewHolder.mMessageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm)", chat.getTime()));
     }
@@ -118,7 +118,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         Date currentTime = Calendar.getInstance().getTime();
         long milliseconds = currentTime.getTime();
-        final String strTimeFormate = "h:mm";
+        final String strTimeFormate = "HH:mm";
         if((DateFormat.format("dd-MM-yyyy", chat.getTime())).equals(DateFormat.format("dd-MM-yyyy", currentTime))){
             if((milliseconds - chat.getTime())<= 3000)
                 otherChatViewHolder.mMessageTime.setText("Just now");

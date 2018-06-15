@@ -35,8 +35,10 @@
         android:layout_height="wrap_content"
         android:text="12:00"
         android:textSize="11sp"
-        android:layout_toRightOf="@+id/text_message_recv"
-        android:layout_marginLeft="5dp"/>
+        android:layout_below="@+id/text_message_recv"
+        android:textColor="@color/divider"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="42dp"/>
 
 
 </RelativeLayout>
