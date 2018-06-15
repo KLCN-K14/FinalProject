@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="12:00"
+        android:textSize="11sp"
         android:layout_toLeftOf="@+id/text_message"
         android:layout_marginRight="5dp"/>
     <com.github.library.bubbleview.BubbleTextView

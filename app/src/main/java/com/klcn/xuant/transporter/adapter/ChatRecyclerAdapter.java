@@ -92,19 +92,14 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         Date currentTime = Calendar.getInstance().getTime();
         long milliseconds = currentTime.getTime();
-        final String strTimeFormate = "h:mm aa";
-        Log.e(" time::",milliseconds +"");
-        Log.e("Message time ::",chat.getTime() +"");
-//        String mTime= DateFormat.format("dd-MM-yyyy", chat.getTime());
-//        String cTime= DateFormat.format("dd-MM-yyyy", chat.getTime());
-
-        if(DateFormat.format("dd-MM-yyyy", chat.getTime())==DateFormat.format("dd-MM-yyyy", currentTime)){
+        final String strTimeFormate = "h:mm";
+        if((DateFormat.format("dd-MM-yyyy", chat.getTime())).equals(DateFormat.format("dd-MM-yyyy", currentTime))){
             if((milliseconds - chat.getTime())<= 3000)
                 myChatViewHolder.mMessageTime.setText("Just now");
             else
                 myChatViewHolder.mMessageTime.setText(DateFormat.format(strTimeFormate, chat.getTime()));
-        }
-        myChatViewHolder.mMessageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", chat.getTime()));
+        }else
+            myChatViewHolder.mMessageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm)", chat.getTime()));
     }
 
     private void configureOtherChatViewHolder(final OtherChatViewHolder otherChatViewHolder, int position) {
@@ -120,6 +115,17 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .priority(Priority.HIGH);
         Glide.with(otherChatViewHolder.profileImage.getContext()).load(imgUrl).apply(options).into(otherChatViewHolder.profileImage);
+
+        Date currentTime = Calendar.getInstance().getTime();
+        long milliseconds = currentTime.getTime();
+        final String strTimeFormate = "h:mm";
+        if((DateFormat.format("dd-MM-yyyy", chat.getTime())).equals(DateFormat.format("dd-MM-yyyy", currentTime))){
+            if((milliseconds - chat.getTime())<= 3000)
+                otherChatViewHolder.mMessageTime.setText("Just now");
+            else
+                otherChatViewHolder.mMessageTime.setText(DateFormat.format(strTimeFormate, chat.getTime()));
+        }else
+            otherChatViewHolder.mMessageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm)", chat.getTime()));
 
 
     }
@@ -157,11 +163,13 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static class OtherChatViewHolder extends RecyclerView.ViewHolder {
         private BubbleTextView txtChatMessage;
         public CircleImageView profileImage;
+        private TextView mMessageTime;
 
         public OtherChatViewHolder(View itemView) {
             super(itemView);
             txtChatMessage = (BubbleTextView) itemView.findViewById(R.id.text_message_recv);
             profileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_layout);
+            mMessageTime = (TextView) itemView.findViewById(R.id.message_time_recv);
 
 
         }
