@@ -9,7 +9,7 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
-        style="@style/Theme.AppCompat.Light.NoActionBar"
+        style="@style/NoActionBarDriver"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorNavigation"
@@ -18,22 +18,14 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/toolbar_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="10dp"
-                app:srcCompat="@drawable/ic_arrow_back_driver" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="FEEDBACK"
-                android:layout_toRightOf="@id/toolbar_back"
                 android:layout_centerVertical="true"
+                android:textStyle="bold"
                 android:layout_marginLeft="10dp"
-                android:textColor="@color/white"
+                android:textColor="@color/colorActiveNavigation"
                 android:textSize="@dimen/dimen_title_20_sp"
                  />
         </RelativeLayout>

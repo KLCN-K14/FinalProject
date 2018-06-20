@@ -18,10 +18,10 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -32,7 +32,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,14 +64,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.CustomInfoWindow;
 import com.klcn.xuant.transporter.helper.DirectionsJSONParser;
+import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.Driver;
-import com.klcn.xuant.transporter.model.RideInfo;
+import com.klcn.xuant.transporter.model.FCMResponse;
+import com.klcn.xuant.transporter.model.Notification;
+import com.klcn.xuant.transporter.model.Sender;
+import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
+import com.klcn.xuant.transporter.remote.IFCMService;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
 
 import org.json.JSONException;
@@ -85,6 +88,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dmax.dialog.SpotsDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -97,7 +101,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
     private NetworkStateReceiver networkStateReceiver;
 
-    private static final int PICK_REQUEST = 1;
+    private static final int CANCEL_TRIP_REQUEST = 11111;
     private FirebaseAuth mFirebaseAuth;
 
     private DatabaseReference mConvDatabase;
@@ -131,6 +135,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
     ImageView mImgChat;
     ImageView mImgPhone;
+    ImageView mImgNotificationMessage;
+    String keyTrip = "";
 
     private GoogleMap mMap;
     SupportMapFragment mapFragment;
@@ -145,12 +151,14 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     private static int DISPLACEMENT = 10;
 
     String ressonCancelTrip = "";
+    String feedBack = "";
     float bearing = 0;
     GeoLocation oldLocationDriver;
     Location oldLocation;
 
     DatabaseReference driverFound;
 
+    Customer mCustomer;
     Marker mDriverMarker;
     LatLng dropOffLocation;
     Marker mCustomerMarker;
@@ -159,6 +167,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     private List<LatLng> polyLineList;
     private Polyline direction;
     IGoogleAPI mService;
+    IFCMService mFCMService;
 
     private static int LIMIT_RANGE = 5;// 5km
 
@@ -167,6 +176,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
     private BroadcastReceiver mReceiver;
     Boolean isOnTrip = false;
+    Boolean onFeedback = false;
+    Boolean isDriverCancel = false;
+    Boolean isCompleteTrip = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -178,6 +190,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         mFirebaseAuth = FirebaseAuth.getInstance();
         mCurrent_user_id = mFirebaseAuth.getCurrentUser().getUid();
 
+        mFCMService = Common.getFCMService();
+        mService = Common.getGoogleAPI();
+
         mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
 
         mConvDatabase.keepSynced(true);
@@ -188,9 +203,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         mDriverID = getIntent().getStringExtra("driverID");
         mDestination = getIntent().getStringExtra("destination");
         mPickUp = getIntent().getStringExtra("pickup");
+        getUserInfo();
         if (mDriverID != null) {
-            Toast.makeText(getApplicationContext(),mDriverID,Toast.LENGTH_LONG);
-            mDriversDatabase.child(mDriverID).addValueEventListener(new ValueEventListener() {
+            mDriversDatabase.child(mDriverID).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     mDriver = dataSnapshot.getValue(Driver.class);
@@ -202,7 +217,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
                     mTxtNameToolbar.setText(mDriver.getName().toUpperCase()+" IS COMING . . .");
 
-                    showFoundDriverDialog();
                 }
 
                 @Override
@@ -219,6 +233,8 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         View llBottomSheet = (View) findViewById(R.id.bottom_sheet);
         mImgPhone = llBottomSheet.findViewById(R.id.img_ic_phone);
         mImgChat = llBottomSheet.findViewById(R.id.img_ic_chat);
+        mImgNotificationMessage = llBottomSheet.findViewById(R.id.img_notification_message);
+        mImgNotificationMessage.setVisibility(View.GONE);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
 
         // set callback for changes
@@ -252,19 +268,26 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         mBtnCancelBook.setVisibility(View.GONE);
         isOnTrip = true;
         dropOffLocation = getLocationFromAddress(getApplicationContext(),mDestination);
-        mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
-                .position(new LatLng(dropOffLocation.latitude, dropOffLocation.longitude))
-                .title("Destination"));
-        mCustomerCircle = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
-                .radius(20)
-                .strokeColor(Color.BLUE)
-                .fillColor(0x220000FF)
-                .strokeWidth(3.0f));
-
         displayLocation();
         startLocationUpdate();
+    }
+
+    private void getUserInfo() {
+        FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            mCustomer = dataSnapshot.getValue(Customer.class);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     public LatLng getLocationFromAddress(Context context, String inputtedAddress) {
@@ -304,9 +327,11 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         switch (view.getId()) {
             case R.id.btn_cancel_book:
                 Intent intent = new Intent(CustomerTrackingActivity.this, CancelBookActivity.class);
-                startActivityForResult(intent, PICK_REQUEST);
+                intent.putExtra("driverID",mDriverID);
+                startActivityForResult(intent, CANCEL_TRIP_REQUEST);
                 break;
             case R.id.img_ic_chat:
+                mImgNotificationMessage.setVisibility(View.GONE);
                 Intent chatIntent = new Intent(CustomerTrackingActivity.this, ChatActivity.class);
                 chatIntent.putExtra("user_id", mDriverID);
                 chatIntent.putExtra("user_name", mDriver.getName());
@@ -321,35 +346,45 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         }
     }
 
-    private void showFoundDriverDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == CANCEL_TRIP_REQUEST){
+            if(resultCode == RESULT_OK){
+                final SpotsDialog waitingDialog = new SpotsDialog(CustomerTrackingActivity.this);
+                waitingDialog.show();
+                HashMap<String,Object> maps = new HashMap<>();
+                maps.put("reasonCancel",data.getStringExtra("reasonCancel"));
+                maps.put("status",Common.trip_info_status_customer_cancel);
+                Log.e("keyTrip",keyTrip);
+                if(!keyTrip.equals("")){
+                    FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
+                            .updateChildren(maps);
+                }else{
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View foundDriverLayout = inflater.inflate(R.layout.layout_found_driver, null);
+                }
 
-        builder.setView(foundDriverLayout);
-        final AlertDialog dialog;
-        dialog = builder.create();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        waitingDialog.dismiss();
+                        finish();
+                    }
+                },1500);
+            }else if(resultCode == RESULT_CANCELED){
 
-        final TextView txtNameDriver = foundDriverLayout.findViewById(R.id.txt_name_driver_dialog);
-        final TextView txtNameCar = foundDriverLayout.findViewById(R.id.txt_name_car_dialog);
-        final TextView txtLicensePlate = foundDriverLayout.findViewById(R.id.txt_license_plate_dialog);
-        final RatingBar ratingBar = foundDriverLayout.findViewById(R.id.rating_bar);
-
-        txtNameDriver.setText(mDriver.getName());
-        txtNameCar.setText(mDriver.getNameVehicle());
-        txtLicensePlate.setText(mDriver.getLicensePlate());
-        ratingBar.setRating(Float.valueOf(mDriver.getAvgRatings()));
-
-        dialog.show();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dialog.dismiss();
             }
-        }, 2000);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!onFeedback){
+            Toast.makeText(getApplicationContext(),"Can't back when on trip",Toast.LENGTH_LONG).show();
+        }else{
+            // finish without feedback
+        }
     }
 
     @Override
@@ -422,11 +457,16 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                                     Driver driver = dataSnapshot.getValue(Driver.class);
                                     Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
                                     if(mMarker==null){
+                                        int drawable;
+                                        if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard))
+                                            drawable = R.drawable.ic_driver_standard;
+                                        else
+                                            drawable = R.drawable.ic_driver_premium;
                                         mMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(new LatLng(location.latitude,location.longitude))
-                                                .snippet(driver.getPhoneNum())
-                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
-                                                .title(driver.getName())
+                                                .snippet(driver.getImgUrl())
+                                                .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
                                                 .flat(true)
                                                 .anchor(0.5f, 0.5f)
                                                 .rotation(bearing));
@@ -481,11 +521,16 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                                     }
 
                                     if(mMarker==null){
+                                        int drawable;
+                                        if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard))
+                                            drawable = R.drawable.ic_driver_standard;
+                                        else
+                                            drawable = R.drawable.ic_driver_premium;
                                         mMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(new LatLng(location.latitude,location.longitude))
-                                                .snippet(driver.getPhoneNum())
-                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
-                                                .title(driver.getName())
+                                                .snippet(driver.getImgUrl())
+                                                .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
                                                 .flat(true)
                                                 .anchor(0.5f, 0.5f)
                                                 .rotation(bearing));
@@ -617,7 +662,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
                         .position(new LatLng(latitude, longitude))
                         .flat(true)
-                        .title("You"));
+                        .snippet(mCustomer.getImgUrl())
+                        .title("You"+Common.keySplit+"Pickup here"));
+                mCustomerMarker.showInfoWindow();
             }else{
                 if(oldLocation!=null){
                     Location startingLocation = new Location("starting point");
@@ -633,21 +680,22 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 }
 
                 mMap.clear();
+                if(dropOffLocation!=null){
+                    mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
+                            .position(new LatLng(dropOffLocation.latitude, dropOffLocation.longitude))
+                            .snippet(mCustomer.getImgUrl())
+                            .title("Destination"+Common.keySplit+mDestination));
+                    mCustomerMarker.showInfoWindow();
+                    mCustomerCircle = mMap.addCircle(new CircleOptions()
+                            .center(new LatLng(dropOffLocation.latitude, dropOffLocation.longitude))
+                            .radius(20)
+                            .strokeColor(Color.BLUE)
+                            .fillColor(0x220000FF)
+                            .strokeWidth(3.0f));
+                }
                 mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
-                        .position(new LatLng(dropOffLocation.latitude, dropOffLocation.longitude))
-                        .title("Destination"));
-                mCustomerCircle = mMap.addCircle(new CircleOptions()
-                        .center(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
-                        .radius(20)
-                        .strokeColor(Color.BLUE)
-                        .fillColor(0x220000FF)
-                        .strokeWidth(3.0f));
-
-                displayLocation();
-
-                mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_driver_on_trip))
                         .position(new LatLng(latitude, longitude))
                         .flat(true)
                         .anchor(0.5f, 0.5f)
@@ -677,6 +725,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     @Override
     public void onStop() {
         super.onStop();
+        Log.e("TEST",String.valueOf(isCompleteTrip)+"-----"+String.valueOf(isDriverCancel));
         if(mGoogleApiClient!=null)
             mGoogleApiClient.disconnect();
         // Remove driver when driver not available
@@ -732,6 +781,14 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Destroy app suck like cancel trip
+//        sendMessageCancelTrip();
+//        HashMap<String,Object> maps = new HashMap<>();
+//        maps.put("reasonCancel","Customer destroy app");
+//        maps.put("status",Common.trip_info_status_customer_cancel);
+//        FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
+//                .updateChildren(maps);
+
         networkStateReceiver.removeListener(this);
         this.unregisterReceiver(networkStateReceiver);
         this.unregisterReceiver(mReceiver);
@@ -753,6 +810,23 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
                 }else if(intent.getStringExtra("DropOff")!=null){
                     showFeedBackDialog();
+                }else if(intent.getStringExtra("KeyTrip")!=null){
+                    keyTrip = intent.getStringExtra("KeyTrip");
+                }else if(intent.getStringExtra("DriverCancelTrip")!=null){
+                    isDriverCancel = true;
+                    final SpotsDialog waitingDialog = new SpotsDialog(CustomerTrackingActivity.this);
+                    waitingDialog.show();
+                    Toast.makeText(getApplicationContext(),"Your driver cancel the trip",Toast.LENGTH_LONG).show();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            waitingDialog.dismiss();
+                            finish();
+                        }
+                    },1500);
+                }else if(intent.getStringExtra("Chat")!=null){
+                    mImgNotificationMessage.setVisibility(View.VISIBLE);
                 }
             }
         };
@@ -761,7 +835,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     }
 
     private void showFeedBackDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        isCompleteTrip = true;
+        onFeedback = true;
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this,android.R.style.Theme_Holo_NoActionBar_Fullscreen);
         builder.setCancelable(true);
 
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -779,7 +855,23 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
-                txtStatusRate.setText("You rated driver "+mDriver.getName()+v+" star");
+                txtStatusRate.setText("You rated driver "+mDriver.getName()+" "+v+" star");
+            }
+        });
+        edtComment.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                feedBack = charSequence.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
 
@@ -787,7 +879,16 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"btnConfirm",Toast.LENGTH_LONG).show();
+                HashMap<String,Object> maps = new HashMap<>();
+                maps.put("rating",ratingBar.getRating());
+                if(!feedBack.equals("")){
+                    maps.put("feedback",feedBack);
+                }else
+                    maps.put("feedback","Nice ride!");
+                FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
+                        .updateChildren(maps);
+                dialog.dismiss();
+                finish();
             }
         });
 
@@ -883,6 +984,44 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             if(polylineOptions!=null)
                 direction = mMap.addPolyline(polylineOptions);
         }
+    }
+
+    private void sendMessageCancelTrip() {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(mDriverID)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("CustomerCancelTrip","Customer cancel the trip!");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessageCancelTrip","Sucess");
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("MessageCancelTrip",response.message());
+                                        Log.e("MessageCancelTrip",response.errorBody().toString());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
 }

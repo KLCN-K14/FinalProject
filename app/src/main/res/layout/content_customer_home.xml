@@ -23,11 +23,11 @@
         android:id="@+id/panel_info_driver"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginRight="25dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="62dp"
         android:layout_gravity="bottom"
-        android:background="@drawable/btn_choose_type_car"
+        android:background="@drawable/shadow_bottom"
         >
 
     </RelativeLayout>
@@ -46,19 +46,19 @@
     </android.support.design.widget.CoordinatorLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/btn_choose_type_car"
+        android:layout_height="60dp"
+        android:background="@drawable/shadow_bottom"
         android:id="@+id/rlt_layout_transport_current"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="70dp"
         android:layout_marginRight="15dp"
         android:layout_marginLeft="15dp"
         android:foregroundGravity="bottom"
         >
         <ImageView
             android:id="@+id/img_current_service"
-            android:layout_width="35dp"
-            android:layout_height="55dp"
+            android:layout_width="25dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:src="@drawable/ic_type_motobike_x"
             />
@@ -68,10 +68,10 @@
             android:layout_height="wrap_content"
             android:text="Transport Standard"
             android:textColor="@color/black"
-            android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true"
-            android:textSize="16sp"
-            android:layout_toRightOf="@id/img_current_service"/>
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
+            android:textSize="14sp"
+            />
 
         <TextView
             android:id="@+id/txt_current_service_price"

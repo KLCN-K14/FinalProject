@@ -35,12 +35,12 @@
     <string name="di_chuyen">Di chuyển</string>
     <string name="vi_tri_cua_ban">91, Nguyễn Văn Thạnh</string>
     <string name="title_activity_driver_main2">DriverMainActivity2</string>
-    <string name="title_home">HOME</string>
+    <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="title_earnings">EARNINGS</string>
-    <string name="title_ratings">RATINGS</string>
-    <string name="title_account">ACCOUNT</string>
+    <string name="title_earnings">Earnings</string>
+    <string name="title_ratings">Ratings</string>
+    <string name="title_account">Account</string>
     <string name="title_activity_test_navigation">TestNavigation</string>
     <string name="go_online">GO ONLINE</string>
     <string name="go_offline">GO OFFLINE</string>

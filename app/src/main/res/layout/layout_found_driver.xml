@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="350dp"
-    android:layout_height="320dp"
+    android:layout_height="wrap_content"
     app:cardElevation="10dp"
     >
     <RelativeLayout
@@ -52,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/rating_bar"
             android:orientation="horizontal"
+            android:id="@+id/temp"
             android:layout_centerInParent="true"
             >
             <TextView
@@ -82,6 +83,35 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/temp"
+            android:orientation="horizontal"
+            >
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="SEND REQUEST"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_margin="5dp"
+                android:id="@+id/btn_send_request"
+                android:background="@drawable/btn_sign_in_driver"
+                />
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="OTHER DRIVER"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_margin="5dp"
+                android:id="@+id/btn_other_driver"
+                android:background="@drawable/btn_register_driver"
+                />
+        </LinearLayout>
 
     </RelativeLayout>
 

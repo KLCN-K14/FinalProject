@@ -119,7 +119,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_REGISTER_CODE) {
             if(resultCode == Activity.RESULT_OK){
-                Intent intent = new Intent(DriverLoginActivity.this,DriverMainActivity.class);
+                Intent intent = new Intent(DriverLoginActivity.this,DriverHomeActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -201,7 +201,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                                                 handler.postDelayed(new Runnable() {
                                                                     @Override
                                                                     public void run() {
-                                                                        Intent intentHome = new Intent(DriverLoginActivity.this, DriverMainActivity.class);
+                                                                        Intent intentHome = new Intent(DriverLoginActivity.this, DriverHomeActivity.class);
                                                                         startActivity(intentHome);
                                                                         finish();
                                                                     }
@@ -304,7 +304,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                                 handler.postDelayed(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        Intent intentHome = new Intent(DriverLoginActivity.this, DriverMainActivity.class);
+                                                        Intent intentHome = new Intent(DriverLoginActivity.this, DriverHomeActivity.class);
                                                         startActivity(intentHome);
                                                         finish();
                                                     }

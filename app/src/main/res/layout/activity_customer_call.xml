@@ -172,7 +172,8 @@
                     android:layout_marginTop="13dp"
                     android:layout_marginBottom="10dp"
                     android:text="12/109 T12-kp3, Tăng Long"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
+                    android:maxLines="2"
                     android:textColor="@color/black"
                     />
                 <!--<TextView-->

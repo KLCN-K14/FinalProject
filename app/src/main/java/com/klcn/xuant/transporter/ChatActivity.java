@@ -54,7 +54,12 @@ import com.klcn.xuant.transporter.adapter.ChatRecyclerAdapter;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.Driver;
+import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Messages;
+import com.klcn.xuant.transporter.model.Notification;
+import com.klcn.xuant.transporter.model.Sender;
+import com.klcn.xuant.transporter.model.Token;
+import com.klcn.xuant.transporter.remote.IFCMService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,6 +67,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -75,6 +84,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTitleView;
     private TextView mLastSeenView;
     private String mCurrentUserId;
+
+    IFCMService mFCMService;
 
     private ImageButton mChatAddBtn;
     private ImageButton mChatSendBtn;
@@ -118,7 +129,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(mChatToolbar);
 
         ActionBar actionBar = getSupportActionBar();
+        mFCMService = Common.getFCMService();
 
+        mTitleView = (TextView) findViewById(R.id.txt_title);
+        mChatAddBtn = (ImageButton) findViewById(R.id.chat_add_btn);
+        mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
+        mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
+        mBtnBack = (ImageView) findViewById(R.id.toolbar_back);
+
+
+        mMessagesList = (RecyclerView) findViewById(R.id.messages_list);
+        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
@@ -159,6 +180,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }else if(getIntent().getStringExtra("driver")!=null){
             // Chat này đến từ driver
             fromCustomer = false;
+            mChatToolbar.setBackgroundColor(getResources().getColor(R.color.colorNavigation));
+            mTitleView.setTextColor(getResources().getColor(R.color.colorActiveNavigation));
             FirebaseDatabase.getInstance().getReference(Common.customers_tbl).child(mChatUser)
                     .addValueEventListener(new ValueEventListener() {
                         @Override
@@ -190,15 +213,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         userName = getIntent().getStringExtra("user_name");
 
 
-        mTitleView = (TextView) findViewById(R.id.txt_title);
-        mChatAddBtn = (ImageButton) findViewById(R.id.chat_add_btn);
-        mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
-        mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
-        mBtnBack = (ImageView) findViewById(R.id.toolbar_back);
 
-
-        mMessagesList = (RecyclerView) findViewById(R.id.messages_list);
-        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
         mLinearLayout = new LinearLayoutManager(this);
 
         mMessagesList.setHasFixedSize(true);
@@ -213,7 +228,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         loadMessages();
 
-        mTitleView.setText(userName);
+        mTitleView.setText(userName.toUpperCase());
 
         mChatSendBtn.setOnClickListener(this);
         mChatAddBtn.setOnClickListener(this);
@@ -383,7 +398,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     progressDialog.dismiss();
-                    Toast.makeText(ChatActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
             uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -524,7 +538,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void sendMessage() {
 
 
-        String message = mChatMessageView.getText().toString();
+        final String message = mChatMessageView.getText().toString();
 
         if (!TextUtils.isEmpty(message)) {
 
@@ -548,7 +562,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
             //Send notification
-            sendNotification(message);
+//            sendNotification(message);
+
+            final DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(Common.chat_tbl).child(mChatUser);
+            connectedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+
+                    boolean onState = (Boolean)snapshot.child("onstate").getValue();
+                    if (!onState) {
+                        sendMessageToChatUser(mChatUser,message);
+                    }
+                    connectedRef.removeEventListener(this);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    System.err.println("Listener was cancelled");
+                }
+            });
 
 
             mChatMessageView.setText("");
@@ -575,6 +607,48 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
+    }
+
+    private void sendMessageToChatUser(final String mChatUserId,final  String message) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(mChatUserId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            String send = "";
+                            if(fromCustomer)
+                                send = Common.customers_tbl;
+                            else
+                                send = Common.drivers_tbl;
+                            Notification notification = new Notification("Chat",message+Common.keySplit+send);
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessageToChatUser","Sucess");
+                                    }
+                                    else{
+                                        Log.e("MessageToChatUser",response.message());
+                                        Log.e("MessageToChatUser",response.errorBody().toString());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     @Override
@@ -643,7 +717,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
         mRootRef.child("Chat").child(mCurrentUserId).child("onstate").setValue(true);
-        Toast.makeText(getBaseContext(),"ON START",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -651,21 +724,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onStop();
 
         mRootRef.child("Chat").child(mCurrentUserId).child("onstate").setValue(false);
-        Toast.makeText(getBaseContext(),"ON STOP",Toast.LENGTH_LONG).show();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mRootRef.child("Chat").child(mCurrentUserId).child("onstate").setValue(false);
-        Toast.makeText(getBaseContext(),"ON DESTROY",Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         mRootRef.child("Chat").child(mCurrentUserId).child("onstate").setValue(false);
-        Toast.makeText(getBaseContext(),"ON BACKPRESSED",Toast.LENGTH_LONG).show();
     }
 
     //Hàm send notification

@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -21,10 +20,6 @@ import android.widget.Toast;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.github.lzyzsd.circleprogress.ArcProgress;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,12 +34,10 @@ import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.PickupRequest;
-import com.klcn.xuant.transporter.model.RideInfo;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.remote.IFCMService;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
-import com.skyfishjy.library.RippleBackground;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,6 +80,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     double lat,lng;
     String destination;
     String customerId;
+    Driver mDriver;
 
     IFCMService mFCMService;
     private BroadcastReceiver mReceiver;
@@ -132,7 +126,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
             }
         });
         mArcProgress.startAnimation(anim);
-
+        getInfoDriver();
         removeDriverAvailable();
         mService = Common.getGoogleAPI();
         if(getIntent()!=null){
@@ -140,11 +134,29 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
              lng = Double.parseDouble(getIntent().getStringExtra("lng").toString());
              destination = getIntent().getStringExtra("destination");
              customerId = getIntent().getStringExtra("customerId");
-            getDirection(lat,lng);
+            getDirection(lat,lng,destination);
         }
 
         mBtnAccept.setOnClickListener(this);
         mBtnCancel.setOnClickListener(this);
+    }
+
+    private void getInfoDriver() {
+        FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            mDriver = dataSnapshot.getValue(Driver.class);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     public void removeDriverAvailable() {
@@ -173,14 +185,14 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                 });
     }
 
-    private void getDirection(double lat, double lng) {
+    private void getDirection(double lat, double lng, String destination) {
         String requestApi = null;
         try{
             requestApi = "https://maps.googleapis.com/maps/api/directions/json?"+
                     "mode=driving&"+
                     "transit_routing_preference=less_driving&"+
-                    "origin="+ Common.mLastLocationDriver.getLatitude()+","+Common.mLastLocationDriver.getLongitude()+"&"+
-                    "destination="+lat+","+lng+"&"+
+                    "origin="+ lat+","+lng+"&"+
+                    "destination="+destination+"&"+
                     "key="+getResources().getString(R.string.google_direction_api);
             Log.d("TRANSPORT",requestApi);
             mService.getPath(requestApi)
@@ -197,17 +209,19 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
                                 JSONObject legsObject = legs.getJSONObject(0);
 
-                                JSONObject distace = legsObject.getJSONObject("distance");
-                                mTxtDistance.setText(distace.getString("text"));
+                                JSONObject distanceJS = legsObject.getJSONObject("distance");
 
-                                Double price = (Double.valueOf(mTxtDistance.getText().toString().replaceAll("[^0-9.,]+",""))*8);
-                                mTxtPrice.setText("VND "+String.valueOf(price.intValue())+"K");
+                                Double distance = distanceJS.getDouble("value");
+                                mTxtDistance.setText(distanceJS.getString("text"));
 
-                                JSONObject time = legsObject.getJSONObject("duration");
-                                mTxtTime.setText(time.getString("text"));
+                                JSONObject timeJS = legsObject.getJSONObject("duration");
 
-                                String address = legsObject.getString("end_address");
-                                mTxtYourDestination.setText(address);
+                                Double time = timeJS.getDouble("value");
+
+                                calculateFare(distance,time);
+
+                                String address = legsObject.getString("start_address");
+                                mTxtYourDestination.setText(address.toUpperCase());
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -342,5 +356,31 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     protected void onPause() {
         mediaPlayer.release();
         super.onPause();
+    }
+
+    private void calculateFare(Double distance, Double time) {
+        Double realDistance = (distance/1000);
+        Double realTime = time/60;
+        Double hour = realTime%60;
+        Double minute = realTime - hour*60;
+        String timeArrived;
+        if(realTime<60.){
+            timeArrived = realTime.intValue() + " min";
+        }else{
+            timeArrived = hour.intValue() + " h "+minute.intValue()+" min";
+        }
+        mTxtTime.setText(timeArrived);
+
+        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_standard*realTime;
+        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
+        String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
+        String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
+        if(mDriver!=null){
+            if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard)){
+                mTxtPrice.setText(textFareStandard);
+            }else{
+                mTxtPrice.setText(textFarePremium);
+            }
+        }
     }
 }

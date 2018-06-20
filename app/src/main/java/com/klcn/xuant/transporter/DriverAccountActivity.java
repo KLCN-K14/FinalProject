@@ -1,7 +1,6 @@
 package com.klcn.xuant.transporter;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,11 +11,13 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -43,7 +44,6 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.klcn.xuant.transporter.common.Common;
-import com.klcn.xuant.transporter.utils.Base64Utils;
 import com.klcn.xuant.transporter.utils.ConvertBitmap;
 import com.klcn.xuant.transporter.utils.Utility;
 
@@ -60,7 +60,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DriverAccountFragment extends Fragment implements View.OnClickListener {
+public class DriverAccountActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.txt_name)
     TextView mTxtName;
@@ -96,23 +96,22 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
 
     private boolean isChangeAvatar = false;
 
-    public static DriverAccountFragment newInstance() {
-        DriverAccountFragment fragment = new DriverAccountFragment();
-        return fragment;
-    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_driver_account);
+        ButterKnife.bind(this);
 
-    }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_driver_account, container, false);
-        ButterKnife.bind(this, view);
-
+        ActionBar ab = getSupportActionBar();
+        if(ab!=null)
+        {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         mPanelSignOut.setOnClickListener(this);
@@ -130,31 +129,30 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
         storageReference = storage.getReference();
 
         getUserInfo();
-
-        return view;
     }
+
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.panel_about:
-                Toast.makeText(getContext(), "Panel about", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Panel about", Toast.LENGTH_LONG).show();
                 break;
             case R.id.panel_documents:
-                Toast.makeText(getContext(), "Panel document", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Panel document", Toast.LENGTH_LONG).show();
                 break;
             case R.id.panel_sign_out:
-                Toast.makeText(getContext(), "Panel sign out", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Panel sign out", Toast.LENGTH_LONG).show();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null) {
                     mFirebaseAuth.signOut();
-                    Intent intent = new Intent(getContext(), ChooseTypeUserActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), ChooseTypeUserActivity.class);
                     startActivity(intent);
-                    getActivity().finish();
+                    finish();
                 }
                 break;
             case R.id.panel_waybill:
-                Toast.makeText(getContext(), "Panel waybill", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Panel waybill", Toast.LENGTH_LONG).show();
                 break;
             case R.id.img_avatar:
                 isChangeAvatar = true;
@@ -165,9 +163,9 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
                 selectImage();
                 break;
             case R.id.txt_edit:
-                LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getContext());
+                LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
                 View mView = layoutInflaterAndroid.inflate(R.layout.input_dialog, null);
-                AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(getContext());
+                AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
                 alertDialogBuilderUserInput.setView(mView);
 
                 final EditText userInputDialogEditText = (EditText) mView.findViewById(R.id.userInputDialog);
@@ -191,9 +189,9 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
                 alertDialogAndroid.show();
                 break;
             case R.id.txt_edit_car:
-                LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+                LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
                 View view1 = layoutInflater.inflate(R.layout.dialog_change_car, null);
-                AlertDialog.Builder alertDialogBuilderUserInput1 = new AlertDialog.Builder(getContext());
+                AlertDialog.Builder alertDialogBuilderUserInput1 = new AlertDialog.Builder(this);
                 alertDialogBuilderUserInput1.setView(view1);
 
                 final EditText userInputDialogEditText1 = (EditText) view1.findViewById(R.id.userInputDialog);
@@ -242,12 +240,12 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
         final CharSequence[] items = {"Take Photo", "Choose from Library",
                 "Cancel"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                boolean result = Utility.checkPermission(getContext());
+                boolean result = Utility.checkPermission(getApplicationContext());
 
                 if (items[item].equals("Take Photo")) {
                     userChoosenTask = "Take Photo";
@@ -343,7 +341,7 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
     @SuppressWarnings("deprecation")
     private void onSelectFromGalleryResult(Intent data) {
 
-        ConvertBitmap myBitMap = new ConvertBitmap(getContext());
+        ConvertBitmap myBitMap = new ConvertBitmap(getApplicationContext());
         Bitmap bitmap = null;
         try {
             bitmap = myBitMap.decodeUri(data.getData());
@@ -372,23 +370,23 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
                         mTxtNameCar.setText(map.get("nameVehicle").toString());
 
 
-                    if (map.get("imgUrl") != null && getActivity()!=null) {
+                    if (map.get("imgUrl") != null && this!=null) {
                         RequestOptions options = new RequestOptions()
                                 .centerCrop()
                                 .placeholder(R.drawable.avavtar)
                                 .error(R.drawable.avavtar)
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .priority(Priority.HIGH);
-                        Glide.with(getActivity()).load(map.get("imgUrl").toString()).apply(options).into(mImgAvatar);
+                        Glide.with(getApplicationContext()).load(map.get("imgUrl").toString()).apply(options).into(mImgAvatar);
                     }
-                    if (map.get("imgVehicle") != null && getActivity()!=null) {
+                    if (map.get("imgVehicle") != null && this!=null) {
                         RequestOptions options = new RequestOptions()
                                 .centerCrop()
                                 .placeholder(R.drawable.car_ava)
                                 .error(R.drawable.car_ava)
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .priority(Priority.HIGH);
-                        Glide.with(getActivity()).load(map.get("imgVehicle").toString()).apply(options).into(mImgVehicle);
+                        Glide.with(getApplicationContext()).load(map.get("imgVehicle").toString()).apply(options).into(mImgVehicle);
                     }
                 }
 
@@ -406,14 +404,14 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
     private void uploadImage() {
 
         if (filePath != null) {
-            final ProgressDialog progressDialog = new ProgressDialog(getContext());
+            final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
 
             final StorageReference ref = FirebaseStorage.getInstance().getReference().child("driver_images/" + UUID.randomUUID().toString()).child(mFirebaseAuth.getCurrentUser().getUid());
 
             Bitmap bitmap = null;
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), filePath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -466,7 +464,7 @@ public class DriverAccountFragment extends Fragment implements View.OnClickListe
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     progressDialog.dismiss();
-                    Toast.makeText(getActivity(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
             uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {

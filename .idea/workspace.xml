@@ -1,25 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AndroidLayouts">
-    <shared>
-      <config />
-    </shared>
-  </component>
-  <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_LOG_LEVEL" value="error" />
-    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="8dd11e1c-2c6a-4841-8d67-2159bc462724" name="Default" comment="">
+    <list default="true" id="ed9fadd7-0309-439b-8549-28aa95ca38f7" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__android_android_27.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeActivity.java" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/NotificationHelper.java" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/TripInfo.java" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable-v21/ic_notification_message.png" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_chat_active.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bottom_sheet_driver.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bottom_sheet_driver_border.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_acceptance.png" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_cancellation.png" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_driver_on_trip.png" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_driver_on_trip_2.png" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_lens_white_24dp.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_rating.png" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/shadow_bottom.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/shadow_bottom_ver2.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_home.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/layout/app_bar_driver_home.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet_driver.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/layout/content_driver_home.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/layout/nav_header_driver_home.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/menu/activity_driver_home_drawer.xml" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_core_runtime_1_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_core_runtime_1_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_lifecycle_livedata_core_1_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_lifecycle_livedata_core_1_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_lifecycle_runtime_1_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_lifecycle_runtime_1_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_lifecycle_viewmodel_1_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__android_arch_lifecycle_viewmodel_1_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_alimuzaffar_lib_pinentryedittext_1_3_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_alimuzaffar_lib_pinentryedittext_1_3_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_animated_vector_drawable_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_animated_vector_drawable_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_appcompat_v7_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_appcompat_v7_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_cardview_v7_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_cardview_v7_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_constraint_constraint_layout_1_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_constraint_constraint_layout_1_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_customtabs_26_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_customtabs_26_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_design_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_design_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_multidex_1_0_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_multidex_1_0_2.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_multidex_instrumentation_1_0_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_multidex_instrumentation_1_0_2.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_percent_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_percent_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_recyclerview_v7_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_recyclerview_v7_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_compat_27_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_compat_27_1_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_core_ui_27_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_core_ui_27_1_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_core_utils_27_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_core_utils_27_1_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_fragment_27_1_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_fragment_27_1_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_media_compat_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_media_compat_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_v4_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_v4_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_vector_drawable_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_support_vector_drawable_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_espresso_espresso_core_3_0_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_espresso_espresso_core_3_0_2.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_espresso_espresso_idling_resource_3_0_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_espresso_espresso_idling_resource_3_0_2.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_monitor_1_0_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_monitor_1_0_2.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_runner_1_0_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_runner_1_0_2.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_transition_27_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_transition_27_1_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_balysv_material_ripple_1_0_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_balysv_material_ripple_1_0_2.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_firebase_geofire_android_2_3_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_firebase_geofire_android_2_3_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_firebaseui_firebase_ui_auth_2_3_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_firebaseui_firebase_ui_auth_2_3_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_firebaseui_firebase_ui_database_1_2_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_firebaseui_firebase_ui_database_1_2_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_bumptech_glide_gifdecoder_4_7_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_bumptech_glide_gifdecoder_4_7_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_bumptech_glide_glide_4_7_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_bumptech_glide_glide_4_7_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_d_max_spots_dialog_0_7.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_d_max_spots_dialog_0_7.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_lguipeng_BubbleView_1_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_lguipeng_BubbleView_1_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_lzyzsd_circleprogress_1_2_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_lzyzsd_circleprogress_1_2_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_zcweng_switch_button_0_0_3.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_zcweng_switch_button_0_0_3.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_ads_identifier_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_ads_identifier_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_auth_11_0_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_auth_11_0_4.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_auth_base_11_0_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_auth_base_11_0_4.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_base_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_base_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_basement_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_basement_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_flags_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_flags_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_location_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_location_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_maps_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_maps_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_measurement_base_15_0_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_measurement_base_15_0_4.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_places_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_places_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_places_placereport_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_places_placereport_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_stats_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_stats_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_tasks_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_tasks_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_analytics_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_analytics_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_analytics_impl_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_analytics_impl_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_auth_16_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_auth_16_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_auth_interop_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_auth_interop_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_common_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_common_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_core_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_core_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_database_16_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_database_16_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_database_collection_15_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_database_collection_15_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_database_connection_16_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_database_connection_16_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_iid_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_iid_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_iid_interop_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_iid_interop_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_measurement_connector_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_measurement_connector_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_measurement_connector_impl_16_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_measurement_connector_impl_16_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_messaging_17_0_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_messaging_17_0_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_storage_16_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_storage_16_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_storage_common_16_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_firebase_firebase_storage_common_16_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_maps_android_android_maps_utils_0_5.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_maps_android_android_maps_utils_0_5.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_hbb20_ccp_1_7_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_hbb20_ccp_1_7_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_iarcuschin_simpleratingbar_0_1_5.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_iarcuschin_simpleratingbar_0_1_5.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_jakewharton_butterknife_8_8_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_jakewharton_butterknife_8_8_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_jaredrummler_material_spinner_1_2_5.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_jaredrummler_material_spinner_1_2_5.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_rengwuxian_materialedittext_library_2_1_4.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_rengwuxian_materialedittext_library_2_1_4.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_skyfishjy_ripplebackground_library_1_0_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_skyfishjy_ripplebackground_library_1_0_1.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_squareup_javawriter_2_1_1_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_squareup_javawriter_2_1_1_jar.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__de_hdodenhof_circleimageview_2_2_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__de_hdodenhof_circleimageview_2_2_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__javax_inject_javax_inject_1_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__javax_inject_javax_inject_1_jar.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__junit_junit_4_12_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__junit_junit_4_12_jar.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_core_1_3_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_core_1_3_jar.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_integration_1_3_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_integration_1_3_jar.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_library_1_3_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_library_1_3_jar.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__uk_co_chrisjenx_calligraphy_2_3_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__uk_co_chrisjenx_calligraphy_2_3_0.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change beforePath="$PROJECT_DIR$/Transporter.iml" afterPath="$PROJECT_DIR$/Transporter.iml" />
+      <change beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CancelBookActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CancelBookActivity.java" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerCallActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/CustomerTrackingActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverAccountFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverAccountActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverEarningsFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverEarningsActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverFeedBackActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverFeedBackActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverInvitesActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverInvitesActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverLoginActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverLoginActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverMainActivity.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverPayStatementActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverPayStatementActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverRatingsFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverRatingsActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTrackingAcitivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTrackingAcitivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTripHistoryActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverTripHistoryActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/common/Common.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/common/Common.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/CustomInfoWindow.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/helper/CustomInfoWindow.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/Driver.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/Driver.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/model/RideInfo.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/findDriver/CustomerFindDriverActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/findDriver/CustomerFindDriverActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/home/CustomerHomeActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/splashScreen/SplashScreenActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/mvp/splashScreen/SplashScreenActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/service/FirebaseMessagingService.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/service/MyFirebaseMessaging.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/service/MyFirebaseMessaging.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/border_right_gray.xml" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/border_right_gray.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/motobike_ver1.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/motobike_ver2.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_cancel_book.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_cancel_book.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_chat.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_chat.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_customer_call.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_customer_call.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_feedback.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_feedback.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_invites.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_invites.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_main.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_pay_statement.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_pay_statement.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_tracking.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_tracking.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_trip_history.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_trip_history.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet_tracking.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/bottom_sheet_tracking.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/content_customer_home.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/content_customer_home.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/custom_customer_info_window.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/custom_customer_info_window.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_driver_account.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_account.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_driver_earnings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_earnings.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_driver_home.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_driver_ratings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_driver_ratings.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/layout_customer_rate_driver.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/layout_customer_rate_driver.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/layout_found_driver.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/layout_found_driver.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/layout_payment.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/layout_payment.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/activity_customer_home_drawer.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/activity_customer_home_drawer.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
+      <change beforePath="$PROJECT_DIR$/local.properties" afterPath="$PROJECT_DIR$/local.properties" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -33,102 +190,13 @@
       <ProjectState />
     </projectState>
   </component>
-  <component name="ExternalProjectsManager">
-    <system id="GRADLE">
-      <state>
-        <projects_view />
-      </state>
-    </system>
-  </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="item_message_recv.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_recv.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="600">
-              <caret line="40" column="40" lean-forward="false" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="40" />
-              <folding />
-            </state>
-          </provider>
-          <provider editor-type-id="android-designer2">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DriverHomeFragment.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2565">
-              <caret line="234" column="0" lean-forward="false" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="item_message_send.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="8" lean-forward="false" selection-start-line="14" selection-start-column="8" selection-end-line="17" selection-end-column="38" />
-              <folding />
-            </state>
-          </provider>
-          <provider editor-type-id="android-designer2">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ChatRecyclerAdapter.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/adapter/ChatRecyclerAdapter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="990">
-              <caret line="99" column="61" lean-forward="false" selection-start-line="99" selection-start-column="61" selection-end-line="99" selection-end-column="61" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ChatActivity.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="134">
-              <caret line="542" column="47" lean-forward="true" selection-start-line="542" selection-start-column="47" selection-end-line="542" selection-end-column="47" />
-              <folding>
-                <element signature="e#9544#9966#0" expanded="true" />
-                <element signature="e#9965#9966#0" expanded="true" />
-                <element signature="e#10166#10396#0" expanded="true" />
-                <element signature="e#10395#10396#0" expanded="true" />
-                <element signature="e#11852#14408#0" expanded="true" />
-                <element signature="e#12077#12612#0" expanded="true" />
-                <element signature="e#12611#12612#0" expanded="true" />
-                <element signature="e#12636#14373#0" expanded="true" />
-                <element signature="e#13660#14166#0" expanded="true" />
-                <element signature="e#14165#14166#0" expanded="true" />
-                <element signature="e#14372#14373#0" expanded="true" />
-                <element signature="e#14407#14408#0" expanded="true" />
-                <element signature="e#14455#14756#0" expanded="true" />
-                <element signature="e#14755#14756#0" expanded="true" />
-                <element signature="e#14804#15223#0" expanded="true" />
-                <element signature="e#15222#15223#0" expanded="true" />
-                <element signature="e#19975#20341#0" expanded="true" />
-                <element signature="e#20340#20341#0" expanded="true" />
-                <element signature="e#21054#21307#0" expanded="true" />
-                <element signature="e#21306#21307#0" expanded="true" />
-                <element signature="e#21820#21871#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GradleLocalSettings">
     <option name="myGradleHomes">
       <map>
-        <entry key="$PROJECT_DIR$" value="$USER_HOME$/.gradle/wrapper/dists/gradle-4.4-all/9br9xq1tocpiv8o6njlyu5op1/gradle-4.4" />
+        <entry key="$PROJECT_DIR$" value="C:\Users\xuant\.gradle\wrapper\dists\gradle-4.4-all\9br9xq1tocpiv8o6njlyu5op1\gradle-4.4" />
       </map>
     </option>
     <option name="myGradleVersions">
@@ -2158,17 +2226,7 @@
       </map>
     </option>
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/adapter/ChatRecyclerAdapter.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/item_message_recv.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
     <option name="width" value="1280" />
     <option name="height" value="729" />
@@ -2189,48 +2247,20 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
-      <pane id="AndroidView">
-        <subPane>
-          <expand>
-            <path>
-              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-            </path>
-            <path>
-              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-            </path>
-            <path>
-              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Transporter" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="transporter" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="adapter" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scratches" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane" />
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="android.sdk.path" value="$USER_HOME$/Library/Android/sdk" />
+    <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
-    <property name="settings.editor.selected.configurable" value="android.sdk-updates" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="device.picker.selection" value="Nexus_6P_API_24" />
+    <property name="device.picker.selection" value="BISSJ7Z999999999 3300116cc6b7a357" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -2403,48 +2433,46 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="8dd11e1c-2c6a-4841-8d67-2159bc462724" name="Default" comment="" />
-      <created>1529047218463</created>
+      <changelist id="ed9fadd7-0309-439b-8549-28aa95ca38f7" name="Default" comment="" />
+      <created>1529526311067</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1529047218463</updated>
+      <updated>1529526311067</updated>
     </task>
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1280" height="729" extended-state="0" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1320" height="784" extended-state="6" />
     <layout>
-      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24959612" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5155483" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32956383" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -2453,188 +2481,5 @@
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_recv.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="40" column="40" lean-forward="false" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3510">
-          <caret line="234" column="0" lean-forward="false" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="8" lean-forward="false" selection-start-line="14" selection-start-column="8" selection-end-line="17" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/adapter/ChatRecyclerAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1485">
-          <caret line="99" column="61" lean-forward="false" selection-start-line="99" selection-start-column="61" selection-end-line="99" selection-end-column="61" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8385">
-          <caret line="559" column="89" lean-forward="false" selection-start-line="559" selection-start-column="89" selection-end-line="559" selection-end-column="89" />
-          <folding>
-            <element signature="e#9544#9966#0" expanded="true" />
-            <element signature="e#9965#9966#0" expanded="true" />
-            <element signature="e#10166#10396#0" expanded="true" />
-            <element signature="e#10395#10396#0" expanded="true" />
-            <element signature="e#11852#14408#0" expanded="true" />
-            <element signature="e#12077#12612#0" expanded="true" />
-            <element signature="e#12611#12612#0" expanded="true" />
-            <element signature="e#12636#14373#0" expanded="true" />
-            <element signature="e#13660#14166#0" expanded="true" />
-            <element signature="e#14165#14166#0" expanded="true" />
-            <element signature="e#14372#14373#0" expanded="true" />
-            <element signature="e#14407#14408#0" expanded="true" />
-            <element signature="e#14455#14756#0" expanded="true" />
-            <element signature="e#14755#14756#0" expanded="true" />
-            <element signature="e#14804#15223#0" expanded="true" />
-            <element signature="e#15222#15223#0" expanded="true" />
-            <element signature="e#19975#20341#0" expanded="true" />
-            <element signature="e#20340#20341#0" expanded="true" />
-            <element signature="e#21054#21307#0" expanded="true" />
-            <element signature="e#21306#21307#0" expanded="true" />
-            <element signature="e#21820#21871#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_recv.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="38" column="41" lean-forward="false" selection-start-line="38" selection-start-column="41" selection-end-line="38" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/adapter/ChatRecyclerAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="615">
-          <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_send.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="8" lean-forward="false" selection-start-line="14" selection-start-column="8" selection-end-line="17" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/item_message_recv.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="40" column="40" lean-forward="false" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/DriverHomeFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2565">
-          <caret line="234" column="0" lean-forward="false" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/adapter/ChatRecyclerAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="990">
-          <caret line="99" column="61" lean-forward="false" selection-start-line="99" selection-start-column="61" selection-end-line="99" selection-end-column="61" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/klcn/xuant/transporter/ChatActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="134">
-          <caret line="542" column="47" lean-forward="true" selection-start-line="542" selection-start-column="47" selection-end-line="542" selection-end-column="47" />
-          <folding>
-            <element signature="e#9544#9966#0" expanded="true" />
-            <element signature="e#9965#9966#0" expanded="true" />
-            <element signature="e#10166#10396#0" expanded="true" />
-            <element signature="e#10395#10396#0" expanded="true" />
-            <element signature="e#11852#14408#0" expanded="true" />
-            <element signature="e#12077#12612#0" expanded="true" />
-            <element signature="e#12611#12612#0" expanded="true" />
-            <element signature="e#12636#14373#0" expanded="true" />
-            <element signature="e#13660#14166#0" expanded="true" />
-            <element signature="e#14165#14166#0" expanded="true" />
-            <element signature="e#14372#14373#0" expanded="true" />
-            <element signature="e#14407#14408#0" expanded="true" />
-            <element signature="e#14455#14756#0" expanded="true" />
-            <element signature="e#14755#14756#0" expanded="true" />
-            <element signature="e#14804#15223#0" expanded="true" />
-            <element signature="e#15222#15223#0" expanded="true" />
-            <element signature="e#19975#20341#0" expanded="true" />
-            <element signature="e#20340#20341#0" expanded="true" />
-            <element signature="e#21054#21307#0" expanded="true" />
-            <element signature="e#21306#21307#0" expanded="true" />
-            <element signature="e#21820#21871#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-  </component>
-  <component name="masterDetails">
-    <states>
-      <state key="ScopeChooserConfigurable.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-    </states>
   </component>
 </project>

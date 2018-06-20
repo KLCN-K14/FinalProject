@@ -1,20 +1,28 @@
 package com.klcn.xuant.transporter;
 
 import android.Manifest;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +33,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -47,7 +56,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -61,18 +69,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.helper.CustomInfoWindow;
 import com.klcn.xuant.transporter.helper.DirectionsJSONParser;
 import com.klcn.xuant.transporter.model.Customer;
+import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.PickupRequest;
-import com.klcn.xuant.transporter.model.RideInfo;
+import com.klcn.xuant.transporter.model.TripInfo;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
 import com.klcn.xuant.transporter.remote.IFCMService;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -82,10 +93,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dmax.dialog.SpotsDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -111,6 +122,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     private static int UPDATE_INTERVAL = 5000;
     private static int FASTEST_INTERVAL = 3000;
     private static int DISPLACEMENT = 10;
+
+    private BroadcastReceiver mReceiver;
 
     Boolean isPickup = true;
     Boolean isSendNotification = false;
@@ -156,13 +169,28 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     @BindView(R.id.img_location)
     ImageView mImgLocation;
 
+    @BindView(R.id.img_notification_message)
+    ImageView mImgNotificationMessage;
+
     @BindView(R.id.txt_name_location)
     TextView mTxtNameLocation;
 
     DatabaseReference mPickupRequestDatabase;
     DatabaseReference mCustomerDatabase;
+    DatabaseReference mTripInfoDatabase;
     PickupRequest mPickupRequest;
+    TripInfo mTripInfo;
     Customer mCustomer;
+    Driver mDriver;
+    Boolean onPayment = false;
+    HashMap<String,Object> mapTripInfo = new HashMap<>();
+    int fixedFare;
+    String otherToll = "";
+    boolean isCustomerCancel = false, isCompleteTrip = false;
+    GeoQuery mGeoQueryCheckNear;
+
+    ValueAnimator animNotification;
+
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -188,39 +216,59 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         mBtnCancel.setOnClickListener(this);
         mBtnPickup.setOnClickListener(this);
 
+        animNotification = new ValueAnimator();
+
+        mImgNotificationMessage.setVisibility(View.GONE);
+
+        mService = Common.getGoogleAPI();
+        mFCMService = Common.getFCMService();
         driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        getInfoDriver();
         //Geo Fire
         driverWorking = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
         mPickupRequestDatabase = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
         mCustomerDatabase = FirebaseDatabase.getInstance().getReference(Common.customers_tbl);
+        mTripInfoDatabase = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl)
+                .child(getIntent().getStringExtra("keyTrip"));
         mGeoFire = new GeoFire(driverWorking);
 
+        mapTripInfo = new HashMap<>();
+        Log.e("Key",getIntent().getStringExtra("keyTrip"));
+
         mPickupRequestDatabase.child(driverID)
-                .addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mPickupRequest = dataSnapshot.getValue(PickupRequest.class);
-                if(isPickup){
-                    customerLat = Double.valueOf(mPickupRequest.getLatPickup());
-                    customerLng = Double.valueOf(mPickupRequest.getLngPickup());
-                    destination = mPickupRequest.getDestination();
-                    mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
-                            .position(new LatLng(customerLat, customerLng))
-                            .title("Customer"));
-                    mTxtNameLocation.setText(getNameAdress(customerLat,customerLng).toUpperCase());
-                }
-                getInfoCustomer(mPickupRequest.getCustomerId());
-            }
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            mPickupRequest = dataSnapshot.getValue(PickupRequest.class);
+                            if (isPickup) {
+                                mTripInfo = new TripInfo();
+                                customerLat = Double.valueOf(mPickupRequest.getLatPickup());
+                                customerLng = Double.valueOf(mPickupRequest.getLngPickup());
+                                destination = mPickupRequest.getDestination();
+                                mTxtNameLocation.setText(getNameAdress(customerLat, customerLng).toUpperCase());
+                                // create trip info
+                                mTripInfo.setPickup(getNameAdress(customerLat, customerLng));
+                                mTripInfo.setDropoff(destination);
+                                mTripInfo.setCustomerId(mPickupRequest.getCustomerId());
+                                mTripInfo.setDriverId(driverID);
+                                mTripInfoDatabase.setValue(mTripInfo);
+                                mapTripInfo.put("dateCreated", ServerValue.TIMESTAMP);
 
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("ERROR", "Failed to read value.", error.toException());
-            }
-        });
+                                getInfoTrip(customerLat,customerLng,destination);
+                                getInfoCustomer(mPickupRequest.getCustomerId());
+                                sendKeyTripToCustomer(getIntent().getStringExtra("keyTrip"));
+                                // remove event listener
+                            }
+                        }
+                    }
 
-
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        // Failed to read value
+                        Log.w("ERROR", "Failed to read value.", error.toException());
+                    }
+                });
 
         networkStateReceiver = new NetworkStateReceiver();
         networkStateReceiver.addListener(this);
@@ -228,19 +276,86 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
     }
 
-    private void getInfoCustomer(String id) {
-        mCustomerDatabase.child(id)
-                .addValueEventListener(new ValueEventListener() {
+
+
+    private void sendKeyTripToCustomer(final String key) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(mPickupRequest.getCustomerId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        mCustomer = dataSnapshot.getValue(Customer.class);
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("KeyTrip",key);
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("KeyTripToCustomer","Sucess");
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("KeyTripToCustomer",response.message());
+                                        Log.e("KeyTripToCustomer",response.errorBody().toString());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
 
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    private void getInfoCustomer(String id) {
+        mCustomerDatabase.child(id)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            mCustomer = dataSnapshot.getValue(Customer.class);
+                            mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                                    .position(new LatLng(customerLat, customerLng))
+                                    .snippet(mCustomer.getImgUrl())
+                                    .title("Pickup here"+Common.keySplit+mCustomer.getPhoneNum()));
+                            mCustomerMarker.showInfoWindow();
+                        }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError error) {
                         // Failed to read value
                         Log.w("ERROR", "Failed to read value.", error.toException());
+                    }
+                });
+    }
+
+    private void getInfoDriver(){
+        FirebaseDatabase.getInstance().getReference(Common.drivers_tbl).child(driverID)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            mDriver = dataSnapshot.getValue(Driver.class);
+
+                            mapTripInfo.put("serviceVehicle",mDriver.getServiceVehicle());
+                            mTripInfoDatabase.updateChildren(mapTripInfo);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
     }
@@ -434,22 +549,29 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                             .flat(true)
                             .anchor(0.5f, 0.5f)
                             .rotation(bearing)
-                            .title("You"));
+                            .snippet(mDriver.getImgUrl())
+                            .title("You"+Common.keySplit+mDriver.getPhoneNum()));
                     getDirection();
 
-                    if(isPickup){
-                        mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
-                                .position(new LatLng(customerLat, customerLng))
-                                .title("Customer"));
-                    }else{
-                        mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
-                                .position(new LatLng(customerLat, customerLng))
-                                .title("Customer"));
+                    if(mCustomer!=null){
+                        if(isPickup){
+                            mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                                    .position(new LatLng(customerLat, customerLng))
+                                    .snippet(mCustomer.getImgUrl())
+                                    .title("Pickup here"+Common.keySplit+mCustomer.getPhoneNum()));
+                            mCustomerMarker.showInfoWindow();
+                        }else{
+                            mCustomerMarker = mMap.addMarker(new MarkerOptions()
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
+                                    .position(new LatLng(customerLat, customerLng))
+                                    .snippet(mCustomer.getImgUrl())
+                                    .title("Drop off here"+Common.keySplit+destination));
+                            mCustomerMarker.showInfoWindow();
+                        }
                     }
 
-                    mTxtNameLocation.setText(getNameAdress(customerLat,customerLng).toUpperCase());
+
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
                 }
             });
@@ -528,6 +650,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 call(mCustomer.getPhoneNum());
                 break;
             case R.id.btn_chat:
+                mImgNotificationMessage.setVisibility(View.GONE);
+
                 Intent chatIntent = new Intent(DriverTrackingAcitivity.this, ChatActivity.class);
                 chatIntent.putExtra("user_id", mPickupRequest.getCustomerId());
                 chatIntent.putExtra("user_name", mCustomer.getName());
@@ -538,7 +662,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
             case R.id.btn_cancel:
                 final String[] listCancel = {"Emergency contact","Customer request to cancel trips"};
                 ressonCancelTrip = listCancel[0];
-                new AlertDialog.Builder(this)
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
                         .setTitle("Reason to cancel trips")
                         .setSingleChoiceItems(listCancel,0, new DialogInterface.OnClickListener() {
                             @Override
@@ -549,15 +673,29 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(getApplicationContext(),ressonCancelTrip,Toast.LENGTH_SHORT).show();
+                                sendMessageCancelTripToCustomer();
+                                removeWorkingDriver();
+                                final SpotsDialog waitingDialog = new SpotsDialog(DriverTrackingAcitivity.this);
+                                waitingDialog.show();
+                                HashMap<String,Object> maps = new HashMap<>();
+                                maps.put("reasonCancel",ressonCancelTrip);
+                                maps.put("status",Common.trip_info_status_driver_cancel);
+                                mTripInfoDatabase.updateChildren(maps);
+                                mPickupRequestDatabase.child(driverID).removeValue();
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        waitingDialog.dismiss();
+                                        finish();
+                                    }
+                                },1000);
+
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                String t = "1231233.123TRANSORT12321321.123123TRANSORTzxc123zx1c32";
-                                String[] list = t.split("TRANSORT");
-                                Toast.makeText(getApplicationContext(),list[0]+"---"+list[1]+"---"+list[2],Toast.LENGTH_LONG).show();
                             }
                         })
                         .show();
@@ -583,6 +721,10 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                             isPickup = false;
                                             sendMessagePickupToCustomer();
 
+                                            mapTripInfo.put("timePickup",ServerValue.TIMESTAMP);
+                                            mTripInfoDatabase.updateChildren(mapTripInfo);
+                                            mapTripInfo.clear();
+
                                             LatLng dropOffLocation = getLocationFromAddress(getApplicationContext(),destination);
                                             customerLat = dropOffLocation.latitude;
                                             customerLng = dropOffLocation.longitude;
@@ -592,6 +734,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                             // Delete pickup Request and create Ride info
 
                                             mTxtNameLocation.setText(destination);
+                                            Log.e("DESTINATION",destination);
                                             mImgLocation.setImageResource(R.drawable.ic_drop_off);
 
                                             mMap.clear();
@@ -620,8 +763,14 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                             .setNeutralButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(final DialogInterface dialog, int which) {
-                                    showPaymentDialog();
+                                    isCompleteTrip = true;
+                                    mPickupRequestDatabase.child(driverID).removeValue();
                                     sendMessageDropOffToCustomer();
+                                    mapTripInfo.put("timeDropoff",ServerValue.TIMESTAMP);
+                                    mapTripInfo.put("status",Common.trip_info_status_complete);
+                                    mTripInfoDatabase.updateChildren(mapTripInfo);
+                                    mapTripInfo.clear();
+                                    showPaymentDialog();
                                 }
                             })
                             .show();
@@ -629,6 +778,44 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
                 break;
         }
+    }
+
+    private void sendMessageCancelTripToCustomer() {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(mPickupRequest.getCustomerId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("DriverCancelTrip","Driver cancel the trip");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessagePickup","Sucess");
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                        Log.e("MessageCancelTrip",response.message());
+                                        Log.e("MessageCancelTrip",response.errorBody().toString());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void sendMessagePickupToCustomer() {
@@ -745,12 +932,13 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     private void checkDriverNear() {
-        GeoFire geoFire = new GeoFire(FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl));
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(customerLat,customerLng),0.05f);
-        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+        final GeoFire geoFire = new GeoFire(FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl));
+        mGeoQueryCheckNear = geoFire.queryAtLocation(new GeoLocation(customerLat,customerLng),0.05f);
+        mGeoQueryCheckNear.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 sendArrivedNotification(mPickupRequest.getCustomerId());
+                geoFire.removeLocation(key);
             }
 
             @Override
@@ -778,10 +966,12 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
@@ -795,14 +985,11 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 //        mMap.setBuildingsEnabled(false);
 //        mMap.getUiSettings().setZoomControlsEnabled(true);
 
-
-
-
-
     }
 
-    private void sendArrivedNotification(String customerID) {
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+    private void sendArrivedNotification( String customerID) {
+        mGeoQueryCheckNear.removeAllListeners();
+         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
         tokens.orderByKey().equalTo(customerID)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -812,25 +999,27 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                             Token token = postData.getValue(Token.class);
                             Notification notification = new Notification("Arrived","Your driver has arrived here!");
                             Sender sender = new Sender(token.getToken(),notification);
-                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
-                                @Override
-                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
-                                    if(response.body().success == 1){
-                                        isSendNotification = true;
-                                        Log.e("ArrivedNotification","Success");
+                            if(!isSendNotification){
+                                mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                    @Override
+                                    public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                        if(response.body().success == 1){
+                                            isSendNotification = true;
+                                            Log.e("ArrivedNotification","Success");
+                                        }
+                                        else{
+                                            Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                            Log.e("ArrivedNotification",response.message());
+                                            Log.e("ArrivedNotification",response.errorBody().toString());
+                                        }
                                     }
-                                    else{
-                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
-                                        Log.e("ArrivedNotification",response.message());
-                                        Log.e("ArrivedNotification",response.errorBody().toString());
+
+                                    @Override
+                                    public void onFailure(Call<FCMResponse> call, Throwable t) {
+
                                     }
-                                }
-
-                                @Override
-                                public void onFailure(Call<FCMResponse> call, Throwable t) {
-
-                                }
-                            });
+                                });
+                            }
                         }
                     }
 
@@ -845,8 +1034,16 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     @Override
     protected void onDestroy() {
         super.onDestroy();
+//        HashMap<String,Object> maps = new HashMap<>();
+//        sendMessageCancelTripToCustomer();
+//        maps.put("reasonCancel","Driver destroy app");
+//        maps.put("status",Common.trip_info_status_driver_cancel);
+//        mTripInfoDatabase.updateChildren(maps);
+//        mPickupRequestDatabase.child(driverID).removeValue();
+
         networkStateReceiver.removeListener(this);
         this.unregisterReceiver(networkStateReceiver);
+        this.unregisterReceiver(mReceiver);
     }
 
     private class ParserTask extends AsyncTask<String,Integer,List<List<HashMap<String,String>>>>{
@@ -943,6 +1140,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     private void showPaymentDialog() {
+        onPayment = true;
+        removeWorkingDriver();
         final AlertDialog.Builder builder = new AlertDialog.Builder(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         builder.setCancelable(true);
 
@@ -957,8 +1156,9 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         final EditText editTollOther = paymentLayout.findViewById(R.id.edt_toll_other);
         final TextView txtTotal = paymentLayout.findViewById(R.id.txt_total_payout);
         final Button btnConfirm = paymentLayout.findViewById(R.id.btn_confirm);
+        txtFixedFare.setText(String.valueOf(fixedFare*1000));
+        txtTotal.setText(String.valueOf(fixedFare*1000));
 
-        final Long fixedFare = Long.parseLong(txtFixedFare.getText().toString().replace(".",""));
 
         editTollOther.addTextChangedListener(new TextWatcher() {
             @Override
@@ -968,7 +1168,9 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                otherToll = charSequence.toString();
+                int total = fixedFare*1000+Integer.parseInt(otherToll);
+                txtTotal.setText(String.valueOf(total));
             }
 
             @Override
@@ -981,16 +1183,186 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"btnConfirm",Toast.LENGTH_LONG).show();
+                if(Integer.parseInt(otherToll)>500){
+                    mapTripInfo.put("otherToll",otherToll);
+                    mTripInfoDatabase.updateChildren(mapTripInfo);
+                }
+                dialog.dismiss();
+                finish();
             }
         });
 
         dialog.show();
 
     }
+
+    private void removeWorkingDriver() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
+
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!onPayment){
+            Toast.makeText(getApplicationContext(),"Can't back when on trip",Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(getApplicationContext(),"Please commit bill to finish trip",Toast.LENGTH_LONG).show();
+        }
+    }
+
     public String formatNumber(int number){
         DecimalFormat decimalFormat = new DecimalFormat("###.###.###");
         String numberAsString = decimalFormat.format(number);
         return numberAsString;
     }
+
+    private void calculateFare(Double distance, Double time) {
+        Double realDistance = (distance/1000);
+        Double realTime = time/60;
+        Double hour = realTime%60;
+        Double minute = realTime - hour*60;
+        String timeArrived;
+        if(realTime<60.){
+            timeArrived = realTime.intValue() + " min";
+        }else{
+            timeArrived = hour.intValue() + " h "+minute.intValue()+" min";
+        }
+
+
+        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_standard*realTime;
+        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
+        String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
+        String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
+        if(mDriver!=null){
+            if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard)){
+                fixedFare = fareStandard.intValue();
+                mapTripInfo.put("fixedFare",String.valueOf(fixedFare*1000));
+            }else{
+                fixedFare = farePremium.intValue();
+                mapTripInfo.put("fixedFare",String.valueOf(fixedFare*1000));
+            }
+
+            mTripInfoDatabase.updateChildren(mapTripInfo);
+        }
+
+
+    }
+
+    private void getInfoTrip(double lat, double lng, String destination) {
+        Log.e("TRACKING",lat+"--"+lng+"--"+destination);
+        String requestApi = null;
+        try{
+            requestApi = "https://maps.googleapis.com/maps/api/directions/json?"+
+                    "mode=driving&"+
+                    "transit_routing_preference=less_driving&"+
+                    "origin="+lat+","+lng+"&"+
+                    "destination="+destination+"&"+
+                    "key="+getResources().getString(R.string.google_direction_api);
+            Log.d("TRANSPORT",requestApi);
+            mService.getPath(requestApi)
+                    .enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response.body().toString());
+                                JSONArray routes = jsonObject.getJSONArray("routes");
+                                Log.e("TRACKING","getInfoTrip onResponse");
+                                JSONObject object = routes.getJSONObject(0);
+
+                                JSONArray legs = object.getJSONArray("legs");
+
+                                JSONObject legsObject = legs.getJSONObject(0);
+
+                                JSONObject distanceJS = legsObject.getJSONObject("distance");
+
+                                mapTripInfo.put("distance",distanceJS.getString("text"));
+                                Double distance = distanceJS.getDouble("value");
+                                Log.e("TRACKING","getInfoTrip onResponse "+distance);
+                                JSONObject timeJS = legsObject.getJSONObject("duration");
+                                mapTripInfo.put("time",timeJS.getString("text"));
+
+                                mTripInfoDatabase.updateChildren(mapTripInfo);
+                                Double time = timeJS.getDouble("value");
+
+                                calculateFare(distance,time);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Log.e("ERRORTRACK",e.getMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Log.e("ERRORTRACK",t.getMessage());
+                        }
+                    });
+
+        }catch (Exception e){
+            Log.e("ERRORTRACK",e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(
+                "android.intent.action.MAIN");
+
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //extract our message from intent
+                if(intent.getStringExtra("CustomerCancelTrip")!=null){
+                    isCustomerCancel = true;
+                    Toast.makeText(getApplicationContext(),"Customer cancel the trip",Toast.LENGTH_LONG).show();
+                    mPickupRequestDatabase.child(driverID).removeValue();
+                    removeWorkingDriver();
+                    final SpotsDialog waitingDialog = new SpotsDialog(DriverTrackingAcitivity.this);
+                    waitingDialog.show();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            waitingDialog.dismiss();
+                            finish();
+                        }
+                    },1500);
+                }else if(intent.getStringExtra("Chat")!=null){
+                    mImgNotificationMessage.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+        //registering our receiver
+        this.registerReceiver(mReceiver, intentFilter);
+    }
+
+    private void startAnimationNotification() {
+        animNotification.setIntValues(Color.WHITE, R.color.colorNavigation);
+        animNotification.setEvaluator(new ArgbEvaluator());
+        animNotification.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                if((Integer)valueAnimator.getAnimatedValue()==Color.WHITE){
+                    mBtnChat.setBackground(getResources().getDrawable(R.drawable.bg_chat_active));
+                }else{
+                    mBtnChat.setBackground(getResources().getDrawable(R.drawable.bg_chat));
+                }
+            }
+        });
+
+        animNotification.setDuration(1000);
+        animNotification.setRepeatCount(Animation.INFINITE);
+        animNotification.start();
+    }
+
+
 }

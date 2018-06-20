@@ -16,7 +16,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera"
         android:required="false" />
     
@@ -43,6 +42,30 @@
             android:name=".ChooseTypeUserActivity"
             android:theme="@style/NoActionBar" />
         <activity
+            android:name=".DriverHomeActivity"
+            android:theme="@style/NoActionBarDriver" />
+        <activity
+            android:name=".DriverRatingsActivity"
+            android:theme="@style/NoActionBarDriver" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverHomeActivity" />
+        </activity>
+        <activity
+            android:name=".DriverEarningsActivity"
+            android:theme="@style/NoActionBarDriver" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverHomeActivity" />
+        </activity>
+        <activity
+            android:name=".DriverAccountActivity"
+            android:theme="@style/NoActionBarDriver" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverHomeActivity" />
+        </activity>
+        <activity
             android:name=".CustomerCallActivity"
             android:theme="@style/NoActionBar" />
         <activity
@@ -50,16 +73,32 @@
             android:theme="@style/NoActionBar" />
         <activity
             android:name=".DriverInvitesActivity"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverEarningsActivity" />
+        </activity>
         <activity
             android:name=".DriverTripHistoryActivity"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverEarningsActivity" />
+        </activity>
         <activity
             android:name=".DriverFeedBackActivity"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverRatingsActivity" />
+        </activity>
         <activity
             android:name=".DriverPayStatementActivity"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverEarningsActivity" />
+        </activity>
         <activity
             android:name=".DriverTrackingAcitivity"
             android:theme="@style/NoActionBar">
@@ -113,17 +152,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".DriverMainActivity"
-            android:label="@string/title_activity_test_navigation">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
         <activity android:name=".mvp.verifypincode.view.TestVerifyActivity" />
 
         <service android:name=".service.MyFirebaseIdService">

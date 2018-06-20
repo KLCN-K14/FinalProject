@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/root_layout"
+    android:orientation="vertical"
+    >
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorNavigation"
+        android:theme="@style/NoActionBarDriver">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/NoActionBarDriver">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+                <TextView
+                    android:id="@+id/txt_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OFFLINE"
+                    android:textColor="@color/white"
+                    android:layout_centerVertical="true"
+                    android:textSize="24sp"/>
+                <com.suke.widget.SwitchButton
+                    android:id="@+id/switch_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    app:sb_checked_color="@color/colorActiveNavigation"
+                    app:sb_uncheck_color="@color/colorInactiveNavigation"
+                    app:sb_button_color="@color/colorInactiveNavigation"
+                    app:sb_uncheckcircle_color="@color/colorInactiveNavigation"
+                    android:layout_margin="10dp"/>
+            </RelativeLayout>
+
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_driver_home" />
+
+</android.support.design.widget.CoordinatorLayout>

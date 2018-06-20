@@ -10,7 +10,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar" >
+    </style>
+    <style name="NoActionBarDriver" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="drawerArrowStyle">@style/DrawerIconStyle</item>
+        <item name="colorControlNormal">@color/colorActiveNavigation</item>
+    </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
@@ -23,6 +28,10 @@
         <item name="android:padding">4dp</item>
         <item name="android:scrollbars">vertical</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="DrawerIconStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/colorActiveNavigation</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -36,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
@@ -135,8 +137,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     GeoFire geoFire;
     Marker mUserMarker;
     FirebaseAuth mFirebaseAuth;
-    DatabaseReference customers;
-    Customer customerModel;
+    Customer mCustomer;
     IGoogleAPI mService;
 
     Driver currentDriver = null;
@@ -201,12 +202,6 @@ public class CustomerHomeActivity extends AppCompatActivity
             ab.setDisplayHomeAsUpEnabled(true);
         }
         mFirebaseAuth= FirebaseAuth.getInstance();
-        customers = FirebaseDatabase.getInstance().getReference().child("Customers").child(mFirebaseAuth.getCurrentUser().getUid());
-        Log.e("Hom activity:::",customers.toString());
-
-        mTxtPhone = (TextView) findViewById(R.id.txt_phone);
-        mAvatar = (CircleImageView) findViewById(R.id.img_avatar_nav);
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -217,6 +212,10 @@ public class CustomerHomeActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        View header = navigationView.getHeaderView(0);
+        mTxtPhone = (TextView) header.findViewById(R.id.txt_phone);
+        mAvatar = (CircleImageView) header.findViewById(R.id.img_avatar_nav);
+
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
@@ -226,6 +225,7 @@ public class CustomerHomeActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
         initView();
+        getUserInfo();
         btnPickRequest.setOnClickListener(this);
 //        ref = FirebaseDatabase.getInstance().getReference("Drivers");
 //        geoFire = new GeoFire(ref);
@@ -255,6 +255,7 @@ public class CustomerHomeActivity extends AppCompatActivity
                     mRltTransportCurrent.setVisibility(View.VISIBLE);
                     txtPriceCurrentService.setText(mTxtPriceStandard.getText());
                     currentService = Common.service_vehicle_standard;
+                    setupCurrentService();
                 }
             }
         });
@@ -320,8 +321,11 @@ public class CustomerHomeActivity extends AppCompatActivity
             imgCurrentService.setImageResource(R.drawable.ic_type_motobike_x);
         }else if(currentService.equals(Common.service_vehicle_premium)){
             imgCurrentService.setImageResource(R.drawable.ic_type_motobike_y);
-
         }
+        hashMapMarker =  new HashMap<>();
+        mMap.clear();
+        displayLocation();
+        startLocationUpdate();
     }
 
 
@@ -340,6 +344,7 @@ public class CustomerHomeActivity extends AppCompatActivity
                 getFragmentManager().findFragmentById(R.id.place_location);
         pickPickupPlace.setOnPlaceSelectedListener(this);
         pickPickupPlace.setText("Your position");
+        ((EditText)pickPickupPlace.getView().findViewById(R.id.place_autocomplete_search_input)).setTextSize(16.0f);
         ((View)findViewById(R.id.place_autocomplete_search_button)).setVisibility(View.GONE);
         ((View)findViewById(R.id.place_autocomplete_clear_button)).setVisibility(View.GONE);
         pickPickupPlace.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -360,6 +365,7 @@ public class CustomerHomeActivity extends AppCompatActivity
         pickDestination.setOnPlaceSelectedListener(this);
         pickDestination.setHint("Where are you going?");
         pickDestination.setBoundsBias(BOUNDS_MOUNTAIN_VIEW);
+        ((EditText)pickDestination.getView().findViewById(R.id.place_autocomplete_search_input)).setTextSize(16.0f);
         pickDestination.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
         pickDestination.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -601,11 +607,15 @@ public class CustomerHomeActivity extends AppCompatActivity
             //Add marker
             if(mUserMarker!=null)
                 mUserMarker.remove();
-            mUserMarker = mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
-                    .position(new LatLng(latitude,longitude))
-                    .title("You"));
-            mUserMarker.setZIndex(1);
+            if(mCustomer!=null){
+                mUserMarker = mMap.addMarker(new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                        .position(new LatLng(latitude,longitude))
+                        .snippet(mCustomer.getImgUrl())
+                        .title("You"+Common.keySplit+mCustomer.getPhoneNum()));
+                mUserMarker.showInfoWindow();
+                mUserMarker.setZIndex(1);
+            }
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
 
             // load drivers available in map
@@ -631,24 +641,35 @@ public class CustomerHomeActivity extends AppCompatActivity
                             .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    Driver driver = dataSnapshot.getValue(Driver.class);
-                                    Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
-                                    if(hashMapBearing.get(dataSnapshot.getKey())!=null)
-                                        bearing = hashMapBearing.get(dataSnapshot.getKey());
-                                    if(mMarker==null){
-                                        mMarker = mMap.addMarker(new MarkerOptions()
-                                                .position(new LatLng(location.latitude,location.longitude))
-                                                .snippet(driver.getPhoneNum())
-                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
-                                                .title(driver.getName())
-                                                .flat(true)
-                                                .anchor(0.5f, 0.5f)
-                                                .rotation(bearing));
-                                        bearing = 0;
-                                        hashMapMarker.put(dataSnapshot.getKey(),mMarker);
-                                        hashMapLocation.put(dataSnapshot.getKey(),location);
+                                    if(dataSnapshot.exists()){
+                                        boolean isOnline = (Boolean)dataSnapshot.child("isOnline").getValue();
+                                        Driver driver = dataSnapshot.getValue(Driver.class);
+                                        if(driver.getServiceVehicle().equals(currentService) && isOnline){
+                                            Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                            if(hashMapBearing.get(dataSnapshot.getKey())!=null)
+                                                bearing = hashMapBearing.get(dataSnapshot.getKey());
+                                            if(mMarker==null){
+                                                int drawable;
+                                                if(currentService.equals(Common.service_vehicle_standard))
+                                                    drawable = R.drawable.ic_driver_standard;
+                                                else
+                                                    drawable = R.drawable.ic_driver_premium;
+                                                mMarker = mMap.addMarker(new MarkerOptions()
+                                                        .position(new LatLng(location.latitude,location.longitude))
+                                                        .snippet(driver.getImgUrl())
+                                                        .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                        .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
+                                                        .flat(true)
+                                                        .anchor(0.5f, 0.5f)
+                                                        .rotation(bearing));
+                                                bearing = 0;
+                                                hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                                hashMapLocation.put(dataSnapshot.getKey(),location);
+                                            }
+                                        }
+
                                     }
-                                    Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
+
                                 }
 
                                 @Override
@@ -697,11 +718,16 @@ public class CustomerHomeActivity extends AppCompatActivity
                                         }
 
                                         if(mMarker==null){
+                                            int drawable;
+                                            if(currentService.equals(Common.service_vehicle_standard))
+                                                drawable = R.drawable.ic_driver_standard;
+                                            else
+                                                drawable = R.drawable.ic_driver_premium;
                                             mMarker = mMap.addMarker(new MarkerOptions()
                                                     .position(new LatLng(location.latitude,location.longitude))
-                                                    .snippet(driver.getPhoneNum())
-                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.motobike_ver2))
-                                                    .title(driver.getName())
+                                                    .snippet(driver.getImgUrl())
+                                                    .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                    .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
                                                     .flat(true)
                                                     .anchor(0.5f, 0.5f)
                                                     .rotation(bearing));
@@ -803,8 +829,10 @@ public class CustomerHomeActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
         mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
     }
 
@@ -857,21 +885,23 @@ public class CustomerHomeActivity extends AppCompatActivity
     }
 
     private void requestPickUpHere() {
-        if(mUserMarker.isVisible())
-            mUserMarker.remove();
-        mUserMarker = mMap.addMarker(new MarkerOptions()
-                .title("Pickup here")
-                .snippet("")
-                .position(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-        mUserMarker.showInfoWindow();
+//        if(mUserMarker.isVisible())
+//            mUserMarker.remove();
+//        mUserMarker = mMap.addMarker(new MarkerOptions()
+//                .title("Pickup here")
+//                .snippet("")
+//                .position(new LatLng(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude()))
+//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
         findDriver();
     }
 
     private void findDriver() {
         Intent intent = new Intent(this, CustomerFindDriverActivity.class);
+        intent.putExtra("pickup",getNameAdress(Common.mLastLocationCustomer));
         intent.putExtra("destination",mPlaceDestination.getName());
+        intent.putExtra("price",txtPriceCurrentService.getText().toString());
+        intent.putExtra("currentService",currentService);
         startActivityForResult(intent,REQUEST_CODE_FIND_DRIVER);
     }
 
@@ -966,33 +996,31 @@ public class CustomerHomeActivity extends AppCompatActivity
     }
 
     private void getUserInfo() {
-        customers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
-                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
-                    if (map.get("phoneNum") != null)
-                        mTxtPhone.setText(map.get("phoneNum").toString());
-
-                    if (map.get("imgUrl") != null) {
-                        RequestOptions options = new RequestOptions()
-                                .centerCrop()
-                                .placeholder(R.drawable.avavtar)
-                                .error(R.drawable.avavtar)
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .priority(Priority.HIGH);
-                        Glide.with(getApplication()).load(map.get("imgUrl").toString()).apply(options).into(mAvatar);
+        FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            mCustomer = dataSnapshot.getValue(Customer.class);
+                            if(mCustomer.getPhoneNum()!=null){
+                                mTxtPhone.setText(mCustomer.getPhoneNum());
+                                RequestOptions options = new RequestOptions()
+                                        .centerCrop()
+                                        .placeholder(R.drawable.avavtar)
+                                        .error(R.drawable.avavtar)
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .priority(Priority.HIGH);
+                                Glide.with(getApplication()).load(mCustomer.getImgUrl()).apply(options).into(mAvatar);
+                            }
+                        }
                     }
-                }
 
-            }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
-
+                    }
+                });
     }
 
     @Override
@@ -1085,7 +1113,6 @@ public class CustomerHomeActivity extends AppCompatActivity
         Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
         String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
         String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
-        Toast.makeText(getApplicationContext(),currentService,Toast.LENGTH_LONG).show();
         if(currentService.equals(Common.service_vehicle_standard)){
             txtPriceCurrentService.setText(textFareStandard);
         }else{

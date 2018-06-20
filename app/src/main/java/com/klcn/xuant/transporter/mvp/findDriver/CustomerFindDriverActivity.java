@@ -1,22 +1,24 @@
 package com.klcn.xuant.transporter.mvp.findDriver;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
-import android.nfc.cardemulation.HostNfcFService;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +28,6 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.github.lzyzsd.circleprogress.ArcProgress;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -35,8 +35,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.klcn.xuant.transporter.DriverMainActivity;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.ArcProgressAnimation;
@@ -45,8 +43,6 @@ import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
-import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
-import com.klcn.xuant.transporter.mvp.splashScreen.SplashScreenActivity;
 import com.klcn.xuant.transporter.remote.IFCMService;
 import com.skyfishjy.library.RippleBackground;
 
@@ -93,10 +89,18 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     IFCMService mService;
     String driverID = "";
     String destination = "";
+    String pickup = "";
+    String price = "";
+    String currentService = "";
     BroadcastReceiver mReceiver;
     Driver mDriver;
     HashMap<String,String> hashDriverFound = new HashMap<>();
     GeoQuery geoQuery;
+    ArcProgressAnimation anim;
+    Boolean isShowDialog = false;
+    AlertDialog dialog;
+    DatabaseReference mDriversDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,14 +110,19 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         mRippleBackground.startRippleAnimation();
 
         mService = Common.getFCMService();
+        pickup = getIntent().getStringExtra("pickup");
+        price = getIntent().getStringExtra("price");
         destination = getIntent().getStringExtra("destination");
+        currentService = getIntent().getStringExtra("currentService");
         mTxtDestination.setText(destination);
+        mTxtPrice.setText(price);
+        mTxtYourPlace.setText(pickup);
 
         getNameAdress(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
         findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
 
         mArcProgress.setMax(5);
-        ArcProgressAnimation anim = new ArcProgressAnimation(mArcProgress, 5, 0);
+        anim = new ArcProgressAnimation(mArcProgress, 5, 0);
         anim.setDuration(5000);
         anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -160,23 +169,30 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
             @Override
             public void onKeyEntered(final String key, GeoLocation location) {
                 if(!isDriverFound && hashDriverFound.get(key)==null){
-                    Toast.makeText(getApplicationContext(),"Start send request to dirver",Toast.LENGTH_SHORT).show();
-                    isDriverFound = true;
-                    sendRequestToDriver(key);
-                    DatabaseReference mDriversDatabase = FirebaseDatabase.getInstance().getReference(Common.drivers_tbl);
-                    mDriversDatabase.child(key).addValueEventListener(new ValueEventListener() {
+                    mDriversDatabase = FirebaseDatabase.getInstance().getReference(Common.drivers_tbl);
+                    mDriversDatabase.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            mDriver = dataSnapshot.getValue(Driver.class);
-                            mTxtNameDriverFound.setText("Driver "+mDriver.getName()+" is responding. . .");
+                            if(dataSnapshot.exists()){
+                                boolean isOnline = (Boolean)dataSnapshot.child("isOnline").getValue();
+                                mDriver = dataSnapshot.getValue(Driver.class);
+                                if(isOnline && mDriver.getServiceVehicle().equals(currentService)){
+                                    if(!isShowDialog){
+                                        isShowDialog = true;
+                                        showFoundDriverDialog();
+                                        driverID = key;
+                                        mDriversDatabase.child(key).removeEventListener(this);
+                                    }
+                                }
+                            }
+
                         }
                         @Override
                         public void onCancelled(DatabaseError error) {
                             // Failed to read value
-                            Log.w("ERROR", "Failed to read value.", error.toException());
+                            Log.e("ERROR", "Failed to read value.", error.toException());
                         }
                     });
-                    driverID = key;
                 }
             }
 
@@ -199,7 +215,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                 }else{
                     final Intent resultIntent = new Intent();
 
-
                     // finish when don't have any driver available
                     if(driverID.equals("")){
                         Handler handler = new Handler();
@@ -212,14 +227,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                         },2000);
                     }else{
                         // auto finish when driver not response after 15s
-                        final Handler handlerWaitRequest = new Handler();
-                        handlerWaitRequest.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                            setResult(RESULT_CANCELED, resultIntent);
-                            finish();
-                            }
-                        },18000);
+
                         // if driver response
                         FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl)
                                 .addChildEventListener(new ChildEventListener() {
@@ -266,7 +274,82 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         });
     }
 
+    private void showFoundDriverDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View foundDriverLayout = inflater.inflate(R.layout.layout_found_driver, null);
+
+        builder.setView(foundDriverLayout);
+        dialog = builder.create();
+
+        final TextView txtNameDriver = foundDriverLayout.findViewById(R.id.txt_name_driver_dialog);
+        final TextView txtNameCar = foundDriverLayout.findViewById(R.id.txt_name_car_dialog);
+        final TextView txtLicensePlate = foundDriverLayout.findViewById(R.id.txt_license_plate_dialog);
+        final RatingBar ratingBar = foundDriverLayout.findViewById(R.id.rating_bar);
+        final Button btnOtherDriver = foundDriverLayout.findViewById(R.id.btn_other_driver);
+        final Button btnSendRequest = foundDriverLayout.findViewById(R.id.btn_send_request);
+
+        btnOtherDriver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hashDriverFound.put(driverID,driverID);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTxtNameDriverFound.setText("Finding another dirver. . .");
+                        isDriverFound = false;
+                        driverID = "";
+                        mDriver = null;
+                        isShowDialog = false;
+                        mRltCancel.setVisibility(View.VISIBLE);
+                        mArcProgress.startAnimation(anim);
+                    }
+                },1000);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
+                    }
+                },2000);
+                dialog.dismiss();
+            }
+        });
+
+        btnSendRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mTxtNameDriverFound.setText("Driver "+mDriver.getName()+" is responding. . .");
+                isDriverFound = true;
+                Log.e("ERROR", "Start send request to dirver");
+                sendRequestToDriver(driverID);
+                dialog.dismiss();
+            }
+        });
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                isShowDialog = true;
+                mRltCancel.setVisibility(View.GONE);
+            }
+        });
+
+        txtNameDriver.setText(mDriver.getName());
+        txtNameCar.setText(mDriver.getNameVehicle());
+        txtLicensePlate.setText(mDriver.getLicensePlate());
+        ratingBar.setRating(Float.valueOf(mDriver.getAvgRatings()));
+
+        try{
+            dialog.show();
+        }catch (Exception e){
+            Log.e("FindDriver",e.getMessage());
+        }
+    }
+
     private void sendRequestToDriver(String key) {
+
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
         tokens.orderByKey().equalTo(key)
@@ -290,9 +373,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                                         @Override
                                         public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
                                             if(response.body().success == 1)
-                                                Toast.makeText(getApplicationContext(),"Request sent",Toast.LENGTH_LONG).show();
+                                                Log.e("SendMessage","Request sent");
                                             else
-                                                Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
+                                                Log.e("SendMessage","Request fail"+response.message());
                                         }
 
                                         @Override
@@ -308,6 +391,15 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
                     }
                 });
+        final Intent intent = new Intent();
+        final Handler handlerWaitRequest = new Handler();
+        handlerWaitRequest.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setResult(RESULT_CANCELED, intent);
+                finish();
+            }
+        },18000);
     }
 
     @Override
@@ -349,7 +441,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                                         Log.e("MessageCancel","Sucess");
                                     }
                                     else{
-                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
                                         Log.e("MessageCancel",response.message());
                                         Log.e("MessageCancel",response.errorBody().toString());
                                     }
@@ -399,24 +490,30 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
             @Override
             public void onReceive(Context context, Intent intent) {
                 if(intent.getStringExtra("Cancel")!=null){
+                    mTxtNameDriverFound.setText("Driver denied your request");
+                    hashDriverFound.put(driverID,driverID);
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            mTxtNameDriverFound.setText("Driver "+mDriver.getName()+" denied your request");
+                            mTxtNameDriverFound.setText("Finding another dirver. . .");
+                            isDriverFound = false;
+                            driverID = "";
+                            mDriver = null;
+                            isShowDialog = false;
+                            mRltCancel.setVisibility(View.VISIBLE);
+                            mArcProgress.startAnimation(anim);
                         }
                     },1000);
-                    mTxtNameDriverFound.setText("Finding another dirver. . .");
-                    isDriverFound = false;
-                    hashDriverFound.put(driverID,driverID);
-                    driverID = "";
-                    mDriver = null;
+
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
                         }
                     },2000);
+                }else if(intent.getStringExtra("DriverAccpet")!=null){
+
                 }
 
             }

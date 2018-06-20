@@ -11,18 +11,19 @@
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="80dp"
         android:gravity="bottom"
-        android:background="@drawable/btn_choose_type_car"
+        android:background="@drawable/shadow_bottom_ver2"
         android:id="@+id/rlt_layout_transport_standard"
         android:layout_gravity="bottom"
         android:foregroundGravity="bottom"
         >
         <ImageView
             android:id="@+id/img_type_standard"
-            android:layout_width="35dp"
-            android:layout_height="55dp"
+            android:layout_width="25dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
             android:src="@drawable/ic_type_motobike_x"
             />
         <TextView
@@ -30,10 +31,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Transport Standard"
-            android:textColor="@color/black"
             android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true"
-            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:paddingBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:textSize="14sp"
             android:layout_toRightOf="@id/img_type_standard"/>
 
         <TextView
@@ -51,28 +53,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
+            android:layout_below="@+id/txt_price_standard"
             android:textColor="@color/black"
-            android:layout_centerVertical="true"
             android:textSize="12sp"
             android:layout_marginRight="10dp"
             android:layout_alignParentRight="true"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="80dp"
         android:gravity="bottom"
-        android:background="@drawable/btn_choose_type_car"
+        android:background="@drawable/shadow_bottom"
         android:layout_gravity="bottom"
         android:id="@+id/rlt_layout_transport_premium"
         android:layout_below="@id/rlt_layout_transport_standard"
-        android:layout_marginBottom="10dp"
         android:foregroundGravity="bottom"
         >
         <ImageView
             android:id="@+id/img_type_premium"
-            android:layout_width="35dp"
-            android:layout_height="55dp"
+            android:layout_width="25dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
             android:src="@drawable/ic_type_motobike_y"
             />
         <TextView
@@ -80,10 +82,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Transport Premium"
-            android:textColor="@color/black"
             android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true"
-            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:paddingBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:textSize="14sp"
             android:layout_toRightOf="@id/img_type_premium"/>
 
         <TextView
@@ -102,7 +105,7 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textColor="@color/black"
-            android:layout_centerVertical="true"
+            android:layout_below="@+id/txt_price_premium"
             android:textSize="12sp"
             android:layout_marginRight="10dp"
             android:layout_alignParentRight="true"/>

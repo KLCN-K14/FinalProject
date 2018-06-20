@@ -2,20 +2,14 @@ package com.klcn.xuant.transporter;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryEventListener;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -23,18 +17,13 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.DataSet;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DriverEarningsFragment extends Fragment implements View.OnClickListener{
+public class DriverEarningsActivity extends AppCompatActivity implements View.OnClickListener{
 
     @BindView(R.id.barchart)
     BarChart mBarChart;
@@ -62,22 +51,25 @@ public class DriverEarningsFragment extends Fragment implements View.OnClickList
     ArrayList<BarEntry> mListBarEntry;
     ArrayList<String> mListEntryLabel;
 
-    public static DriverEarningsFragment newInstance() {
-        DriverEarningsFragment fragment = new DriverEarningsFragment();
+    public static DriverEarningsActivity newInstance() {
+        DriverEarningsActivity fragment = new DriverEarningsActivity();
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_driver_earnings);
+        ButterKnife.bind(this);
 
-    }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_driver_earnings, container, false);
-        ButterKnife.bind(this,view);
+        ActionBar ab = getSupportActionBar();
+        if(ab!=null)
+        {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
 
         mListBarEntry = new ArrayList<>();
         mListEntryLabel = new ArrayList<>();
@@ -98,7 +90,7 @@ public class DriverEarningsFragment extends Fragment implements View.OnClickList
         mBarDataSet =new BarDataSet(mListBarEntry,"");
         mBarDataSet.setColors(new int[] {R.color.colorActiveNavigation,R.color.colorActiveNavigation,R.color.colorActiveNavigation,
                 R.color.colorActiveNavigation,R.color.colorActiveNavigation,R.color.colorActiveNavigation,
-                R.color.colorActiveNavigation},getActivity());
+                R.color.colorActiveNavigation},this);
         mBarDataSet.setValueTextColor(Color.rgb(255, 255, 83));
         mBarDataSet.setValueTextSize(10);
         mListEntryLabel.add("Mon");
@@ -126,24 +118,21 @@ public class DriverEarningsFragment extends Fragment implements View.OnClickList
         legend.setEnabled(false);
         mBarChart.setDescription("");
         mBarChart.setDrawValueAboveBar(true);
-
-        return view;
     }
-
 
     @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.panel_invites:
-                Intent intentInvites = new Intent(getContext(),DriverInvitesActivity.class);
+                Intent intentInvites = new Intent(this,DriverInvitesActivity.class);
                 startActivity(intentInvites);
                 break;
             case R.id.panel_pay_statement:
-                Intent intentPayStatement = new Intent(getContext(),DriverPayStatementActivity.class);
+                Intent intentPayStatement = new Intent(this,DriverPayStatementActivity.class);
                 startActivity(intentPayStatement);
                 break;
             case R.id.panel_trip_history:
-                Intent intentTripHistory = new Intent(getContext(),DriverTripHistoryActivity.class);
+                Intent intentTripHistory = new Intent(this,DriverTripHistoryActivity.class);
                 startActivity(intentTripHistory);
                 break;
             default: break;

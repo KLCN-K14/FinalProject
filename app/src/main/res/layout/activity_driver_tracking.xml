@@ -76,7 +76,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ngã tư thủ đức"
+            android:text=""
             android:textSize="18sp"
             android:gravity="center"
             android:textColor="@color/white"
@@ -146,10 +146,19 @@
                     android:background="@drawable/bg_chat">
                     <ImageView
                         android:layout_width="wrap_content"
+                        android:id="@+id/temp5"
                         android:layout_height="wrap_content"
                         app:srcCompat="@drawable/ic_chat_white"
                         android:layout_centerInParent="true"/>
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="25dp"
+                        android:id="@+id/img_notification_message"
+                        android:layout_marginLeft="55dp"
+                        android:src="@drawable/ic_notification_message"
+                        />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

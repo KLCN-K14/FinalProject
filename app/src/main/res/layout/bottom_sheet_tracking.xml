@@ -35,7 +35,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"/>
         <TextView
             android:id="@+id/txt_name_driver"
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/img_ic_chat"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="35dp"
             android:src="@drawable/ic_phone_black"/>
         <ImageView
             android:id="@+id/img_ic_chat"
@@ -65,6 +65,12 @@
             android:layout_marginRight="15dp"
             android:layout_alignParentRight="true"
             android:src="@drawable/ic_chat_black"/>
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:id="@+id/img_notification_message"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_notification_message"/>
 
     </RelativeLayout>
         <LinearLayout
@@ -111,9 +117,10 @@
                     android:id="@+id/txt_place_location"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="10dp"
                     android:text="99 Nguyễn Văn Thạnh"
                     android:textSize="14sp"
+                    android:textStyle="bold"
                     android:textColor="@color/colorBlack"
                     android:paddingBottom="10dp"/>
 
@@ -123,22 +130,18 @@
                     android:layout_height="35dp"
                     android:layout_marginTop="5dp"
                     android:textSize="14sp"
+                    android:textStyle="bold"
                     android:textColor="@color/colorBlack"
                     android:text="145 Trần Não Quận 2"
                     android:paddingBottom="10dp"/>
             </LinearLayout>
 
         </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/divider"/>
 
     <Button
         android:id="@+id/btn_cancel_book"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:background="#000"
         android:foreground="?attr/selectableItemBackground"
         android:text="Cancel book"

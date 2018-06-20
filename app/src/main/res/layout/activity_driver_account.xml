@@ -6,11 +6,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginBottom="30dp">
+    >
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        style="@style/NoActionBarDriver"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorNavigation"
+        app:contentInsetStart="0dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ACCOUNT"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/colorActiveNavigation"
+                android:textStyle="bold"
+                android:textSize="@dimen/dimen_title_20_sp"
+                />
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/colorNavigation"
+        android:background="@color/colorPayStatement"
         android:orientation="horizontal"
         android:weightSum="2"
         android:layout_weight="3">
