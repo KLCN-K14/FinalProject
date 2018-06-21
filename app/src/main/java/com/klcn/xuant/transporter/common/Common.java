@@ -2,14 +2,13 @@ package com.klcn.xuant.transporter.common;
 
 import android.location.Location;
 
+import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.remote.FCMClient;
 import com.klcn.xuant.transporter.remote.IFCMService;
 import com.klcn.xuant.transporter.remote.IGoogleAPI;
 import com.klcn.xuant.transporter.remote.RetrofitClient;
 
 public class Common {
-
-    public static final String currentToken = "";
 
     public static final String drivers_tbl = "Drivers";
     public static final String driver_available_tbl = "DriverAvailable";

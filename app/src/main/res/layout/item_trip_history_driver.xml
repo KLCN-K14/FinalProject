@@ -13,6 +13,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Completed"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:padding="5dp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_completed"
+            android:textColor="@color/colorActiveNavigation"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="22 Mar 2017, 10:53PM"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -37,6 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/txt_pickup"
+                android:textStyle="bold"
                 android:layout_toRightOf="@id/temp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="15dp"
@@ -49,6 +60,7 @@
                 android:id="@+id/txt_destination"
                 android:layout_toRightOf="@id/temp"
                 android:layout_marginLeft="10dp"
+                android:textStyle="bold"
                 android:layout_alignParentBottom="true"
                 android:textSize="16sp"
                 android:text="Ngã tư thủ đức"/>
@@ -57,7 +69,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="VND 70000"
+            android:text="VND 70K"
             android:layout_alignParentBottom="true"
             android:layout_margin="10dp"
             android:id="@+id/txt_price"

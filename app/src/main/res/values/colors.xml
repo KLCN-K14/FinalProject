@@ -74,5 +74,6 @@
     <color name="colorFillMarkerDestination">#11ff1a00</color>
     <color name="colorStrokeMarkerDestination">#3dff1a00</color>
     <color name="gray_20_precent">#F0F0F0</color>
+    <color name="colorCompleted">#06ea19</color>
 
 </resources>

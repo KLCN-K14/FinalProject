@@ -59,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ESTIMATED PAYOUT"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:layout_marginLeft="20dp"
                     android:layout_centerVertical="true"
                     android:textColor="@color/white"/>
@@ -88,7 +88,6 @@
             android:layout_height="240dp"
             android:id="@+id/panel_content"
             android:orientation="vertical"
-            android:layout_marginTop="10dp"
             android:layout_alignParentBottom="true"
             android:weightSum="3"
             >
@@ -123,7 +122,7 @@
                     android:layout_toRightOf="@+id/img_temp"
                     android:layout_below="@id/txt_temp"
                     android:textColor="@color/Gray1"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:text="Last trip: VND 50K"/>
                 <ImageView
                     android:layout_width="wrap_content"
@@ -164,7 +163,7 @@
                     android:layout_below="@id/txt_temp2"
                     android:id="@+id/txt_total_payout"
                     android:textColor="@color/Gray1"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:text="Total payout: VND 250K"/>
                 <ImageView
                     android:layout_width="wrap_content"
@@ -203,7 +202,7 @@
                     android:layout_toRightOf="@+id/img_temp3"
                     android:layout_below="@id/txt_temp3"
                     android:textColor="@color/Gray1"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:text="Earn VND 100K for inviting new drivers"/>
                 <ImageView
                     android:layout_width="wrap_content"

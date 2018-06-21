@@ -90,6 +90,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         myChatViewHolder.txtChatMessage.setText(chat.getMessage());
 
+
         Date currentTime = Calendar.getInstance().getTime();
         long milliseconds = currentTime.getTime();
         final String strTimeFormate = "HH:mm";

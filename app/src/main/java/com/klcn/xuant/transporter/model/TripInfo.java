@@ -7,14 +7,15 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class TripInfo {
 
-    private String pickup,dropoff,customerId,driverId,serviceVehicle,status,distance,
+    private String key,pickup,dropoff,customerId,driverId,serviceVehicle,status,distance,
             time,fixedFare,otherToll,rating,feedback,reasonCancel;
     private Long dateCreated,timePickup,timeDropoff;
 
     public TripInfo() {
     }
 
-    public TripInfo(String pickup, String dropoff, String customerId, String driverId, String serviceVehicle, String status, String distance, String time, String fixedFare, String otherToll, String rating, String feedback, String reasonCancel, Long dateCreated, Long timePickup, Long timeDropoff) {
+    public TripInfo(String key, String pickup, String dropoff, String customerId, String driverId, String serviceVehicle, String status, String distance, String time, String fixedFare, String otherToll, String rating, String feedback, String reasonCancel, Long dateCreated, Long timePickup, Long timeDropoff) {
+        this.key = key;
         this.pickup = pickup;
         this.dropoff = dropoff;
         this.customerId = customerId;
@@ -31,6 +32,14 @@ public class TripInfo {
         this.dateCreated = dateCreated;
         this.timePickup = timePickup;
         this.timeDropoff = timeDropoff;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getPickup() {

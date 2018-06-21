@@ -938,7 +938,6 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 sendArrivedNotification(mPickupRequest.getCustomerId());
-                geoFire.removeLocation(key);
             }
 
             @Override
