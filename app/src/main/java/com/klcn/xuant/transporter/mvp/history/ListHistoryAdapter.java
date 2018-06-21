@@ -1,21 +1,27 @@
 package com.klcn.xuant.transporter.mvp.history;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.klcn.xuant.transporter.R;
+import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.TripInfo;
+
+import java.util.ArrayList;
 
 public class ListHistoryAdapter extends BaseAdapter {
 
-    private String[] listData;
+    private ArrayList<TripInfo> listData;
     private LayoutInflater layoutInflater;
     private Context context;
 
-    public ListHistoryAdapter(Context aContext,  String[] listData) {
+    public ListHistoryAdapter(Context aContext, ArrayList<TripInfo> listData) {
         this.context = aContext;
         this.listData = listData;
         layoutInflater = LayoutInflater.from(aContext);
@@ -23,12 +29,12 @@ public class ListHistoryAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return listData.length;
+        return listData.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return listData.get(i);
     }
 
     @Override
@@ -45,12 +51,31 @@ public class ListHistoryAdapter extends BaseAdapter {
             holder.mTxtPlaceLocation = (TextView) view.findViewById(R.id.txt_place_location);
             holder.mTxtPlaceDistination = (TextView) view.findViewById(R.id.txt_place_destination);
             holder.mTxtDateTime = (TextView) view.findViewById(R.id.txt_date_time);
+            holder.mStatus = (TextView) view.findViewById(R.id.trip_status);
+            holder.mRating = (SimpleRatingBar) view.findViewById(R.id.ratingbar);
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
         }
 
-        holder.mTxtPlaceDistination.setText(listData[i]);
+        TripInfo tripInfo = this.listData.get(i);
+        holder.mTxtPlaceLocation.setText(tripInfo.getPickup());
+        holder.mTxtPlaceDistination.setText(tripInfo.getDropoff());
+        if (tripInfo.getRating() != null)
+            holder.mRating.setRating(Integer.parseInt(tripInfo.getRating()));
+        else
+            holder.mRating.setRating(0);
+
+        if (tripInfo.getStatus().equals(Common.trip_info_status_customer_cancel) || tripInfo.getStatus().equals(Common.trip_info_status_driver_cancel)) {
+
+            holder.mTxtDateTime.setText(DateFormat.format("dd/MM/yyyy, HH:mm", tripInfo.getDateCreated()));
+            holder.mStatus.setText("Huỷ chuyến");
+
+        } else {
+            holder.mTxtDateTime.setText(DateFormat.format("dd/MM/yyyy, HH:mm", tripInfo.getTimeDropoff()));
+            holder.mStatus.setText("Hoàn thành");
+
+        }
         return view;
     }
 
@@ -58,5 +83,7 @@ public class ListHistoryAdapter extends BaseAdapter {
         TextView mTxtPlaceLocation;
         TextView mTxtPlaceDistination;
         TextView mTxtDateTime;
+        TextView mStatus;
+        SimpleRatingBar mRating;
     }
 }

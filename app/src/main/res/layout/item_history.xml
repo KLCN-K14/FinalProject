@@ -141,7 +141,7 @@
                     android:src="@drawable/ic_cost"/>
 
                 <TextView
-                    android:id="@+id/profile_mail"
+                    android:id="@+id/total_cash"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -174,7 +174,7 @@
                     android:src="@drawable/ic_time_black"/>
 
                 <TextView
-                    android:id="@+id/profile_phone"
+                    android:id="@+id/history_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -252,16 +252,27 @@
             </LinearLayout>
 
         </LinearLayout>
-        <Button
+        <LinearLayout
+            android:layout_below="@+id/ln_place_group"
             android:layout_width="match_parent"
-            android:text="@string/send_feedback"
-            android:layout_margin="10dp"
-            android:textColor="@color/colorBlack"
-            android:textSize="18sp"
-            android:layout_marginBottom="20dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/button_rounder"
-            android:layout_height="wrap_content" />
+            android:orientation="horizontal"
+            android:layout_marginLeft="20dp"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_feedback2"/>
+            <TextView
+                android:id="@+id/feedback_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="FeedBack"
+                android:layout_marginLeft="5dp"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+        </LinearLayout>
+
+
     </RelativeLayout>
 
 </LinearLayout>
