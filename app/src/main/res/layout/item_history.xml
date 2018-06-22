@@ -45,10 +45,11 @@
         android:id="@+id/top_group"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
+        android:gravity="center_horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_avatar"
+            android:layout_alignParentTop="true"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="10dp"
@@ -268,7 +269,7 @@
                 android:layout_height="wrap_content"
                 android:text="FeedBack"
                 android:layout_marginLeft="5dp"
-                android:textColor="@color/black"
+                android:textColor="@color/bgColor6"
                 android:textSize="18sp"/>
         </LinearLayout>
 

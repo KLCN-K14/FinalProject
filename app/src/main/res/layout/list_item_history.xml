@@ -114,10 +114,10 @@
             app:srb_fillColor="@color/colorYellow"
             app:srb_isIndicator="true"
             app:srb_numberOfStars="5"
-            app:srb_rating="2"
+            app:srb_rating="2.5"
             app:srb_starBorderWidth="1"
             app:srb_starSize="20dp"
-            app:srb_stepSize="1" />
+            app:srb_stepSize="0.5" />
 
     </LinearLayout>
 

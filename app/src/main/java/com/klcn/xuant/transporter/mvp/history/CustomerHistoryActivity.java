@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -27,12 +29,13 @@ import com.klcn.xuant.transporter.model.TripInfo;
 
 import java.util.ArrayList;
 
-public class CustomerHistoryActivity extends AppCompatActivity implements View.OnClickListener{
+public class CustomerHistoryActivity extends AppCompatActivity implements View.OnClickListener {
 
     ArrayList<TripInfo> listData;
     ImageView mImgback;
     FirebaseAuth mFirebaseAuth;
     DatabaseReference trips;
+    String customerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,23 +47,28 @@ public class CustomerHistoryActivity extends AppCompatActivity implements View.O
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         trips = FirebaseDatabase.getInstance().getReference().child(Common.trip_info_tbl);
-        Query query = trips.orderByChild("customerId").equalTo(mFirebaseAuth.getCurrentUser().getUid());
 
-        listData= new ArrayList<>();
+        customerId = mFirebaseAuth.getCurrentUser().getUid();
+        Query query = trips.orderByChild("customerId").equalTo(customerId);
 
+        listData = new ArrayList<>();
 
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 listData.clear();
-                for (DataSnapshot item : dataSnapshot.getChildren())
-                {
+                for (DataSnapshot item : dataSnapshot.getChildren()) {
                     TripInfo trip = item.getValue(TripInfo.class);
+//                    if(trip.getStatus().equals(Common.trip_info_status_complete)
+//                            && trip.getCustomerId().equals(customerId)){
+//                        trip.setKey(item.getKey());
+//                    }
                     listData.add(trip);
 
+
                 }
-                final ListHistoryAdapter listHistoryAdapter = new ListHistoryAdapter(getApplicationContext(),listData );
+                final ListHistoryAdapter listHistoryAdapter = new ListHistoryAdapter(getApplicationContext(), listData);
                 listView.setAdapter(listHistoryAdapter);
                 listHistoryAdapter.notifyDataSetChanged();
             }
@@ -75,7 +83,24 @@ public class CustomerHistoryActivity extends AppCompatActivity implements View.O
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(CustomerHistoryActivity.this, ItemHistoryActivity.class);
-                intent.putExtra("POSITION", position);
+                if (listData.get(position).getRating() != null)
+                    intent.putExtra("rating", listData.get(position).getRating());
+
+                else
+                    intent.putExtra("rating", 0);
+                int total=0;
+                if(listData.get(position).getFixedFare()!=null && listData.get(position).getOtherToll()!=null)
+                    total = Integer.parseInt(listData.get(position).getFixedFare()) + Integer.parseInt(listData.get(position).getOtherToll());
+                else if(listData.get(position).getOtherToll()==null)
+                    total = Integer.parseInt(listData.get(position).getFixedFare());
+
+                intent.putExtra("pickup", listData.get(position).getPickup());
+                intent.putExtra("dropoff", listData.get(position).getDropoff());
+                intent.putExtra("feedback", listData.get(position).getFeedback());
+                intent.putExtra("total", total+"đ");
+                intent.putExtra("time", DateFormat.format("HH:mm", listData.get(position).getDateCreated()));
+                intent.putExtra("driverId", listData.get(position).getDriverId());
+
                 startActivity(intent);
             }
         });
@@ -83,12 +108,11 @@ public class CustomerHistoryActivity extends AppCompatActivity implements View.O
         mImgback.setOnClickListener(this);
 
 
-
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.toolbar_back:
                 finish();
                 break;

@@ -62,7 +62,7 @@ public class ListHistoryAdapter extends BaseAdapter {
         holder.mTxtPlaceLocation.setText(tripInfo.getPickup());
         holder.mTxtPlaceDistination.setText(tripInfo.getDropoff());
         if (tripInfo.getRating() != null)
-            holder.mRating.setRating(Integer.parseInt(tripInfo.getRating()));
+            holder.mRating.setRating(Float.parseFloat(tripInfo.getRating()));
         else
             holder.mRating.setRating(0);
 
