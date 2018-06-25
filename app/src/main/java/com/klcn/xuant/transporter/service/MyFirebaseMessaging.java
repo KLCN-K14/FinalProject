@@ -95,7 +95,19 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
             Intent i = new Intent("android.intent.action.MAIN").putExtra("Chat", remoteMessage.getNotification().getBody().toString());
             this.sendBroadcast(i);
+        }else if(remoteMessage.getNotification().getTitle().equals("InviteSucess")){
+            NotificationCompat.Builder builder = mNotificationHelper.getNotificationChannel("Invite Sucess",
+                    "You have invited successfully driver with email "+remoteMessage.getNotification().getBody());
+            mNotificationHelper.getManager().notify(new Random().nextInt(),builder.build());
+        }else if(remoteMessage.getNotification().getTitle().equals("RemindFirstTrip")){
+            NotificationCompat.Builder builder = mNotificationHelper.getNotificationChannel("Remind Transport",
+                    "Complete first trip to receive promo");
+            mNotificationHelper.getManager().notify(new Random().nextInt(),builder.build());
+        }else if(remoteMessage.getNotification().getTitle().equals("DriverAccept")){
+            Intent i = new Intent("android.intent.action.MAIN").putExtra("DriverAccept", remoteMessage.getNotification().getBody().toString());
+            this.sendBroadcast(i);
         }
+
     }
 
     private void showNotification(String body) {

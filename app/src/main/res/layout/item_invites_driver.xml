@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/message_single_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:background="@drawable/border_bottom_gray_layout_white"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:src="@drawable/driver_avatar_default"
+            android:id="@+id/img_avatar_driver"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lam Xuan"
+            android:id="@+id/txt_name_driver"
+            android:layout_toRightOf="@id/img_avatar_driver"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginLeft="5dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lam Xuan"
+            android:textStyle="bold"
+            android:textColor="@color/colorGray"
+            android:id="@+id/txt_name_service"
+            android:layout_below="@id/txt_name_driver"
+            android:layout_toRightOf="@id/img_avatar_driver"
+            android:layout_marginLeft="5dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lam Xuan"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:textColor="@color/colorGray"
+            android:id="@+id/txt_date_created"
+            android:layout_marginTop="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_waiting"
+            android:text="Remind"
+            android:padding="5dp"
+            android:textColor="@color/white"
+            android:id="@+id/txt_status"
+            android:textStyle="bold"
+            android:layout_below="@id/txt_date_created"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -185,7 +185,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     Boolean onPayment = false;
     HashMap<String,Object> mapTripInfo = new HashMap<>();
     int fixedFare;
-    String otherToll = "";
+    String otherToll = "0", keyTrip = "";
     boolean isCustomerCancel = false, isCompleteTrip = false;
     GeoQuery mGeoQueryCheckNear;
 
@@ -234,6 +234,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
         mapTripInfo = new HashMap<>();
         Log.e("Key",getIntent().getStringExtra("keyTrip"));
+        keyTrip = getIntent().getStringExtra("keyTrip");
 
         mPickupRequestDatabase.child(driverID)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -770,7 +771,13 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                     mapTripInfo.put("status",Common.trip_info_status_complete);
                                     mTripInfoDatabase.updateChildren(mapTripInfo);
                                     mapTripInfo.clear();
-                                    showPaymentDialog();
+
+                                    Intent intent = new Intent(DriverTrackingAcitivity.this,DriverConfirmBillActivity.class);
+                                    intent.putExtra("keyTrip",keyTrip);
+                                    intent.putExtra("fixedFare",fixedFare);
+                                    startActivity(intent);
+                                    finish();
+//                                    showPaymentDialog();
                                 }
                             })
                             .show();
@@ -988,7 +995,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
     private void sendArrivedNotification( String customerID) {
         mGeoQueryCheckNear.removeAllListeners();
-         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
         tokens.orderByKey().equalTo(customerID)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1140,8 +1147,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
     private void showPaymentDialog() {
         onPayment = true;
-        removeWorkingDriver();
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this,android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
         builder.setCancelable(true);
 
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -1182,6 +1188,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                removeWorkingDriver();
                 if(Integer.parseInt(otherToll)>500){
                     mapTripInfo.put("otherToll",otherToll);
                     mTripInfoDatabase.updateChildren(mapTripInfo);

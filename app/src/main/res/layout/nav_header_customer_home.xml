@@ -33,22 +33,17 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/txt_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="@string/point" />
+            android:text="Lam Triet" />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:background="@color/black"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thành viên ưu đãi"
-            android:textColor="@color/black"
-            android:drawableRight="@drawable/ic_chevron_right"/>
+
     </LinearLayout>
 
 </LinearLayout>

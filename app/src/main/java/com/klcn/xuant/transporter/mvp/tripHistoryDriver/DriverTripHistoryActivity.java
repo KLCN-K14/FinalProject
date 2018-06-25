@@ -24,6 +24,7 @@ import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.TripInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,17 +65,19 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
 
     private void setupInit() {
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
-        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID);
+        final Query mQuery = mData.orderByChild("dateCreated");
         mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @TargetApi(Build.VERSION_CODES.N)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot item : dataSnapshot.getChildren()){
                     TripInfo tripInfo = item.getValue(TripInfo.class);
-                    if(tripInfo.getStatus().equals(Common.trip_info_status_complete)){
+                    if(tripInfo.getStatus().equals(Common.trip_info_status_complete) &&
+                        tripInfo.getDriverId().equals(driverID)){
                         tripInfo.setKey(item.getKey());
                         tripInfos.add(tripInfo);
                     }
+                    Collections.reverse(tripInfos);
                     mAdapter = new ItemTripHistoryAdapter(getApplicationContext(), tripInfos);
                     mList.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();

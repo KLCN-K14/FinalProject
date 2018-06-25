@@ -139,17 +139,11 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
                 Toast.makeText(getApplicationContext(), "Panel about", Toast.LENGTH_LONG).show();
                 break;
             case R.id.panel_documents:
-                Toast.makeText(getApplicationContext(), "Panel document", Toast.LENGTH_LONG).show();
+                showDialogChangePassword();
                 break;
             case R.id.panel_sign_out:
-                Toast.makeText(getApplicationContext(), "Panel sign out", Toast.LENGTH_LONG).show();
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
-                    mFirebaseAuth.signOut();
-                    Intent intent = new Intent(getApplicationContext(), ChooseTypeUserActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
+                setResult(RESULT_OK,null);
+                finish();
                 break;
             case R.id.panel_waybill:
                 Toast.makeText(getApplicationContext(), "Panel waybill", Toast.LENGTH_LONG).show();
@@ -217,6 +211,10 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
                 alertDialogAndroid1.show();
                 break;
         }
+    }
+
+    private void showDialogChangePassword() {
+
     }
 
     //Change avatar

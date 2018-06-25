@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,6 +45,10 @@ import com.klcn.xuant.transporter.remote.IGoogleAPI;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -117,6 +124,7 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void onAnimationEnd(Animation animation) {
                 addDriverAvailable();
+                sendMessageCancelRequest();
                 finish();
             }
 
@@ -132,7 +140,8 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         if(getIntent()!=null){
              lat = Double.parseDouble(getIntent().getStringExtra("lat").toString());
              lng = Double.parseDouble(getIntent().getStringExtra("lng").toString());
-             destination = getIntent().getStringExtra("destination");
+             mTxtYourDestination.setText(getNameAdress(lat,lng).toUpperCase());
+            destination = getIntent().getStringExtra("destination");
              customerId = getIntent().getStringExtra("customerId");
             getDirection(lat,lng,destination);
         }
@@ -221,7 +230,6 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                                 calculateFare(distance,time);
 
                                 String address = legsObject.getString("start_address");
-                                mTxtYourDestination.setText(address.toUpperCase());
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -249,6 +257,8 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
             break;
 
             case R.id.btn_accept_pickup_request:
+                sendMessageAccept();
+
                 DatabaseReference pickupRequest = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
                 PickupRequest pickupRequest1 = new PickupRequest();
                 pickupRequest1.setLatPickup(String.valueOf(lat));
@@ -275,6 +285,44 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
+    private void sendMessageAccept() {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
+
+        tokens.orderByKey().equalTo(customerId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postData: dataSnapshot.getChildren()){
+                            Token token = postData.getValue(Token.class);
+                            Notification notification = new Notification("DriverAccept","Your driver accept your request!");
+                            Sender sender = new Sender(token.getToken(),notification);
+                            mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
+                                @Override
+                                public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                    if(response.body().success == 1){
+                                        Log.e("MessageCancelRequest","Success");
+                                    }
+                                    else{
+                                        Log.e("MessageCancelRequest",response.message());
+                                        Log.e("MessageCancelRequest",response.errorBody().toString());
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<FCMResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
     private void sendMessageCancelRequest() {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
@@ -293,7 +341,6 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                                         Log.e("MessageCancelRequest","Success");
                                     }
                                     else{
-                                        Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG).show();
                                         Log.e("MessageCancelRequest",response.message());
                                         Log.e("MessageCancelRequest",response.errorBody().toString());
                                     }
@@ -317,7 +364,10 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onResume() {
+        mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.notification);
+        mediaPlayer.setLooping(true);
         mediaPlayer.start();
+
         IntentFilter intentFilter = new IntentFilter(
                 "android.intent.action.MAIN");
 
@@ -356,6 +406,24 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     protected void onPause() {
         mediaPlayer.release();
         super.onPause();
+    }
+
+    private String getNameAdress(double lat, double lng) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat,lng, 1);
+            if(!addresses.isEmpty()){
+                Address obj = addresses.get(0);
+                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+                return namePlacePickup;
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return "";
     }
 
     private void calculateFare(Double distance, Double time) {

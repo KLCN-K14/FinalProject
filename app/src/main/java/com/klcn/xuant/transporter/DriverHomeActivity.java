@@ -61,16 +61,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.Token;
+import com.klcn.xuant.transporter.model.TripInfo;
 import com.klcn.xuant.transporter.mvp.history.CustomerHistoryActivity;
 import com.klcn.xuant.transporter.mvp.profile.CustomerProfileActivity;
 import com.klcn.xuant.transporter.receiver.NetworkStateReceiver;
 import com.suke.widget.SwitchButton;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import butterknife.BindView;
@@ -94,6 +97,7 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
 
     private static final int PLAY_SERVICE_RES_REQUEST = 7001;
     private static final int REQUEST_HAVE_TRIP = 7002;
+    private static final int REQUEST_ACTIVITY_ACCOUNT = 7003;
     private static final int MY_PERMISSION_REQUEST_CODE = 7000;
 
     private LocationRequest mLocationRequest;
@@ -124,10 +128,13 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
 
     @BindView(R.id.root_layout)
     CoordinatorLayout mRoot;
-    TextView mTxtPercentAcceptance,mTxtPercentCancellation,mTxtRatings;
+    TextView mTxtPercentAcceptance,mTxtPercentCancellation,mTxtRatings,
+            mTxtNameServiceBottom,mTxtNameCarBottom,mTxtLicensePlateBottom,
+            mTxtAcceptBottom,mTxtCancelBottom;
     BottomSheetBehavior bottomSheetBehavior;
 
     Driver mDriver;
+    ArrayList<TripInfo> tripInfos;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -201,8 +208,12 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
                 }
             }
         });
+        mDriver = new Driver();
+        tripInfos = new ArrayList<>();
+
         driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         getInfoDriver();
+        getTripInfo();
 
         final View llBottomSheet = (View) findViewById(R.id.bottom_sheet_driver);
 
@@ -210,10 +221,73 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
         mTxtPercentAcceptance = llBottomSheet.findViewById(R.id.txt_percent_accecpt);
         mTxtRatings = llBottomSheet.findViewById(R.id.txt_rating);
         mTxtPercentCancellation = llBottomSheet.findViewById(R.id.txt_percent_cancellation);
+        mTxtNameServiceBottom = llBottomSheet.findViewById(R.id.txt_name_service);
+        mTxtLicensePlateBottom = llBottomSheet.findViewById(R.id.txt_license_plate);
+        mTxtNameCarBottom = llBottomSheet.findViewById(R.id.txt_name_car);
+        mTxtAcceptBottom = llBottomSheet.findViewById(R.id.txt_percent_accecpt);
+        mTxtCancelBottom = llBottomSheet.findViewById(R.id.txt_percent_cancellation);
 
         networkStateReceiver = new NetworkStateReceiver();
         networkStateReceiver.addListener(this);
         this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void getTripInfo() {
+        tripInfos = new ArrayList<>();
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
+        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID);
+        mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot item : dataSnapshot.getChildren()){
+                    TripInfo tripInfo = item.getValue(TripInfo.class);
+                    tripInfo.setKey(item.getKey());
+                    tripInfos.add(tripInfo);
+                }
+                mTxtAcceptBottom.setText(getAcceptTrip());
+                mTxtCancelBottom.setText(getCancelTrip());
+                mQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private String getCancelTrip() {
+        int count = 0, countCompleted = 0;
+        for(int i=0;i<tripInfos.size();i++){
+            if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete)
+                    || tripInfos.get(i).getStatus().equals(Common.trip_info_status_driver_cancel)){
+                count++;
+                if(tripInfos.get(i).equals(Common.trip_info_status_driver_cancel))
+                    countCompleted++;
+            }
+        }
+
+        if(count==0)
+            return "0%";
+
+        Double percent = Double.valueOf(countCompleted/count);
+        return percent.intValue()+"%";
+    }
+
+    private String getAcceptTrip() {
+        int count = 0, countCompleted = 0;
+        for(int i=0;i<tripInfos.size();i++){
+            if(tripInfos.get(i).equals(Common.trip_info_status_complete))
+                countCompleted++;
+            if(tripInfos.get(i).equals(Common.trip_info_status_driver_cancel) ||
+                    tripInfos.get(i).equals(Common.trip_info_status_complete))
+                count++;
+        }
+        if(count==0)
+            return "100%";
+
+        Double percent = Double.valueOf(countCompleted/count);
+        return percent.intValue()+"%";
     }
 
     private void getInfoDriver(){
@@ -225,6 +299,11 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
                             mDriver = dataSnapshot.getValue(Driver.class);
                             mTxtNameDriver.setText(mDriver.getName().toUpperCase());
                             mTxtNameService.setText(mDriver.getServiceVehicle());
+                            mTxtNameServiceBottom.setText(mDriver.getServiceVehicle());
+                            mTxtLicensePlateBottom.setText(mDriver.getLicensePlate().toUpperCase());
+                            mTxtNameCarBottom.setText(mDriver.getNameVehicle().toUpperCase());
+                            Double rating = Double.valueOf(mDriver.getAvgRatings().replace(",","."));
+                            mTxtRatings.setText(String.format("%.1f",rating));
                             RequestOptions options = new RequestOptions()
                                     .centerCrop()
                                     .placeholder(R.drawable.avavtar)
@@ -245,19 +324,22 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
     private void updateOffline() {
         HashMap<String,Object> maps = new HashMap<>();
         maps.put("isOnline",false);
-        FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .updateChildren(maps);
+        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+            FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .updateChildren(maps);
 
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);
 
-        GeoFire geoFire = new GeoFire(ref);
-        geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
-            @Override
-            public void onComplete(String key, DatabaseError error) {
-            }
-        });
+            GeoFire geoFire = new GeoFire(ref);
+            geoFire.removeLocation(userId, new GeoFire.CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+                }
+            });
+        }
+
     }
 
     private void updateOnline() {
@@ -591,6 +673,19 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_HAVE_TRIP){
             onTrip = false;
+        }else{
+            if(requestCode == REQUEST_ACTIVITY_ACCOUNT){
+                if(resultCode == RESULT_OK){
+                    updateOffline();
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        FirebaseAuth.getInstance().signOut();
+                        Intent intent = new Intent(getApplicationContext(), ChooseTypeUserActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            }
         }
     }
 
@@ -644,6 +739,8 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onResume() {
         super.onResume();
+
+        getTripInfo();
 
         if (isFirstTime){
             isFirstTime = false;
@@ -756,8 +853,9 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
             startActivity(intentHistory);
         } else if (id == R.id.navigation_account) {
             Intent intentHistory = new Intent(DriverHomeActivity.this, DriverAccountActivity.class);
-            startActivity(intentHistory);
+            startActivityForResult(intentHistory,REQUEST_ACTIVITY_ACCOUNT);
         }else if (id == R.id.nav_sign_out) {
+            updateOffline();
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 FirebaseAuth.getInstance().signOut();
@@ -771,4 +869,6 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }

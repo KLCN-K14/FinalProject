@@ -35,7 +35,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/txt_status_rate"
         android:layout_marginTop="20dp"
-        android:progressTint="@color/white"
+        android:progressTint="@color/red"
         android:id="@+id/rating_bar"
         />
     <EditText
@@ -59,13 +59,13 @@
         android:id="@+id/btn_confirm"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_alignParentBottom="true"
         android:textStyle="bold"
         android:textColor="@color/black"
-        android:layout_alignParentBottom="true"
         android:background="@drawable/btn_cancel_find_driver"
         android:textSize="20sp"
+        android:layout_marginBottom="20dp"
         android:text="CONFIRM"
         />
-
 </RelativeLayout>

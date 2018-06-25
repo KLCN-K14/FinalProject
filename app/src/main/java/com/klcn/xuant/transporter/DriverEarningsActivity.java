@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,13 +30,13 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.TripInfo;
+import com.klcn.xuant.transporter.mvp.invitesDriver.DriverInvitesActivity;
+import com.klcn.xuant.transporter.mvp.payStatementDriver.DriverPayStatementActivity;
 import com.klcn.xuant.transporter.mvp.tripHistoryDriver.DriverTripHistoryActivity;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -72,6 +73,7 @@ public class DriverEarningsActivity extends AppCompatActivity implements View.On
 
     String driverID = "";
     ArrayList<TripInfo> tripInfos;
+    String totalPayout = "";
 
     public static DriverEarningsActivity newInstance() {
         DriverEarningsActivity fragment = new DriverEarningsActivity();
@@ -111,7 +113,6 @@ public class DriverEarningsActivity extends AppCompatActivity implements View.On
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
         final Query mQuery = mData.orderByChild("driverId").equalTo(driverID);
         mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @TargetApi(Build.VERSION_CODES.N)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot item : dataSnapshot.getChildren()){
@@ -190,9 +191,6 @@ public class DriverEarningsActivity extends AppCompatActivity implements View.On
         mBarChart.setDescription("");
         mBarChart.setDrawValueAboveBar(true);
 
-
-
-
     }
 
     private String getPayoutWeek() {
@@ -209,6 +207,7 @@ public class DriverEarningsActivity extends AppCompatActivity implements View.On
         for(int i=0;i<list.size();i++){
             sum+= Float.valueOf(list.get(i).getFixedFare())/1000;
         }
+        Log.e("Sum",String.valueOf(sum));
 
         return "VND "+String.valueOf(sum.intValue())+"K";
     }
@@ -218,7 +217,7 @@ public class DriverEarningsActivity extends AppCompatActivity implements View.On
         for(int i=0;i<tripInfos.size();i++){
             sum+= Float.valueOf(tripInfos.get(i).getFixedFare())/1000;
         }
-
+        totalPayout = "VND "+String.valueOf(sum.intValue())+"K";
         return "Total payout: VND "+String.valueOf(sum.intValue())+"K";
     }
 
@@ -238,7 +237,7 @@ public class DriverEarningsActivity extends AppCompatActivity implements View.On
             sum+= Float.valueOf(list.get(i).getFixedFare())/1000;
         }
         DecimalFormat decimalFormat = new DecimalFormat("#.#");
-
+        Log.e("day"+day,String.valueOf(sum));
         return Float.valueOf(decimalFormat.format(sum));
     }
 
@@ -251,6 +250,7 @@ public class DriverEarningsActivity extends AppCompatActivity implements View.On
                 break;
             case R.id.panel_pay_statement:
                 Intent intentPayStatement = new Intent(this,DriverPayStatementActivity.class);
+                intentPayStatement.putExtra("totalPayout",totalPayout);
                 startActivity(intentPayStatement);
                 break;
             case R.id.panel_trip_history:

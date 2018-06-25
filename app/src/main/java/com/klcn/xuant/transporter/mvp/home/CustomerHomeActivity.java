@@ -179,7 +179,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
 
-    TextView mTxtPhone;
+    TextView mTxtPhone,mTxtName;
     CircleImageView mAvatar;
 
     HashMap<String,Marker> hashMapMarker = new HashMap<>();
@@ -214,6 +214,7 @@ public class CustomerHomeActivity extends AppCompatActivity
 
         View header = navigationView.getHeaderView(0);
         mTxtPhone = (TextView) header.findViewById(R.id.txt_phone);
+        mTxtName = (TextView) header.findViewById(R.id.txt_name);
         mAvatar = (CircleImageView) header.findViewById(R.id.img_avatar_nav);
 
         getWindow().setFlags(
@@ -347,17 +348,18 @@ public class CustomerHomeActivity extends AppCompatActivity
         ((EditText)pickPickupPlace.getView().findViewById(R.id.place_autocomplete_search_input)).setTextSize(16.0f);
         ((View)findViewById(R.id.place_autocomplete_search_button)).setVisibility(View.GONE);
         ((View)findViewById(R.id.place_autocomplete_clear_button)).setVisibility(View.GONE);
-        pickPickupPlace.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                Log.e("CustomerHomeActivity"," "+place.getName());
-            }
-
-            @Override
-            public void onError(Status status) {
-                Log.e("error:::::"," "+status);
-            }
-        });
+        pickPickupPlace.getView().setEnabled(false);
+//        pickPickupPlace.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+//            @Override
+//            public void onPlaceSelected(Place place) {
+//                Log.e("CustomerHomeActivity"," "+place.getName());
+//            }
+//
+//            @Override
+//            public void onError(Status status) {
+//                Log.e("error:::::"," "+status);
+//            }
+//        });
 
         //Bạn muốn đi đâu
         pickDestination = (PlaceAutocompleteFragment)
@@ -1005,6 +1007,7 @@ public class CustomerHomeActivity extends AppCompatActivity
                             mCustomer = dataSnapshot.getValue(Customer.class);
                             if(mCustomer.getPhoneNum()!=null){
                                 mTxtPhone.setText(mCustomer.getPhoneNum());
+                                mTxtName.setText(mCustomer.getName());
                                 RequestOptions options = new RequestOptions()
                                         .centerCrop()
                                         .placeholder(R.drawable.avavtar)

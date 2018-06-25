@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.klcn.xuant.transporter.CustomerTrackingActivity;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.ArcProgressAnimation;
@@ -43,6 +44,7 @@ import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
+import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
 import com.klcn.xuant.transporter.remote.IFCMService;
 import com.skyfishjy.library.RippleBackground;
 
@@ -212,11 +214,11 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                 if(!isDriverFound && radius<=LIMIT_RANGE){
                     radius++;
                     findDriver(lat,lng);
-                }else{
+                }else {
                     final Intent resultIntent = new Intent();
 
                     // finish when don't have any driver available
-                    if(driverID.equals("")){
+                    if (driverID.equals("")) {
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             @Override
@@ -224,46 +226,8 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                                 setResult(RESULT_CANCELED, resultIntent);
                                 finish();
                             }
-                        },2000);
-                    }else{
-                        // auto finish when driver not response after 15s
-
-                        // if driver response
-                        FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl)
-                                .addChildEventListener(new ChildEventListener() {
-                                    @Override
-                                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                                        if(dataSnapshot.getKey().equals(driverID)){
-                                            setResult(RESULT_OK, resultIntent);
-                                            resultIntent.putExtra("driverID", driverID);
-                                            Log.e("DRIVER",driverID);
-                                            finish();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                                    }
-
-                                    @Override
-                                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-                                    }
-
-                                    @Override
-                                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-
+                        }, 2000);
                     }
-
                 }
             }
 
@@ -339,13 +303,20 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         txtNameDriver.setText(mDriver.getName());
         txtNameCar.setText(mDriver.getNameVehicle());
         txtLicensePlate.setText(mDriver.getLicensePlate());
-        ratingBar.setRating(Float.valueOf(mDriver.getAvgRatings()));
+        ratingBar.setRating(Float.valueOf(mDriver.getAvgRatings().replace(",",".")));
 
         try{
             dialog.show();
         }catch (Exception e){
             Log.e("FindDriver",e.getMessage());
         }
+
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            mTxtNameDriverFound.setText("No response. Stop find driver");
+            Handler newHandler = new Handler();
+            newHandler.postDelayed(()-> finish(),1000);
+        },15000);
     }
 
     private void sendRequestToDriver(String key) {
@@ -512,8 +483,11 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                             findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
                         }
                     },2000);
-                }else if(intent.getStringExtra("DriverAccpet")!=null){
-
+                }else if(intent.getStringExtra("DriverAccept")!=null){
+                    Intent resultIntent = new Intent();
+                    CustomerFindDriverActivity.this.setResult(RESULT_OK, resultIntent);
+                    resultIntent.putExtra("driverID", driverID);
+                    finish();
                 }
 
             }

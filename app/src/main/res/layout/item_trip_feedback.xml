@@ -5,8 +5,8 @@
     android:id="@+id/message_single_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    android:layout_marginBottom="20dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
     >
     <RelativeLayout
         android:layout_width="match_parent"
@@ -26,10 +26,11 @@
         <RatingBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:rating="5"
+            android:rating="4"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/txt_content_feedback"
             android:progressTint="@color/colorYellow"
+            android:isIndicator="true"
             android:id="@+id/rating_bar"
             />
 
@@ -38,6 +39,7 @@
             android:layout_height="wrap_content"
             android:text="22 Mar 2017, 10:53PM"
             android:maxLines="3"
+            android:id="@+id/txt_time"
             android:gravity="center"
             android:layout_marginBottom="20dp"
             android:layout_centerHorizontal="true"

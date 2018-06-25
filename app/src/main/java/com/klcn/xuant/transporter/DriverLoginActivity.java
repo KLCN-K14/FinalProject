@@ -32,6 +32,9 @@ import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.Driver;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
@@ -51,6 +54,9 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
 
     @BindView(R.id.btn_register)
     Button mBtnRegister;
+
+    @BindView(R.id.txt_forgot_pass)
+    TextView mTxtForgotPass;
 
     private int REQUEST_REGISTER_CODE = 2896;
 
@@ -93,6 +99,7 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
 
         // Init view
         mBtnSignIn.setOnClickListener(this);
+        mTxtForgotPass.setOnClickListener(this);
         mBtnRegister.setOnClickListener(this);
     }
 
@@ -106,7 +113,10 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_sign_in:
-                    showSignInDialog();
+                showSignInDialog();
+                break;
+            case R.id.txt_forgot_pass:
+                showForgotPassDialog();
                 break;
             case R.id.btn_register:
                 Intent intent = new Intent(DriverLoginActivity.this,DriverRegisterActivity.class);
@@ -128,122 +138,64 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void showRegisterDialog() {
+    private void showForgotPassDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("REGISTER");
-        builder.setMessage("Please user email to register");
+        builder.setTitle("FORGOT PASSWORD");
+        builder.setMessage("Enter your email address");
         builder.setCancelable(true);
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        View registerLayout = inflater.inflate(R.layout.layout_register_driver,null);
+        View registerLayout = inflater.inflate(R.layout.layout_forgot_password,null);
 
         builder.setView(registerLayout);
         final AlertDialog dialog;
         dialog = builder.create();
 
-        final MaterialEditText editEmail = registerLayout.findViewById(R.id.edt_email_register);
-        final MaterialEditText editPassword = registerLayout.findViewById(R.id.edt_pass_register);
-        final MaterialEditText editName = registerLayout.findViewById(R.id.edt_name_register);
-        final MaterialEditText editPhone = registerLayout.findViewById(R.id.edt_phone_register);
-        final TextView txtRegister = registerLayout.findViewById(R.id.txt_register);
+        final MaterialEditText editEmail = registerLayout.findViewById(R.id.edt_email_sign_in);
+        final TextView txtReset = registerLayout.findViewById(R.id.txt_reset);
         final TextView txtCancel = registerLayout.findViewById(R.id.txt_cancel);
 
         // Set button dialog
-        txtRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(TextUtils.isEmpty(editEmail.getText().toString())){
-                    Toast.makeText(getApplicationContext(), "Please enter email address",Toast.LENGTH_SHORT)
-                            .show();
-                }else if(TextUtils.isEmpty(editPassword.getText().toString())){
-                    Toast.makeText(getApplicationContext(), "Please enter password",Toast.LENGTH_SHORT)
-                            .show();
-                }else if(TextUtils.isEmpty(editName.getText().toString())){
-                    Toast.makeText(getApplicationContext(), "Please enter your name",Toast.LENGTH_SHORT)
-                            .show();
-                }else if(TextUtils.isEmpty(editPhone.getText().toString())){
-                    Toast.makeText(getApplicationContext(), "Please enter phone number",Toast.LENGTH_SHORT)
-                            .show();
-                }else if(editPassword.getText().toString().length()<6){
-                    Toast.makeText(getApplicationContext(), "Password too short",Toast.LENGTH_SHORT)
-                            .show();
-                }else {
-                    final SpotsDialog waitingDialog = new SpotsDialog(DriverLoginActivity.this);
-
-                    mFirebaseAuth.createUserWithEmailAndPassword(editEmail.getText().toString(),editPassword.getText().toString())
-                            .addOnCompleteListener(DriverLoginActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if(!task.isSuccessful()){
-                                        dialog.dismiss();
-                                        Snackbar.make(mRootLayout, "Register fail! "+task.getException().getMessage(), Snackbar.LENGTH_LONG)
-                                                .show();
-                                    }else{
-                                        Driver driver = new Driver();
-                                        driver.setEmail(editEmail.getText().toString());
-                                        driver.setName(editName.getText().toString());
-                                        driver.setPhoneNum(editPhone.getText().toString());
-                                        drivers.child(mFirebaseAuth.getCurrentUser().getUid())
-                                                .setValue(driver)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        dialog.dismiss();
-                                                        waitingDialog.show();
-                                                        Handler handler = new Handler();
-                                                        handler.postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                waitingDialog.dismiss();
-                                                                Toast.makeText(getApplicationContext(), "Register success",
-                                                                        Toast.LENGTH_SHORT).show();
-                                                                Handler handler = new Handler();
-                                                                handler.postDelayed(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        Intent intentHome = new Intent(DriverLoginActivity.this, DriverHomeActivity.class);
-                                                                        startActivity(intentHome);
-                                                                        finish();
-                                                                    }
-                                                                },1000);
-                                                            }
-                                                        },2000);
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull final Exception e) {
-                                                        dialog.dismiss();
-                                                        waitingDialog.show();
-                                                        Handler handler = new Handler();
-                                                        handler.postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                waitingDialog.dismiss();
-                                                                Toast.makeText(getApplicationContext(), "Register fail"+ e.getMessage(),
-                                                                        Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        },2000);
-                                                    }
-                                                });
-                                    }
-                                }
-                            });
-
-
-                }
-            }
-        });
-
-        txtCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        txtReset.setOnClickListener(view -> {
+            if(TextUtils.isEmpty(editEmail.getText())){
+                Toast.makeText(getApplicationContext(), "Please enter your email",Toast.LENGTH_SHORT)
+                        .show();
+            }else if(!isEmailValid(editEmail.getText().toString())){
+                Toast.makeText(getApplicationContext(), "Email not valid",Toast.LENGTH_SHORT)
+                        .show();
+            }else{
+                final SpotsDialog waitingDialog = new SpotsDialog(DriverLoginActivity.this);
                 dialog.dismiss();
+                waitingDialog.show();
+
+                FirebaseAuth.getInstance().sendPasswordResetEmail(editEmail.getText().toString().trim())
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                waitingDialog.dismiss();
+                                Snackbar.make(mRootLayout,"Check your mail to reset password",Snackbar.LENGTH_LONG).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        waitingDialog.dismiss();
+                        Snackbar.make(mRootLayout,""+e.getMessage(),Snackbar.LENGTH_LONG).show();
+                    }
+                });
             }
         });
+
+        txtCancel.setOnClickListener(view -> dialog.dismiss());
 
         dialog.show();
 
+    }
+
+    public static boolean isEmailValid(String email) {
+        String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+        Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
     private void showSignInDialog() {
@@ -287,8 +239,8 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                             @Override
                                             public void run() {
                                                 waitingDialog.dismiss();
-                                                Toast.makeText(getApplicationContext(), "Sign in fail "+task.getException().getMessage(),
-                                                        Toast.LENGTH_LONG).show();
+                                                Snackbar.make(mRootLayout, ""+task.getException().getMessage(),
+                                                        Snackbar.LENGTH_LONG).show();
                                             }
                                         },2000);
 
@@ -298,8 +250,8 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                             @Override
                                             public void run() {
                                                 waitingDialog.dismiss();
-                                                Toast.makeText(getApplicationContext(), "Sign in success ",
-                                                        Toast.LENGTH_SHORT).show();
+                                                Snackbar.make(mRootLayout, "Sign in success ",
+                                                        Snackbar.LENGTH_SHORT).show();
                                                 Handler handler = new Handler();
                                                 handler.postDelayed(new Runnable() {
                                                     @Override
@@ -313,7 +265,14 @@ public class DriverLoginActivity extends AppCompatActivity implements View.OnCli
                                         },2000);
                                     }
                                 }
-                            });
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            waitingDialog.dismiss();
+                            Snackbar.make(mRootLayout, ""+e.getMessage(),
+                                    Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });

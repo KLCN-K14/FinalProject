@@ -123,8 +123,8 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="25dp"
                 android:id="@+id/img_temp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
@@ -136,9 +136,9 @@
                 android:layout_toRightOf="@id/img_temp"
                 android:layout_centerVertical="true"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:text="Waybill"/>
+                android:text="My Wallet"/>
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -154,22 +154,22 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:id="@+id/img_temp1"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_document"/>
+                android:src="@drawable/ic_change_pass"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/img_temp1"
                 android:layout_centerVertical="true"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:text="Documents"/>
+                android:text="Change Password"/>
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -185,22 +185,22 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:id="@+id/img_temp2"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_about"/>
+                android:src="@drawable/ic_support"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/img_temp2"
                 android:layout_centerVertical="true"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:text="About"/>
+                android:text="Support"/>
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -216,20 +216,20 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:id="@+id/img_temp3"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_sign_out"/>
+                android:src="@drawable/ic_logout"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/img_temp3"
                 android:layout_centerVertical="true"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:text="Sign Out"/>
             <ImageView

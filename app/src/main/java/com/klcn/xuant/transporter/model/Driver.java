@@ -5,8 +5,8 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Driver {
 
-    private String name,email,phoneNum,imgUrl,imgVehicle,serviceVehicle,nameVehicle,licensePlate,
-            avgRatings,creadits,cashBalance,inviteCode;
+    private String key,name,email,phoneNum,imgUrl,imgVehicle,serviceVehicle,nameVehicle,licensePlate,
+            avgRatings,credits,cashBalance,inviteCode;
 
     private boolean isOnline;
     private Long dateCreated;
@@ -14,7 +14,8 @@ public class Driver {
     public Driver() {
     }
 
-    public Driver(String name, String email, String phoneNum, String imgUrl, String imgVehicle, String serviceVehicle, String nameVehicle, String licensePlate, String avgRatings, String creadits, String cashBalance, String inviteCode, boolean isOnline, Long dateCreated) {
+    public Driver(String key, String name, String email, String phoneNum, String imgUrl, String imgVehicle, String serviceVehicle, String nameVehicle, String licensePlate, String avgRatings, String credits, String cashBalance, String inviteCode, boolean isOnline, Long dateCreated) {
+        this.key = key;
         this.name = name;
         this.email = email;
         this.phoneNum = phoneNum;
@@ -24,11 +25,19 @@ public class Driver {
         this.nameVehicle = nameVehicle;
         this.licensePlate = licensePlate;
         this.avgRatings = avgRatings;
-        this.creadits = creadits;
+        this.credits = credits;
         this.cashBalance = cashBalance;
         this.inviteCode = inviteCode;
         this.isOnline = isOnline;
         this.dateCreated = dateCreated;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getName() {
@@ -103,12 +112,12 @@ public class Driver {
         this.avgRatings = avgRatings;
     }
 
-    public String getCreadits() {
-        return creadits;
+    public String getCredits() {
+        return credits;
     }
 
-    public void setCreadits(String creadits) {
-        this.creadits = creadits;
+    public void setCredits(String credits) {
+        this.credits = credits;
     }
 
     public String getCashBalance() {

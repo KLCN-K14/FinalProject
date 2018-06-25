@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:text="76-G1 214.00"
-                android:id="@+id/txt_name_car"
+                android:id="@+id/txt_license_plate"
                 android:textSize="16sp"
                 android:layout_marginRight="10dp"
                 />
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:text="Yamaha Sirius RC"
-                android:id="@+id/txt_license_plate"
+                android:id="@+id/txt_name_car"
                 android:textSize="16sp"
                 android:layout_marginLeft="10dp"
                 />

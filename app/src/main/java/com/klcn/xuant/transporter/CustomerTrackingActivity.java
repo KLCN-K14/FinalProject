@@ -807,7 +807,12 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                     setupOnTrip();
 
                 }else if(intent.getStringExtra("DropOff")!=null){
-                    showFeedBackDialog();
+//                    showFeedBackDialog();
+                      Intent intentFeedBack = new Intent(CustomerTrackingActivity.this,CustomerRateActivity.class);
+                      intentFeedBack.putExtra("keyTrip",keyTrip);
+                      intentFeedBack.putExtra("driverID",mDriverID);
+                      startActivity(intentFeedBack);
+                      finish();
                 }else if(intent.getStringExtra("KeyTrip")!=null){
                     keyTrip = intent.getStringExtra("KeyTrip");
                 }else if(intent.getStringExtra("DriverCancelTrip")!=null){
@@ -835,7 +840,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     private void showFeedBackDialog() {
         isCompleteTrip = true;
         onFeedback = true;
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this,android.R.style.Theme_Holo_NoActionBar_Fullscreen);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this,android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
         builder.setCancelable(true);
 
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -874,20 +879,18 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         });
 
         // Set button dialog
-        btnConfirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                HashMap<String,Object> maps = new HashMap<>();
-                maps.put("rating",String.valueOf(ratingBar.getRating()));
-                if(!feedBack.equals("")){
-                    maps.put("feedback",feedBack);
-                }else
-                    maps.put("feedback","Nice ride!");
-                FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
-                        .updateChildren(maps);
-                dialog.dismiss();
-                finish();
-            }
+        btnConfirm.setOnClickListener(view -> {
+            HashMap<String,Object> maps = new HashMap<>();
+            String rating = String.valueOf(ratingBar.getRating());
+            maps.put("rating",rating);
+            if(!feedBack.equals("")){
+                maps.put("feedback",feedBack);
+            }else
+                maps.put("feedback","Nice ride!");
+            FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
+                    .updateChildren(maps);
+            dialog.dismiss();
+            finish();
         });
 
         dialog.show();

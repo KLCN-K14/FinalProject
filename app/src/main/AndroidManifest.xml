@@ -72,7 +72,7 @@
             android:name=".DriverRegisterActivity"
             android:theme="@style/NoActionBarDriver" />
         <activity
-            android:name=".DriverInvitesActivity"
+            android:name=".mvp.invitesDriver.DriverInvitesActivity"
             android:theme="@style/NoActionBarDriver" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -86,14 +86,14 @@
                 android:value=".DriverEarningsActivity" />
         </activity>
         <activity
-            android:name=".DriverFeedBackActivity"
+            android:name=".mvp.feedbackDriver.DriverFeedBackActivity"
             android:theme="@style/NoActionBarDriver" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DriverRatingsActivity" />
         </activity>
         <activity
-            android:name=".DriverPayStatementActivity"
+            android:name=".mvp.payStatementDriver.DriverPayStatementActivity"
             android:theme="@style/NoActionBarDriver" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -126,6 +126,12 @@
         <activity
             android:name=".mvp.findDriver.CustomerFindDriverActivity"
             android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".CustomerRateActivity"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".DriverConfirmBillActivity"
+            android:theme="@style/NoActionBarDriver" />
         <activity android:name=".mvp.confirminfo.view.ConfirmInfoActivity" />
         <activity android:name=".mvp.verifypincode.view.VerifyPincodeActivity" />
         <activity android:name=".mvp.signup.view.CustomerSignUpActivity" />
@@ -164,7 +170,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
+        <service android:name=".service.OnClearFromRecentService" android:stopWithTask="false" />
         <activity android:name=".mvp.profile.CustomerProfileActivity" />
         <activity android:name=".CancelBookActivity" />
         <activity android:name=".ChatActivity"></activity>

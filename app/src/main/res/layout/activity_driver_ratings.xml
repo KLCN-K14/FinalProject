@@ -55,7 +55,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4.82"
+                    android:text="5.0"
                     android:textColor="@color/white"
                     android:layout_marginLeft="5dp"
                     android:layout_toRightOf="@id/img_temp"
@@ -83,7 +83,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="120"
+                    android:text="0"
                     android:id="@+id/txt_total_trip"
                     android:textColor="@color/white"
                     android:textSize="20sp"
@@ -100,7 +100,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="105"
+                    android:text="0"
                     android:id="@+id/txt_accept_trip"
                     android:textColor="@color/white"
                     android:textSize="20sp"
@@ -109,7 +109,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TRIP ACCEPTED"
+                    android:text="TRIP COMPLETED"
                     android:layout_below="@id/txt_accept_trip"
                     android:textColor="@color/colorGray2"
                     android:textSize="10sp"
@@ -118,7 +118,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="85"
+                    android:text="0"
                     android:id="@+id/txt_full_star_trip"
                     android:textColor="@color/white"
                     android:textSize="20sp"
