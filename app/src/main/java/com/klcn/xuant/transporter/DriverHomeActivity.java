@@ -290,7 +290,7 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private String getCancelTrip() {
-        int count = 0, countCancel = 0;
+        double count = 0, countCancel = 0;
         for(int i=0;i<tripInfos.size();i++){
             if(tripInfos!=null){
                 if(tripInfos.get(i).getStatus()!=null){
@@ -305,23 +305,25 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
         if(count==0)
             return "0%";
 
-        Double percent = Double.valueOf(countCancel/count*100);
+        Double percent = (countCancel/count)*100;
         return percent.intValue()+"%";
     }
 
     private String getAcceptTrip() {
-        int count = 0, countCompleted = 0;
+        double count = 0, countCompleted = 0;
         for(int i=0;i<tripInfos.size();i++){
             if (tripInfos.get(i).getStatus() != null) {
-                if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete))
+                if (tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete)) {
                     countCompleted++;
+                }
                 count++;
             }
         }
+
         if(count==0)
             return "100%";
 
-        Double percent = Double.valueOf(countCompleted/count*100);
+        Double percent = (countCompleted/count)*100;
         return percent.intValue()+"%";
     }
 

@@ -3,6 +3,7 @@ package com.klcn.xuant.transporter.mvp.tripHistoryDriver;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -10,6 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,11 +39,22 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
     @BindView(R.id.list_history)
     RecyclerView mList;
 
+    @BindView(R.id.progress_bar)
+    ProgressBar mProgressBar;
+
+    @BindView(R.id.scrollView)
+    ScrollView mScrollView;
+
     String driverID;
     ArrayList<TripInfo> tripInfos;
 
+    String endAt = "";
+    int count = 0;
+    boolean isLoading = false;
+
     ItemTripHistoryAdapter mAdapter;
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +74,32 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
 
         RecyclerView.LayoutManager layoutManager =
                 new LinearLayoutManager(DriverTripHistoryActivity.this);
+
+
         mList.setLayoutManager(layoutManager);
         mList.setHasFixedSize(true);
+
+        mProgressBar.setVisibility(View.GONE);
+
+        mList.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    Log.e("Load more",String.valueOf(scrollY)+"----"+String.valueOf(oldScrollY));
+
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    isLoading = true;
+                    Handler handler = new Handler();
+                count++;
+                Log.e("Count",String.valueOf(count));
+                handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mProgressBar.setVisibility(View.GONE);
+                        }
+                    },2000);
+            }
+        });
+
         setupInit();
     }
 
@@ -93,4 +133,5 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
             }
         });
     }
+
 }

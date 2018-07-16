@@ -273,7 +273,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     public   Runnable customerNoResponse = new Runnable() {
         @Override
         public void run() {
-            Log.e("test",isCustomerResponse.toString());
             if(!isCustomerResponse){
                 dialog.dismiss();
                 mTxtNameDriverFound.setText("No response. Stop find driver");

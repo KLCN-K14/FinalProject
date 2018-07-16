@@ -845,7 +845,6 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                     Intent intent = new Intent(DriverTrackingAcitivity.this,DriverConfirmBillActivity.class);
                                     intent.putExtra("keyTrip",keyTrip);
                                     intent.putExtra("fixedFare",fixedFare);
-                                    Log.e("fixedFare",String.valueOf(fixedFare));
                                     startActivity(intent);
                                     finish();
 //                                    showPaymentDialog();

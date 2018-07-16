@@ -517,7 +517,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                                                     .flat(true)
                                                     .anchor(0.5f, 0.5f)
                                                     .rotation(bearing));
-                                            mMarker.showInfoWindow();
                                             hashMapMarker.put(dataSnapshot.getKey(),mMarker);
                                             oldLocationDriver = location;
 
@@ -599,7 +598,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                                                         .flat(true)
                                                         .anchor(0.5f, 0.5f)
                                                         .rotation(bearing));
-                                                mMarker.showInfoWindow();
 
                                                 // animate camera two point
                                                 LatLngBounds.Builder builder = new LatLngBounds.Builder();

@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -16,6 +17,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,6 +32,8 @@ import com.klcn.xuant.transporter.helper.NotificationHelper;
 import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.TripInfo;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import butterknife.BindView;
@@ -59,6 +65,9 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
 
         keyTrip = getIntent().getStringExtra("keyTrip");
         fixedFare = getIntent().getIntExtra("fixedFare",0);
+        if(fixedFare == 0){
+
+        }
 
 
         txtFixedFare.setText(String.valueOf(fixedFare*1000));
@@ -95,13 +104,70 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
                     FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
                             .updateChildren(maps);
                 }
+                checkIsTripOverLoad();
                 checkIsFirstTrip();
                 updateCreditAndCashDriver();
-
                 finish();
             }
         });
 
+    }
+
+    private void checkIsTripOverLoad() {
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
+        final Query mQuery = mData.orderByChild("driverId").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Log.e("CountTrip",String.valueOf(dataSnapshot.getChildrenCount()));
+                    if(dataSnapshot.getChildrenCount()>=200){
+                        deleteIfTripOverLoad();
+                        mQuery.removeEventListener(this);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void deleteIfTripOverLoad() {
+        ArrayList<TripInfo> tripInfos = new ArrayList<>();
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
+        final Query mQuery = mData.orderByChild("dateCreated");
+        mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot item : dataSnapshot.getChildren()){
+                    TripInfo tripInfo = item.getValue(TripInfo.class);
+                    if(tripInfo.getDriverId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                        Log.e("Key trip delete", ""+item.getKey());
+                        mData.child(item.getKey()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Log.e("Remove OverLoadTrip","Success delete ");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Remove OverLoadTrip",e.getMessage());
+                            }
+                        });
+                        break;
+                    }
+                }
+                mQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void updateCreditAndCashDriver() {
@@ -171,6 +237,7 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
     }
 
     private void checkDriverHaveInviteCode() {
+        Log.e("Driver","First Trip");
         FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -180,6 +247,7 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
                         if(dataSnapshot.exists()){
                             Driver mDriver = dataSnapshot.getValue(Driver.class);
                             if(mDriver.getInviteCode()!=null){
+                                Log.e("Driver","have invite code ---- increase money");
                                 // increase credits to driver invite
                                 // notification to driver invite
                                 getDriverInvited(mDriver.getInviteCode());
@@ -196,6 +264,7 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
     }
 
     private void getDriverInvited(String inviteCode) {
+        Log.e("Driver","getDriverInvited success");
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.drivers_tbl);
         Query query = mData.orderByKey();
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -205,6 +274,7 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
                     if(item.getKey().substring(0,10).equals(inviteCode)){
                         // send message to driver invited
                         // increase credits to driver invited
+                        Log.e("Driver","give invite code ---- increase money");
                     }
                 }
             }
