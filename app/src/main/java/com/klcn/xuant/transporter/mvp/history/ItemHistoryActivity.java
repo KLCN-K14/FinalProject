@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -32,7 +33,7 @@ import butterknife.BindView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ItemHistoryActivity extends AppCompatActivity implements View.OnClickListener {
-    ImageView mImgback;
+    ImageView mImgback,mImgTemp;
     CircleImageView mAvatarDriver;
     TextView mNameDriver, mRating, mTotal, mTime, mPickUp, mDropOff, mFeedback;
     DatabaseReference drivers;
@@ -53,6 +54,7 @@ public class ItemHistoryActivity extends AppCompatActivity implements View.OnCli
         mPickUp = (TextView) findViewById(R.id.txt_place_location);
         mDropOff = (TextView) findViewById(R.id.txt_place_destination);
         mFeedback = (TextView) findViewById(R.id.feedback_history);
+        mImgTemp = (ImageView) findViewById(R.id.img_temp);
 
         mImgback.setOnClickListener(this);
 
@@ -95,6 +97,11 @@ public class ItemHistoryActivity extends AppCompatActivity implements View.OnCli
 
         mRating.setText(rating);
         mPickUp.setText(pickup);
+
+        if(pickup.length()>30){
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(18, 45);
+            mImgTemp.setLayoutParams(layoutParams);
+        }
         mDropOff.setText(dropoff);
         mFeedback.setText(feedback);
         mTotal.setText(total);

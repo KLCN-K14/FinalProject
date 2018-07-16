@@ -23,10 +23,10 @@
     <application
         android:allowBackup="true"
         android:hardwareAccelerated="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_transport"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_transport"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
@@ -98,6 +98,13 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DriverEarningsActivity" />
+        </activity>
+        <activity
+            android:name=".DriverWalletActivity"
+            android:theme="@style/NoActionBarDriver" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DriverAccountActivity" />
         </activity>
         <activity
             android:name=".DriverTrackingAcitivity"

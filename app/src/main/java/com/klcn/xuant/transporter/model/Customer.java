@@ -7,14 +7,17 @@ public class Customer {
 
     private String name,phoneNum,email,imgUrl;
 
+    private Long dateCreated;
+
     public Customer() {
     }
 
-    public Customer(String name, String phoneNum, String email, String imgUrl) {
+    public Customer(String name, String phoneNum, String email, String imgUrl, Long dateCreated) {
         this.name = name;
-        this.email = email;
         this.phoneNum = phoneNum;
+        this.email = email;
         this.imgUrl = imgUrl;
+        this.dateCreated = dateCreated;
     }
 
     public String getName() {
@@ -47,5 +50,13 @@ public class Customer {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public Long getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Long dateCreated) {
+        this.dateCreated = dateCreated;
     }
 }

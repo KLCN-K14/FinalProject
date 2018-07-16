@@ -32,6 +32,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -68,6 +72,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -91,7 +96,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mChatSendBtn;
     private EditText mChatMessageView;
     private ImageView mBtnBack;
-
+    private CircleImageView mAvatar;
     private RecyclerView mMessagesList;
     private SwipeRefreshLayout mRefreshLayout;
 
@@ -132,6 +137,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mFCMService = Common.getFCMService();
 
         mTitleView = (TextView) findViewById(R.id.txt_title);
+        mAvatar = (CircleImageView) findViewById(R.id.img_avatar);
         mChatAddBtn = (ImageButton) findViewById(R.id.chat_add_btn);
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
@@ -158,6 +164,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             if(dataSnapshot.exists()){
                                 Driver driver = dataSnapshot.getValue(Driver.class);
                                 imgUrl = driver.getImgUrl();
+                                RequestOptions options = new RequestOptions()
+                                        .centerCrop()
+                                        .placeholder(R.drawable.default_avatar)
+                                        .error(R.drawable.default_avatar)
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .priority(Priority.HIGH);
+                                Glide.with(getApplicationContext()).load(imgUrl).apply(options).into(mAvatar);
+
                                 mAdapter = new ChatRecyclerAdapter(messagesList,imgUrl);
                                 mMessagesList.setAdapter(mAdapter);
                                 mAdapter.notifyDataSetChanged();
@@ -180,6 +194,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }else if(getIntent().getStringExtra("driver")!=null){
             // Chat này đến từ driver
             fromCustomer = false;
+            mBtnBack.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_back_driver_24dp));
             mChatToolbar.setBackgroundColor(getResources().getColor(R.color.colorNavigation));
             mTitleView.setTextColor(getResources().getColor(R.color.colorActiveNavigation));
             FirebaseDatabase.getInstance().getReference(Common.customers_tbl).child(mChatUser)
@@ -192,7 +207,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 mAdapter = new ChatRecyclerAdapter(messagesList,imgUrl);
                                 mMessagesList.setAdapter(mAdapter);
                                 mAdapter.notifyDataSetChanged();
-
+                                RequestOptions options = new RequestOptions()
+                                        .centerCrop()
+                                        .placeholder(R.drawable.default_avatar)
+                                        .error(R.drawable.default_avatar)
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .priority(Priority.HIGH);
+                                Glide.with(getApplicationContext()).load(imgUrl).apply(options).into(mAvatar);
                                 mMessagesList.scrollToPosition(messagesList.size() - 1);
 
                                 mRefreshLayout.setRefreshing(false);
@@ -228,7 +249,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         loadMessages();
 
-        mTitleView.setText(userName.toUpperCase());
+        mTitleView.setText(userName);
 
         mChatSendBtn.setOnClickListener(this);
         mChatAddBtn.setOnClickListener(this);

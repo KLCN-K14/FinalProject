@@ -10,15 +10,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +32,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,9 +45,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.utils.ConvertBitmap;
 import com.klcn.xuant.transporter.utils.Utility;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -80,13 +85,15 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
     RelativeLayout mPanelAbout;
     @BindView(R.id.panel_sign_out)
     RelativeLayout mPanelSignOut;
+    @BindView(R.id.container)
+    LinearLayout mRoot;
     @BindView(R.id.img_avatar_car)
     CircleImageView mImgVehicle;
 
     FirebaseAuth mFirebaseAuth;
     String encodedString = "";
-    DatabaseReference drivers;
-
+    DatabaseReference mDBDriver;
+    Driver mDriver;
     FirebaseStorage storage;
     StorageReference storageReference;
     private Uri filePath;
@@ -95,6 +102,8 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
     private String userChoosenTask;
 
     private boolean isChangeAvatar = false;
+
+    String serviceVehicle = "";
 
 
 
@@ -123,7 +132,8 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
         mTxtEdit.setOnClickListener(this);
         mTxtEditCar.setOnClickListener(this);
 
-        drivers = FirebaseDatabase.getInstance().getReference().child(Common.drivers_tbl).child(mFirebaseAuth.getCurrentUser().getUid());
+        mDBDriver = FirebaseDatabase.getInstance().getReference().child(Common.drivers_tbl)
+                .child(mFirebaseAuth.getCurrentUser().getUid());
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -132,11 +142,14 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
     }
 
 
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.panel_about:
-                Toast.makeText(getApplicationContext(), "Panel about", Toast.LENGTH_LONG).show();
+
+                
+
                 break;
             case R.id.panel_documents:
                 showDialogChangePassword();
@@ -146,7 +159,8 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
                 finish();
                 break;
             case R.id.panel_waybill:
-                Toast.makeText(getApplicationContext(), "Panel waybill", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this,DriverWalletActivity.class);
+                startActivity(intent);
                 break;
             case R.id.img_avatar:
                 isChangeAvatar = true;
@@ -158,17 +172,31 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
                 break;
             case R.id.txt_edit:
                 LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
-                View mView = layoutInflaterAndroid.inflate(R.layout.input_dialog, null);
+                View mView = layoutInflaterAndroid.inflate(R.layout.layout_change_name_driver, null);
                 AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
                 alertDialogBuilderUserInput.setView(mView);
+                alertDialogBuilderUserInput.setTitle("CHANGE NAME");
 
-                final EditText userInputDialogEditText = (EditText) mView.findViewById(R.id.userInputDialog);
+                final MaterialEditText userInputDialogEditText =  mView.findViewById(R.id.userInputDialog);
+
+                userInputDialogEditText.setText(mDriver.getName().toString());
                 alertDialogBuilderUserInput
                         .setCancelable(false)
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogBox, int id) {
                                 mTxtName.setText(userInputDialogEditText.getText().toString());
-                                drivers.child("name").setValue(mTxtName.getText().toString());
+                                mDBDriver.child("name").setValue(mTxtName.getText().toString())
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Snackbar.make(mRoot,"Update Success",Snackbar.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar.make(mRoot,""+e.getMessage(),Snackbar.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
                         })
 
@@ -181,22 +209,43 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
 
                 AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
                 alertDialogAndroid.show();
+
+
                 break;
             case R.id.txt_edit_car:
                 LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
-                View view1 = layoutInflater.inflate(R.layout.dialog_change_car, null);
+                View view1 = layoutInflater.inflate(R.layout.layout_change_car_driver, null);
                 AlertDialog.Builder alertDialogBuilderUserInput1 = new AlertDialog.Builder(this);
                 alertDialogBuilderUserInput1.setView(view1);
+                alertDialogBuilderUserInput1.setTitle("CHANGE VEHICLE");
 
-                final EditText userInputDialogEditText1 = (EditText) view1.findViewById(R.id.userInputDialog);
-                final EditText licensePlateInput= (EditText) view1.findViewById(R.id.edit_license_plate);
+                final MaterialEditText userInputDialogEditText1 = (MaterialEditText) view1.findViewById(R.id.userInputDialog);
+                final MaterialEditText licensePlateInput= (MaterialEditText) view1.findViewById(R.id.edit_license_plate);
+
+                userInputDialogEditText1.setText(mDriver.getNameVehicle().toString());
+                licensePlateInput.setText(mDriver.getLicensePlate().toString());
+                final MaterialSpinner spinnerService= (MaterialSpinner) view1.findViewById(R.id.spinner_service);
                 alertDialogBuilderUserInput1
                         .setCancelable(false)
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogBox, int id) {
                                 mTxtNameCar.setText(userInputDialogEditText1.getText().toString());
-                                drivers.child("nameVehicle").setValue(mTxtNameCar.getText().toString());
-                                drivers.child("licensePlate").setValue(licensePlateInput.getText().toString());
+                                mDBDriver.child("nameVehicle").setValue(mTxtNameCar.getText().toString());
+                                mDBDriver.child("licensePlate").setValue(licensePlateInput.getText().toString());
+                                HashMap<String,Object> map = new HashMap<>();
+                                map.put("serviceVehicle",serviceVehicle);
+                                mDBDriver.updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Snackbar.make(mRoot,"Update Success",Snackbar.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar.make(mRoot,""+e.getMessage(),Snackbar.LENGTH_SHORT).show();
+                                    }
+                                });
+
                             }
                         })
 
@@ -207,6 +256,26 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
                                     }
                                 });
 
+                spinnerService.setItems("Transport Standard", "Transport Premium");
+                spinnerService.setSelectedIndex(0);
+                if (mDriver != null) {
+                    if (mDriver.getServiceVehicle().equals(Common.service_vehicle_standard)) {
+                        spinnerService.setSelectedIndex(0);
+                        serviceVehicle = "Transport Standard";
+
+                    } else {
+                        spinnerService.setSelectedIndex(1);
+                        serviceVehicle = "Transport Standard";
+                    }
+                }
+
+                spinnerService.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+                    @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                        serviceVehicle = item;
+                    }
+                });
+
                 AlertDialog alertDialogAndroid1 = alertDialogBuilderUserInput1.create();
                 alertDialogAndroid1.show();
                 break;
@@ -214,6 +283,83 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
     }
 
     private void showDialogChangePassword() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("CHANGE PASSWORD");
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View changePassLayout = inflater.inflate(R.layout.layout_change_password,null);
+
+        builder.setView(changePassLayout);
+        final AlertDialog dialog;
+        dialog = builder.create();
+
+        final MaterialEditText oldPass =  changePassLayout.findViewById(R.id.edt_old_password);
+        final MaterialEditText newPass =  changePassLayout.findViewById(R.id.edt_new_password);
+        final MaterialEditText renewPass =  changePassLayout.findViewById(R.id.edt_renew_password);
+        final TextView txtChange =  changePassLayout.findViewById(R.id.txt_change);
+        final TextView txtCancel =  changePassLayout.findViewById(R.id.txt_cancel);
+
+        // Set button dialog
+        txtChange.setOnClickListener(view -> {
+            if(TextUtils.isEmpty(oldPass.getText())){
+                Toast.makeText(getApplicationContext(), "Please enter old password",Toast.LENGTH_SHORT)
+                        .show();
+            }else if(TextUtils.isEmpty(newPass.getText())){
+                Toast.makeText(getApplicationContext(), "Please enter new password",Toast.LENGTH_SHORT)
+                        .show();
+            }else if(TextUtils.isEmpty(renewPass.getText())){
+                Toast.makeText(getApplicationContext(), "Please confirm password",Toast.LENGTH_SHORT)
+                        .show();
+            }else if(renewPass.getText().length()<6){
+                Toast.makeText(getApplicationContext(), "Password must have more 6 charater",Toast.LENGTH_SHORT)
+                        .show();
+            }else if(!renewPass.getText().toString().equals(newPass.getText().toString())){
+                Toast.makeText(getApplicationContext(), "New password does not match",Toast.LENGTH_SHORT)
+                        .show();
+            }else{
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                AuthCredential credential = EmailAuthProvider
+                        .getCredential(FirebaseAuth.getInstance().getCurrentUser().getEmail(),
+                                oldPass.getText().toString());
+
+                user.reauthenticate(credential)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    user.updatePassword(newPass.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                dialog.dismiss();
+                                                Snackbar.make(mRoot,"Change Success",Snackbar.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(getApplicationContext(),e.getMessage().toString(),Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } else {
+
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(),e.getMessage().toString(),Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        txtCancel.setOnClickListener(view -> dialog.dismiss());
+
+        dialog.show();
 
     }
 
@@ -356,10 +502,12 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
     }
 
     private void getUserInfo() {
-        drivers.addValueEventListener(new ValueEventListener() {
+        mDBDriver.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                    mDriver = dataSnapshot.getValue(Driver.class);
+
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
                     if (map.get("name") != null)
                         mTxtName.setText(map.get("name").toString());
@@ -449,7 +597,7 @@ public class DriverAccountActivity extends AppCompatActivity implements View.OnC
                                 } else {
                                     newImg.put("imgVehicle", task.getResult().toString());
                                 }
-                                drivers.updateChildren(newImg);
+                                mDBDriver.updateChildren(newImg);
                             } else {
 
                             }

@@ -52,16 +52,25 @@
 
             </android.support.v7.widget.RecyclerView>
         </ScrollView>
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
-            android:id="@+id/txt_nobody"
-            android:text="You have not invited anyone yet"
-            android:layout_centerInParent="true"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textSize="18sp"/>
+            android:layout_below="@id/temp"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_invites">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:id="@+id/txt_nobody"
+                android:layout_centerHorizontal="true"
+                android:text="You have not invited anyone yet"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+        </RelativeLayout>
+
 
     </RelativeLayout>
 </RelativeLayout>

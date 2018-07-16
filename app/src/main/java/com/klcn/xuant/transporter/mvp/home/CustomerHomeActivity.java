@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CpuUsageInfo;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -132,6 +133,7 @@ public class CustomerHomeActivity extends AppCompatActivity
     private static int LIMIT_RANGE = 5;// 5km
 
     int distance = 1;
+    double fixedFare = 0.0;
 
     Place mPlaceDestination = null;
     GeoFire geoFire;
@@ -149,6 +151,9 @@ public class CustomerHomeActivity extends AppCompatActivity
 
     @BindView(R.id.img_current_service)
     ImageView imgCurrentService;
+
+    @BindView(R.id.ic_position)
+    ImageView imgPosition;
 
     @BindView(R.id.txt_name_current_service)
     TextView txtNameCurrentService;
@@ -246,6 +251,17 @@ public class CustomerHomeActivity extends AppCompatActivity
         mTxtPricePremium = llBottomSheet.findViewById(R.id.txt_price_premium);
         mTxtTimePremium = llBottomSheet.findViewById(R.id.txt_time_premium);
         mTxtTimeStandard = llBottomSheet.findViewById(R.id.txt_time_standard);
+
+        imgPosition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Common.mLastLocationCustomer!=null){
+                    mMap.animateCamera(CameraUpdateFactory
+                            .newLatLngZoom(new LatLng(Common.mLastLocationCustomer.getLatitude(),
+                                    Common.mLastLocationCustomer.getLongitude()),17.0f));
+                }
+            }
+        });
 
         mRltStandard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -618,7 +634,7 @@ public class CustomerHomeActivity extends AppCompatActivity
                 mUserMarker.showInfoWindow();
                 mUserMarker.setZIndex(1);
             }
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),17.0f));
 
             // load drivers available in map
             loadAllDriverAvailable();
@@ -903,6 +919,7 @@ public class CustomerHomeActivity extends AppCompatActivity
         intent.putExtra("pickup",getNameAdress(Common.mLastLocationCustomer));
         intent.putExtra("destination",mPlaceDestination.getName());
         intent.putExtra("price",txtPriceCurrentService.getText().toString());
+        intent.putExtra("fixedFare",String.valueOf(fixedFare));
         intent.putExtra("currentService",currentService);
         startActivityForResult(intent,REQUEST_CODE_FIND_DRIVER);
     }
@@ -918,7 +935,7 @@ public class CustomerHomeActivity extends AppCompatActivity
                 intent.putExtra("pickup",getNameAdress(Common.mLastLocationCustomer));
                 startActivity(intent);
             }
-            if (resultCode == Activity.RESULT_CANCELED) {
+            if (resultCode == Activity.RESULT_FIRST_USER) {
                 showNotFoundDriverDialog();
             }
         }
@@ -953,8 +970,34 @@ public class CustomerHomeActivity extends AppCompatActivity
             List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
             if(!addresses.isEmpty()){
                 Address obj = addresses.get(0);
-                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+                String namePlacePickup = "";
+//                else
+                if(obj.getSubThoroughfare()!=null)
+                    namePlacePickup = namePlacePickup + obj.getSubThoroughfare()+" "+obj.getThoroughfare()
+                            +", "+obj.getLocality()+", "+obj.getSubAdminArea();
+                else{
+                    if(obj.getThoroughfare()!=null)
+                        namePlacePickup = namePlacePickup + obj.getThoroughfare()+", "+obj.getSubLocality()+", "+obj.getSubAdminArea();
+                    else
+                        namePlacePickup = namePlacePickup + obj.getSubLocality()+", "+obj.getSubAdminArea();
+                }
+//                Log.e("getAdminArea()", "" + obj.getAdminArea());
+//                Log.e(" getCountryCode()", "" + obj.getCountryCode());
+//                Log.e(" getCountryName()", "" + obj.getCountryName());
+//                Log.e(" getFeatureName()", "" + obj.getFeatureName());
+//                Log.e(" getLocality()", "" + obj.getLocality());
+//                Log.e(" getPostalCode()", "" + obj.getPostalCode());
+//                Log.e("Addresses getPremises()", "" + obj.getPremises());
+//                Log.e(" getSubAdminArea()", "" + obj.getSubAdminArea());
+//                Log.e(" getSubLocality()", "" + obj.getSubLocality());
+//                Log.e(" getSubThoroughfare()", "" + obj.getSubThoroughfare());
+//                Log.e(" getThoroughfare()", "" + obj.getThoroughfare());
+                String api = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+mLastLocation.getLatitude()+","+mLastLocation.getLongitude()
+                        +"&key=AIzaSyAOEbw-GFk9BSzU_E8RjTKrPzO64lSxNzM";
+                if(namePlacePickup.contains("null"))
+                    return getNameAdress(mLastLocation);
                 return namePlacePickup;
+
             }
 
         } catch (IOException e) {
@@ -1118,8 +1161,12 @@ public class CustomerHomeActivity extends AppCompatActivity
         String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
         if(currentService.equals(Common.service_vehicle_standard)){
             txtPriceCurrentService.setText(textFareStandard);
+            fixedFare =fareStandard;
+
         }else{
             txtPriceCurrentService.setText(textFarePremium);
+            fixedFare =farePremium;
+
         }
         txtTimeCurrentService.setText(timeArrived);
         mTxtTimeStandard.setText(timeArrived);

@@ -112,6 +112,22 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         mediaPlayer.setLooping(true);
         mediaPlayer.start();
 
+        getInfoDriver();
+        removeDriverAvailable();
+        mService = Common.getGoogleAPI();
+        if(getIntent()!=null){
+            lat = Double.parseDouble(getIntent().getStringExtra("lat").toString());
+            lng = Double.parseDouble(getIntent().getStringExtra("lng").toString());
+            mTxtYourDestination.setText(getNameAdress(lat,lng).toUpperCase());
+            destination = getIntent().getStringExtra("destination");
+            customerId = getIntent().getStringExtra("customerId");
+            getDirection(lat,lng,destination);
+        }
+
+        mBtnAccept.setOnClickListener(this);
+        mBtnCancel.setOnClickListener(this);
+
+
         mArcProgress.setMax(15);
         ArcProgressAnimation anim = new ArcProgressAnimation(mArcProgress, 0, 15);
         anim.setDuration(15000);
@@ -123,6 +139,16 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                try {
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
+                    mediaPlayer=null;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 addDriverAvailable();
                 sendMessageCancelRequest();
                 finish();
@@ -133,21 +159,9 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
             }
         });
-        mArcProgress.startAnimation(anim);
-        getInfoDriver();
-        removeDriverAvailable();
-        mService = Common.getGoogleAPI();
-        if(getIntent()!=null){
-             lat = Double.parseDouble(getIntent().getStringExtra("lat").toString());
-             lng = Double.parseDouble(getIntent().getStringExtra("lng").toString());
-             mTxtYourDestination.setText(getNameAdress(lat,lng).toUpperCase());
-            destination = getIntent().getStringExtra("destination");
-             customerId = getIntent().getStringExtra("customerId");
-            getDirection(lat,lng,destination);
-        }
 
-        mBtnAccept.setOnClickListener(this);
-        mBtnCancel.setOnClickListener(this);
+        mArcProgress.startAnimation(anim);
+
     }
 
     private void getInfoDriver() {
@@ -397,14 +411,16 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onStop() {
-        mediaPlayer.release();
+        if(mediaPlayer!=null)
+            mediaPlayer.release();
         this.unregisterReceiver(mReceiver);
         super.onStop();
     }
 
     @Override
     protected void onPause() {
-        mediaPlayer.release();
+        if(mediaPlayer!=null)
+            mediaPlayer.release();
         super.onPause();
     }
 

@@ -50,6 +50,7 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_star_ratings"
                     android:id="@+id/img_temp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
                     />
                 <TextView

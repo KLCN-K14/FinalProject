@@ -19,6 +19,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -54,8 +55,6 @@ public class CustomerRateActivity extends AppCompatActivity{
     ArrayList<TripInfo> tripInfos;
     String keyTrip = "",driverID = "", feedBack = "Nice Trip";
 
-    Double sumRating = 0.;
-    int count = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,21 +106,31 @@ public class CustomerRateActivity extends AppCompatActivity{
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
 
-                        Double currentBase = 0.;
-                        if(mDriver!=null)
-                            currentBase = Double.valueOf(mDriver.getAvgRatings());
-                        sumRating += ratingBar.getRating();
-                        count++;
-                        if(count!=0){
-                            sumRating = sumRating/count;
-                            currentBase = (currentBase+sumRating)/2;
-                        }
+//                        Double currentBase = 0.;
+//                        if(mDriver!=null)
+//                            currentBase = Double.valueOf(mDriver.getAvgRatings().replace(",","."));
+//                        sumRating += ratingBar.getRating();
+//                        count++;
+//                        if(count!=0){
+//                            sumRating = sumRating/count;
+//                            currentBase = (currentBase+sumRating)/2;
+//                        }
 
                         HashMap<String,Object> mapRating = new HashMap<>();
-                        maps.put("avgRatings",String.format("%.1f", currentBase));
+                        mapRating.put("avgRatings",String.valueOf(getRating()));
 
                         FirebaseDatabase.getInstance().getReference(Common.drivers_tbl).child(driverID)
-                                .updateChildren(maps);
+                                .updateChildren(mapRating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Log.e("UpdateRating","Success");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("UpdateRating",""+e.getMessage());
+                            }
+                        });
                         finish();
 
                     }
@@ -154,16 +163,28 @@ public class CustomerRateActivity extends AppCompatActivity{
 
     private void getTripInfos() {
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
-        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID);
+        final Query mQuery = mData.orderByChild("dateCreated");
         mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count = 0;
+                if(dataSnapshot.hasChildren()){
+                    Log.e("getTripInfos","has child");
+                }else
+                    Log.e("getTripInfos","don't child");
+
                 for(DataSnapshot item : dataSnapshot.getChildren()){
                     TripInfo tripInfo = item.getValue(TripInfo.class);
                     tripInfo.setKey(item.getKey());
-                    tripInfos.add(tripInfo);
+                    if(tripInfo.getRating()!=null && tripInfo.getDriverId().equals(driverID)){
+                        tripInfos.add(tripInfo);
+                        count++;
+                    }
+                    if(count==100)
+                        break;
                 }
-                getRating();
+                Log.e("CountTrip","----"+String.valueOf(count));
+               // getRating();
                 mQuery.removeEventListener(this);
             }
 
@@ -174,17 +195,25 @@ public class CustomerRateActivity extends AppCompatActivity{
         });
     }
 
-    private void getRating() {
+    private double getRating() {
+        Double sumRating = 0.0;
+        int count = 0;
         if(tripInfos!=null){
             for(int i=0;i<tripInfos.size();i++){
-                if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete)){
-                    if(tripInfos.get(i).getRating()!=null){
-                        sumRating+=Double.valueOf(tripInfos.get(i).getRating());
-                        count++;
+                if(tripInfos.get(i).getStatus()!=null){
+                    if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete)){
+                        if(tripInfos.get(i).getRating()!=null){
+                            sumRating+=Double.valueOf(tripInfos.get(i).getRating());
+                            count++;
+                        }
                     }
                 }
+
             }
         }
+        sumRating += ratingBar.getRating();
+        count++;
+        return sumRating/count;
 //        return String.format("%.1f", currentBase);
     }
 }

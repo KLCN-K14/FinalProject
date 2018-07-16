@@ -27,6 +27,7 @@ import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.remote.IFCMService;
 
+import dmax.dialog.SpotsDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -113,7 +114,6 @@ public class CancelBookActivity extends AppCompatActivity implements View.OnClic
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         currentResson = charSequence.toString();
-                        Toast.makeText(getApplicationContext(),currentResson,Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -141,6 +141,8 @@ public class CancelBookActivity extends AppCompatActivity implements View.OnClic
                                     intent.putExtra("reasonCancel",currentResson);
                                     setResult(RESULT_OK, intent);
                                     sendMessageCancelTrip();
+
+
                                     finish();
                                 }
                             })

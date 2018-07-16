@@ -1,6 +1,9 @@
 package com.klcn.xuant.transporter;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -14,10 +17,16 @@ import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.helper.NotificationHelper;
+import com.klcn.xuant.transporter.model.Driver;
+import com.klcn.xuant.transporter.model.TripInfo;
 
 import java.util.HashMap;
 
@@ -86,7 +95,123 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
                     FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
                             .updateChildren(maps);
                 }
+                checkIsFirstTrip();
+                updateCreditAndCashDriver();
+
                 finish();
+            }
+        });
+
+    }
+
+    private void updateCreditAndCashDriver() {
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        mData.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Driver mDriver = dataSnapshot.getValue(Driver.class);
+                    Double cashBalance = Double.valueOf(mDriver.getCashBalance());
+                    Double credits = Double.valueOf(mDriver.getCredits());
+
+                    if(Integer.parseInt(otherToll)>1000){
+                        credits = credits - (fixedFare*1000 + (Integer.parseInt(otherToll))*Common.transport_fee);
+                        cashBalance = cashBalance + fixedFare*1000 + (Integer.parseInt(otherToll));
+                    }else{
+                        credits = credits - fixedFare*Common.transport_fee*1000;
+                        cashBalance = cashBalance + fixedFare*1000;
+                    }
+
+                    HashMap<String,Object> maps = new HashMap<>();
+                    maps.put("credits",String.valueOf(credits));
+                    maps.put("cashBalance",String.valueOf(cashBalance));
+
+                    FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .updateChildren(maps);
+
+                    mData.removeEventListener(this);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void checkIsFirstTrip() {
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
+        Query query = mData.orderByChild("driverId").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    int count = 0;
+                    for(DataSnapshot item: dataSnapshot.getChildren()){
+                        TripInfo tripInfo = item.getValue(TripInfo.class);
+                        if(tripInfo.getStatus()!=null){
+                            if(tripInfo.getStatus().equals(Common.trip_info_status_complete))
+                                count++;
+                        }
+                    }
+                    if(count == 1)
+                        checkDriverHaveInviteCode();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void checkDriverHaveInviteCode() {
+        FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @TargetApi(Build.VERSION_CODES.O)
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            Driver mDriver = dataSnapshot.getValue(Driver.class);
+                            if(mDriver.getInviteCode()!=null){
+                                // increase credits to driver invite
+                                // notification to driver invite
+                                getDriverInvited(mDriver.getInviteCode());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+    }
+
+    private void getDriverInvited(String inviteCode) {
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.drivers_tbl);
+        Query query = mData.orderByKey();
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot item: dataSnapshot.getChildren()){
+                    if(item.getKey().substring(0,10).equals(inviteCode)){
+                        // send message to driver invited
+                        // increase credits to driver invited
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
 

@@ -56,11 +56,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -90,6 +98,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -169,6 +178,12 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     @BindView(R.id.img_location)
     ImageView mImgLocation;
 
+    @BindView(R.id.ic_position)
+    ImageView mImgPosition;
+
+    @BindView(R.id.img_navigation)
+    ImageView mImgNavigation;
+
     @BindView(R.id.img_notification_message)
     ImageView mImgNotificationMessage;
 
@@ -184,7 +199,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     Driver mDriver;
     Boolean onPayment = false;
     HashMap<String,Object> mapTripInfo = new HashMap<>();
-    int fixedFare;
+    int fixedFare = 0;
     String otherToll = "0", keyTrip = "";
     boolean isCustomerCancel = false, isCompleteTrip = false;
     GeoQuery mGeoQueryCheckNear;
@@ -215,6 +230,21 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         mBtnChat.setOnClickListener(this);
         mBtnCancel.setOnClickListener(this);
         mBtnPickup.setOnClickListener(this);
+        mImgNavigation.setOnClickListener(this);
+
+        mImgPosition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Common.mLastLocationDriver!=null){
+                    CameraPosition cameraPos = new CameraPosition.Builder()
+                            .target(new LatLng(Common.mLastLocationDriver.getLatitude(),
+                                    Common.mLastLocationDriver.getLongitude()))
+                            .zoom(20.0f).bearing(bearing).tilt(30).build();
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos), null);
+                }
+
+            }
+        });
 
         animNotification = new ValueAnimator();
 
@@ -223,6 +253,10 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         mService = Common.getGoogleAPI();
         mFCMService = Common.getFCMService();
         driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        FirebaseDatabase.getInstance().getReference().child("Chat")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("onstate").setValue(false);
+
         getInfoDriver();
         //Geo Fire
         driverWorking = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
@@ -572,8 +606,11 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                         }
                     }
 
-
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
+                    CameraPosition cameraPos = new CameraPosition.Builder().target(new LatLng(latitude,longitude))
+                            .zoom(20.0f).bearing(bearing).tilt(30).build();
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos), null);
+                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
+                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
                 }
             });
 
@@ -591,6 +628,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                     "origin="+ Common.mLastLocationDriver.getLatitude()+","+Common.mLastLocationDriver.getLongitude()+"&"+
                     "destination="+customerLat+","+customerLng+"&"+
                     "key="+getResources().getString(R.string.google_direction_api);
+
             Log.e("getDirection",requestApi);
             mService.getPath(requestApi)
                     .enqueue(new Callback<String>() {
@@ -650,6 +688,18 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
             case R.id.btn_phone:
                 call(mCustomer.getPhoneNum());
                 break;
+            case R.id.img_navigation:
+                Intent navigation = new Intent(Intent.ACTION_VIEW, Uri
+                        .parse("http://maps.google.com/maps?saddr="
+                                + Common.mLastLocationDriver.getLatitude()  + ","
+                                + Common.mLastLocationDriver.getLongitude() +
+                                "&daddr="
+                                + customerLat + "," + customerLng));
+                navigation.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK&Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                navigation.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                startActivity(navigation);
+
+                break;
             case R.id.btn_chat:
                 mImgNotificationMessage.setVisibility(View.GONE);
 
@@ -681,16 +731,36 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                 HashMap<String,Object> maps = new HashMap<>();
                                 maps.put("reasonCancel",ressonCancelTrip);
                                 maps.put("status",Common.trip_info_status_driver_cancel);
-                                mTripInfoDatabase.updateChildren(maps);
-                                mPickupRequestDatabase.child(driverID).removeValue();
-                                Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
+                                mTripInfoDatabase.updateChildren(maps).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
-                                    public void run() {
-                                        waitingDialog.dismiss();
-                                        finish();
+                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                        mPickupRequestDatabase.child(driverID).removeValue();
+                                        Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                waitingDialog.dismiss();
+                                                Toast.makeText(getApplicationContext(),"Cancel success!",Toast.LENGTH_SHORT).show();
+                                                Handler newHandler = new Handler();
+                                                newHandler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        finish();
+                                                    }
+                                                },500);
+                                            }
+                                        },1000);
                                     }
-                                },1000);
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        waitingDialog.dismiss();
+                                        Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
 
                             }
                         })
@@ -775,6 +845,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                     Intent intent = new Intent(DriverTrackingAcitivity.this,DriverConfirmBillActivity.class);
                                     intent.putExtra("keyTrip",keyTrip);
                                     intent.putExtra("fixedFare",fixedFare);
+                                    Log.e("fixedFare",String.valueOf(fixedFare));
                                     startActivity(intent);
                                     finish();
 //                                    showPaymentDialog();
@@ -944,7 +1015,12 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         mGeoQueryCheckNear.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                sendArrivedNotification(mPickupRequest.getCustomerId());
+                if(!isSendNotification){
+                    isSendNotification = true;
+                    sendArrivedNotification(mPickupRequest.getCustomerId());
+                }
+
+                mGeoQueryCheckNear.removeAllListeners();
             }
 
             @Override
@@ -994,7 +1070,6 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     private void sendArrivedNotification( String customerID) {
-        mGeoQueryCheckNear.removeAllListeners();
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);
 
         tokens.orderByKey().equalTo(customerID)
@@ -1005,7 +1080,6 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                             Token token = postData.getValue(Token.class);
                             Notification notification = new Notification("Arrived","Your driver has arrived here!");
                             Sender sender = new Sender(token.getToken(),notification);
-                            if(!isSendNotification){
                                 mFCMService.sendMessage(sender).enqueue(new Callback<FCMResponse>() {
                                     @Override
                                     public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
@@ -1025,8 +1099,9 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
                                     }
                                 });
+
+                                tokens.orderByKey().equalTo(customerID).removeEventListener(this);
                             }
-                        }
                     }
 
                     @Override
@@ -1083,19 +1158,24 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
             ArrayList points = null;
             PolylineOptions polylineOptions = null;
-
             for(int i=0;i<lists.size();i++){
                 points = new ArrayList();
                 polylineOptions = new PolylineOptions();
 
                 List<HashMap<String,String>> path = lists.get(i);
-
                 for(int j=0;j<path.size();j++){
                     HashMap<String,String> point = path.get(j);
 
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat,lng);
+
+                    if(i == lists.size()-1 && j == path.size()-1){
+                        drawLastRoute(lat,lng);
+                    }
+                    if(i == 0 && j == 0){
+                        drawFirstRoute(lat,lng);
+                    }
 
                     points.add(position);
                 }
@@ -1112,6 +1192,38 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 direction = mMap.addPolyline(polylineOptions);
         }
     }
+
+    private void drawLastRoute(double lat, double lng) {
+        PolylineOptions polylineOptions = new PolylineOptions().add(new LatLng(lat,lng))
+                .add(new LatLng(customerLat,customerLng)).width(8);
+        if(isPickup)
+            polylineOptions.color(getResources().getColor(R.color.rippleEffectColor));
+        else
+            polylineOptions.color(getResources().getColor(R.color.colorActiveNavigation));
+        polylineOptions.geodesic(true);
+        polylineOptions.pattern(PATTERN_POLYGON_ALPHA);
+        mMap.addPolyline(polylineOptions);
+    }
+
+    private void drawFirstRoute(double lat, double lng) {
+        PolylineOptions polylineOptions = new PolylineOptions().add(new LatLng(lat,lng))
+                .add(new LatLng(Common.mLastLocationDriver.getLatitude(),Common.mLastLocationDriver.getLongitude()))
+                .width(8);
+        if(isPickup)
+            polylineOptions.color(getResources().getColor(R.color.rippleEffectColor));
+        else
+            polylineOptions.color(getResources().getColor(R.color.colorActiveNavigation));
+        polylineOptions.geodesic(true);
+        polylineOptions.pattern(PATTERN_POLYGON_ALPHA);
+        mMap.addPolyline(polylineOptions);
+    }
+
+    public static final int PATTERN_DASH_LENGTH_PX = 20;
+    public static final int PATTERN_GAP_LENGTH_PX = 5;
+    public static final PatternItem DOT = new Dot();
+    public static final PatternItem DASH = new Dash(PATTERN_DASH_LENGTH_PX);
+    public static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
+    public static final List<PatternItem> PATTERN_POLYGON_ALPHA = Arrays.asList(DOT, GAP);
 
     public LatLng getLocationFromAddress(Context context, String inputtedAddress) {
 
@@ -1231,6 +1343,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     private void calculateFare(Double distance, Double time) {
+
         Double realDistance = (distance/1000);
         Double realTime = time/60;
         Double hour = realTime%60;
@@ -1256,6 +1369,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 mapTripInfo.put("fixedFare",String.valueOf(fixedFare*1000));
             }
 
+            Log.e("CalculateFare",""+fixedFare);
+
             mTripInfoDatabase.updateChildren(mapTripInfo);
         }
 
@@ -1263,7 +1378,6 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     }
 
     private void getInfoTrip(double lat, double lng, String destination) {
-        Log.e("TRACKING",lat+"--"+lng+"--"+destination);
         String requestApi = null;
         try{
             requestApi = "https://maps.googleapis.com/maps/api/directions/json?"+

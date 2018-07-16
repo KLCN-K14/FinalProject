@@ -66,6 +66,7 @@
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="20dp"
+                android:id="@+id/img_distance_temp"
                 android:layout_marginLeft="3dp"
                 android:src="@drawable/icons_menu_vertical" />
 
@@ -87,18 +88,20 @@
             <TextView
                 android:id="@+id/txt_place_location"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:maxLines="2"
                 android:paddingBottom="10dp"
-                android:text="99 Nguyễn Văn Thạnh"
+                android:text="99 Nguyễn Văn Thạnh Nguyễn"
                 android:textColor="@color/colorBlack" />
 
             <TextView
                 android:id="@+id/txt_place_destination"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:paddingBottom="10dp"
+                android:maxLines="2"
                 android:text="145 Trần Não Quận 2"
                 android:textColor="@color/colorBlack" />
         </LinearLayout>

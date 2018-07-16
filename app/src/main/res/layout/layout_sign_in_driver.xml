@@ -28,22 +28,30 @@
             app:met_baseColor="@color/edtRegister"
             app:met_floatingLabel="highlight"
             app:met_primaryColor="@color/edtRegister"/>
-
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edt_pass_sign_in"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:text=""
-            android:textColor="@color/edtRegister"
-            android:textColorHint="@color/edtRegister"
-            android:textSize="20sp"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true"
+            android:theme="@style/NoActionBarDriver"
+            app:hintEnabled="false"
+            >
 
-            app:met_singleLineEllipsis="true"
-            app:met_baseColor="@color/edtRegister"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/edtRegister"/>
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edt_pass_sign_in"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:text=""
+                android:textColor="@color/edtRegister"
+                android:textColorHint="@color/edtRegister"
+                android:textSize="20sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                app:met_singleLineEllipsis="true"
+                app:met_baseColor="@color/edtRegister"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/edtRegister"/>
+        </android.support.design.widget.TextInputLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"

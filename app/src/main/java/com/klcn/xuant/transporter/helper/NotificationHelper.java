@@ -49,7 +49,7 @@ public class NotificationHelper extends ContextWrapper {
         return  new NotificationCompat.Builder(getApplicationContext(),TRANSPORT_CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setSmallIcon(R.mipmap.ic_transport)
                 .setAutoCancel(true);
     }
 }

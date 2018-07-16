@@ -31,6 +31,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -110,6 +112,8 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
     DatabaseReference driverAvailable;
     GeoFire mGeoFire;
 
+    SupportMapFragment mapFragment;
+
     float bearing = 0;
     Location oldLocation;
 
@@ -125,6 +129,9 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
 
     @BindView(R.id.txt_status)
     TextView mTxtStatus;
+
+    @BindView(R.id.ic_position)
+    ImageView mImgPosition;
 
     @BindView(R.id.root_layout)
     CoordinatorLayout mRoot;
@@ -177,22 +184,47 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mImgPosition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Common.mLastLocationDriver!=null) {
+                    mMap.animateCamera(CameraUpdateFactory
+                            .newLatLngZoom(new LatLng(Common.mLastLocationDriver.getLatitude(),
+                                    Common.mLastLocationDriver.getLongitude()), 17.0f));
+                }
+            }
+        });
+
+        mDriver = new Driver();
+        tripInfos = new ArrayList<>();
+
+        driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        getInfoDriver();
+        getTripInfo();
+
 
         mSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (isChecked) {
-                    Snackbar.make(mRoot, "You are online", Snackbar.LENGTH_SHORT).show();
-                    mTxtStatus.setText("ONLINE");
-                    mTxtStatus.setTextColor(getResources().getColor(R.color.colorActiveNavigation));
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    if (mDriver != null) {
+                        if(Double.parseDouble(mDriver.getCredits().toString())<10000){
+                            Snackbar.make(mRoot, "Your credits must greater 10k to work", Snackbar.LENGTH_SHORT).show();
+                        }else{
+                            Snackbar.make(mRoot, "You are online", Snackbar.LENGTH_SHORT).show();
+                            mTxtStatus.setText("ONLINE");
+                            mTxtStatus.setTextColor(getResources().getColor(R.color.colorActiveNavigation));
+                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-                    updateOnline();
-                    startLocationUpdate();
-                    displayLocation();
+                            updateOnline();
+                            startLocationUpdate();
+                            displayLocation();
+                        }
+                    }
                 } else {
                     Snackbar.make(mRoot, "You are offline", Snackbar.LENGTH_SHORT).show();
                     mTxtStatus.setText("OFFLINE");
@@ -208,12 +240,7 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
                 }
             }
         });
-        mDriver = new Driver();
-        tripInfos = new ArrayList<>();
 
-        driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        getInfoDriver();
-        getTripInfo();
 
         final View llBottomSheet = (View) findViewById(R.id.bottom_sheet_driver);
 
@@ -235,14 +262,20 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
     private void getTripInfo() {
         tripInfos = new ArrayList<>();
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
-        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID);
+        final Query mQuery = mData.orderByChild("dateCreated");
         mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count=0;
                 for(DataSnapshot item : dataSnapshot.getChildren()){
                     TripInfo tripInfo = item.getValue(TripInfo.class);
                     tripInfo.setKey(item.getKey());
-                    tripInfos.add(tripInfo);
+                    if(tripInfo.getDriverId().equals(driverID)){
+                        tripInfos.add(tripInfo);
+                        count++;
+                    }
+                    if(count==100)
+                        break;
                 }
                 mTxtAcceptBottom.setText(getAcceptTrip());
                 mTxtCancelBottom.setText(getCancelTrip());
@@ -257,36 +290,38 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private String getCancelTrip() {
-        int count = 0, countCompleted = 0;
+        int count = 0, countCancel = 0;
         for(int i=0;i<tripInfos.size();i++){
-            if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete)
-                    || tripInfos.get(i).getStatus().equals(Common.trip_info_status_driver_cancel)){
-                count++;
-                if(tripInfos.get(i).equals(Common.trip_info_status_driver_cancel))
-                    countCompleted++;
+            if(tripInfos!=null){
+                if(tripInfos.get(i).getStatus()!=null){
+                        count++;
+                    if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_driver_cancel))
+                        countCancel++;
+                }
             }
+
         }
 
         if(count==0)
             return "0%";
 
-        Double percent = Double.valueOf(countCompleted/count);
+        Double percent = Double.valueOf(countCancel/count*100);
         return percent.intValue()+"%";
     }
 
     private String getAcceptTrip() {
         int count = 0, countCompleted = 0;
         for(int i=0;i<tripInfos.size();i++){
-            if(tripInfos.get(i).equals(Common.trip_info_status_complete))
-                countCompleted++;
-            if(tripInfos.get(i).equals(Common.trip_info_status_driver_cancel) ||
-                    tripInfos.get(i).equals(Common.trip_info_status_complete))
+            if (tripInfos.get(i).getStatus() != null) {
+                if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete))
+                    countCompleted++;
                 count++;
+            }
         }
         if(count==0)
             return "100%";
 
-        Double percent = Double.valueOf(countCompleted/count);
+        Double percent = Double.valueOf(countCompleted/count*100);
         return percent.intValue()+"%";
     }
 
@@ -589,7 +624,7 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
                                                             .anchor(0.5f, 0.5f)
                                                             .rotation(bearing)
                                                             .title("You"));
-                                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15.0f));
+                                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
                                                 }
                                             });
                                 }
@@ -665,7 +700,8 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
         mMap.setBuildingsEnabled(false);
         mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
     }
 
     @Override

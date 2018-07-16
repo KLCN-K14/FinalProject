@@ -45,16 +45,23 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -81,6 +88,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -119,6 +127,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     @BindView(R.id.txt_name_driver)
     TextView mTxtNameDriver;
 
+    @BindView(R.id.ic_position)
+    ImageView mImgPosition;
+
     @BindView(R.id.txt_place_location)
     TextView mTxtPlaceLocation;
 
@@ -137,6 +148,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     String keyTrip = "";
 
     private GoogleMap mMap;
+    GeoQuery mGeoQuery;
     SupportMapFragment mapFragment;
 
     private LocationRequest mLocationRequest;
@@ -190,6 +202,9 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
         mFCMService = Common.getFCMService();
         mService = Common.getGoogleAPI();
+
+        FirebaseDatabase.getInstance().getReference().child("Chat")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("onstate").setValue(false);
 
         mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
 
@@ -250,6 +265,34 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mImgPosition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Common.mLastLocationCustomer!=null){
+                    if (isOnTrip) {
+                        mMap.animateCamera(CameraUpdateFactory
+                                .newLatLngZoom(new LatLng(Common.mLastLocationCustomer.getLatitude(),
+                                        Common.mLastLocationCustomer.getLongitude()), 17.0f));
+                    }else{
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                        builder.include(new LatLng(Common.mLastLocationCustomer.getLatitude(),
+                                    Common.mLastLocationCustomer.getLongitude()));
+                        builder.include(new LatLng(oldLocationDriver.latitude,
+                                oldLocationDriver.longitude));
+                        LatLngBounds bounds = builder.build();
+
+                        int width = getResources().getDisplayMetrics().widthPixels;
+                        int height = getResources().getDisplayMetrics().heightPixels;
+                        int padding = (int) (width * 0.25);
+                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                        mMap.animateCamera(cu);
+                    }
+
+                }
+
+            }
+        });
 
         mBtnCancelBook.setOnClickListener(this);
         mImgChat.setOnClickListener(this);
@@ -358,8 +401,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 if(!keyTrip.equals("")){
                     FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl).child(keyTrip)
                             .updateChildren(maps);
-                }else{
-
                 }
 
                 Handler handler = new Handler();
@@ -367,7 +408,14 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                     @Override
                     public void run() {
                         waitingDialog.dismiss();
-                        finish();
+                        Toast.makeText(getApplicationContext(),"Cancel success",Toast.LENGTH_SHORT).show();
+                        Handler newHandler = new Handler();
+                        newHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        },500);
                     }
                 },1500);
             }else if(resultCode == RESULT_CANCELED){
@@ -437,128 +485,167 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
     }
 
     private void loadDriverFound() {
-        DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
-        GeoFire gfDriverAvailable = new GeoFire(driverAvailable);
+        if(!isOnTrip){
+            DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
+            GeoFire gfDriverAvailable = new GeoFire(driverAvailable);
 
-        GeoQuery geoQuery = gfDriverAvailable.queryAtLocation(new GeoLocation(Common.mLastLocationCustomer.getLatitude(),
-                Common.mLastLocationCustomer.getLongitude()),distance);
-        geoQuery.removeAllListeners();
-        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-            @Override
-            public void onKeyEntered(String key, final GeoLocation location) {
-                if(key.equals(mDriverID)){
-                    FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
-                            .child(key)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    Driver driver = dataSnapshot.getValue(Driver.class);
-                                    Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
-                                    if(mMarker==null){
-                                        int drawable;
-                                        if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard))
-                                            drawable = R.drawable.ic_driver_standard;
-                                        else
-                                            drawable = R.drawable.ic_driver_premium;
-                                        mMarker = mMap.addMarker(new MarkerOptions()
-                                                .position(new LatLng(location.latitude,location.longitude))
-                                                .snippet(driver.getImgUrl())
-                                                .icon(BitmapDescriptorFactory.fromResource(drawable))
-                                                .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
-                                                .flat(true)
-                                                .anchor(0.5f, 0.5f)
-                                                .rotation(bearing));
-                                        hashMapMarker.put(dataSnapshot.getKey(),mMarker);
-                                        oldLocationDriver = location;
+            mGeoQuery = gfDriverAvailable.queryAtLocation(new GeoLocation(Common.mLastLocationCustomer.getLatitude(),
+                    Common.mLastLocationCustomer.getLongitude()),distance);
+            mGeoQuery.removeAllListeners();
+            mGeoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                @Override
+                public void onKeyEntered(String key, final GeoLocation location) {
+                    if(key.equals(mDriverID)){
+                        FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                                .child(key)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Driver driver = dataSnapshot.getValue(Driver.class);
+                                        Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                        if(mMarker==null){
+                                            int drawable;
+                                            if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard))
+                                                drawable = R.drawable.ic_driver_standard;
+                                            else
+                                                drawable = R.drawable.ic_driver_premium;
+                                            mMarker = mMap.addMarker(new MarkerOptions()
+                                                    .position(new LatLng(location.latitude,location.longitude))
+                                                    .snippet(driver.getImgUrl())
+                                                    .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                    .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
+                                                    .flat(true)
+                                                    .anchor(0.5f, 0.5f)
+                                                    .rotation(bearing));
+                                            mMarker.showInfoWindow();
+                                            hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                            oldLocationDriver = location;
+
+                                            // animate camera two point
+                                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                            builder.include(mMarker.getPosition());
+                                            if(mCustomerMarker!=null)
+                                                builder.include(mCustomerMarker.getPosition());
+                                            LatLngBounds bounds = builder.build();
+
+                                            int width = getResources().getDisplayMetrics().widthPixels;
+                                            int height = getResources().getDisplayMetrics().heightPixels;
+                                            int padding = (int) (width * 0.25);
+                                            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                                            mMap.animateCamera(cu);
+                                        }
+                                        Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
                                     }
-                                    Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
-                                }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
+                                    }
+                                });
+                    }
                 }
-            }
 
-            @Override
-            public void onKeyExited(String key) {
+                @Override
+                public void onKeyExited(String key) {
 //                Marker marker = hashMapMarker.get(key);
 //                if(marker!=null){
 //                    marker.remove();
 //                    hashMapMarker.remove(key);
 //                    Log.e("REMOVE",key+"  out hashMapMarker");
 //                }
-            }
-
-            @Override
-            public void onKeyMoved(final String key,final GeoLocation location) {
-                Marker marker = hashMapMarker.get(key);
-                if(marker!=null){
-                    marker.remove();
-                    hashMapMarker.remove(key);
-                    FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
-                            .child(key)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    Driver driver = dataSnapshot.getValue(Driver.class);
-                                    Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
-                                    if(oldLocationDriver!=null){
-                                        Location startingLocation = new Location("starting point");
-                                        startingLocation.setLatitude(oldLocationDriver.latitude);
-                                        startingLocation.setLongitude(oldLocationDriver.longitude);
-
-                                        //Get the target location
-                                        Location endingLocation = new Location("ending point");
-                                        endingLocation.setLatitude(location.latitude);
-                                        endingLocation.setLongitude(location.longitude);
-
-                                        bearing = startingLocation.bearingTo(endingLocation);
-                                    }
-
-                                    if(mMarker==null){
-                                        int drawable;
-                                        if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard))
-                                            drawable = R.drawable.ic_driver_standard;
-                                        else
-                                            drawable = R.drawable.ic_driver_premium;
-                                        mMarker = mMap.addMarker(new MarkerOptions()
-                                                .position(new LatLng(location.latitude,location.longitude))
-                                                .snippet(driver.getImgUrl())
-                                                .icon(BitmapDescriptorFactory.fromResource(drawable))
-                                                .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
-                                                .flat(true)
-                                                .anchor(0.5f, 0.5f)
-                                                .rotation(bearing));
-                                        hashMapMarker.put(dataSnapshot.getKey(),mMarker);
-                                        oldLocationDriver = location;
-                                    }
-                                    Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
                 }
-            }
 
-            @Override
-            public void onGeoQueryReady() {
-                if(distance<=LIMIT_RANGE){
-                    distance++;
-                    loadDriverFound();
+                @Override
+                public void onKeyMoved(final String key,final GeoLocation location) {
+                    if(!isOnTrip){
+                        Marker marker = hashMapMarker.get(key);
+                        if(marker!=null){
+                            marker.remove();
+                            hashMapMarker.remove(key);
+                            FirebaseDatabase.getInstance().getReference(Common.drivers_tbl)
+                                    .child(key)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Driver driver = dataSnapshot.getValue(Driver.class);
+                                            Marker mMarker = hashMapMarker.get(dataSnapshot.getKey());
+                                            if(oldLocationDriver!=null){
+                                                Location startingLocation = new Location("starting point");
+                                                startingLocation.setLatitude(oldLocationDriver.latitude);
+                                                startingLocation.setLongitude(oldLocationDriver.longitude);
+
+                                                //Get the target location
+                                                Location endingLocation = new Location("ending point");
+                                                endingLocation.setLatitude(location.latitude);
+                                                endingLocation.setLongitude(location.longitude);
+
+                                                bearing = startingLocation.bearingTo(endingLocation);
+                                            }
+
+
+
+
+                                            if(mMarker==null){
+                                                int drawable;
+                                                if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard))
+                                                    drawable = R.drawable.ic_driver_standard;
+                                                else
+                                                    drawable = R.drawable.ic_driver_premium;
+                                                mMarker = mMap.addMarker(new MarkerOptions()
+                                                        .position(new LatLng(location.latitude,location.longitude))
+                                                        .snippet(driver.getImgUrl())
+                                                        .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                        .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
+                                                        .flat(true)
+                                                        .anchor(0.5f, 0.5f)
+                                                        .rotation(bearing));
+                                                mMarker.showInfoWindow();
+
+                                                // animate camera two point
+                                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                                builder.include(mMarker.getPosition());
+                                                if(mCustomerMarker!=null)
+                                                    builder.include(mCustomerMarker.getPosition());
+                                                LatLngBounds bounds = builder.build();
+
+                                                int width = getResources().getDisplayMetrics().widthPixels;
+                                                int height = getResources().getDisplayMetrics().heightPixels;
+                                                int padding = (int) (width * 0.25);
+                                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                                                mMap.animateCamera(cu);
+
+                                                hashMapMarker.put(dataSnapshot.getKey(),mMarker);
+                                                oldLocationDriver = location;
+                                            }
+                                            Log.e("PUT",dataSnapshot.getKey()+"  into hashMapMarker");
+                                        }
+
+
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                        }
+                    }
                 }
-            }
 
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
+                @Override
+                public void onGeoQueryReady() {
+                    if(distance<=LIMIT_RANGE){
+                        distance++;
+                        loadDriverFound();
+                    }
+                }
 
-            }
-        });
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+
+                }
+            });
+        }
+
     }
 
     @Override
@@ -655,6 +742,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             if (mCustomerMarker != null)
                 mCustomerMarker.remove();
             if(!isOnTrip){
+
                 loadDriverFound();
                 mCustomerMarker = mMap.addMarker(new MarkerOptions()
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
@@ -699,9 +787,29 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                         .anchor(0.5f, 0.5f)
                         .rotation(bearing)
                         .title("You"));
+
+
+
+//                CameraPosition cameraPos = new CameraPosition.Builder().target(new LatLng(latitude,longitude))
+//                        .zoom(20.0f).bearing(bearing).tilt(30).build();
+//                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos), null);
+
                 getDirection();
+
+                // animate camera two point
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(new LatLng(dropOffLocation.latitude, dropOffLocation.longitude));
+                if(mCustomerMarker!=null)
+                    builder.include(mCustomerMarker.getPosition());
+                LatLngBounds bounds = builder.build();
+
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
+                int padding = (int) (width * 0.25);
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                mMap.animateCamera(cu);
             }
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
+
         } else {
             Log.e("ERROR", "Can't get your location");
         }
@@ -726,6 +834,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
         Log.e("TEST",String.valueOf(isCompleteTrip)+"-----"+String.valueOf(isDriverCancel));
         if(mGoogleApiClient!=null)
             mGoogleApiClient.disconnect();
+//        unregisterReceiver(mReceiver);
         // Remove driver when driver not available
 
     }
@@ -804,6 +913,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 //extract our message from intent
                 if(intent.getStringExtra("Pickup")!=null){
                     Toast.makeText(getApplicationContext(),intent.getStringExtra("Pickup"),Toast.LENGTH_LONG).show();
+                    mGeoQuery.removeAllListeners();
                     setupOnTrip();
 
                 }else if(intent.getStringExtra("DropOff")!=null){
@@ -974,6 +1084,13 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat,lng);
 
+                    if(i == lists.size()-1 && j == path.size()-1){
+                        drawLastRoute(lat,lng);
+                    }
+                    if(i == 0 && j == 0){
+                        drawFirstRoute(lat,lng);
+                    }
+
                     points.add(position);
                 }
 
@@ -986,6 +1103,37 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 direction = mMap.addPolyline(polylineOptions);
         }
     }
+
+    private void drawLastRoute(double lat, double lng) {
+        if(Common.mLastLocationCustomer!=null){
+            PolylineOptions polylineOptions = new PolylineOptions().add(new LatLng(lat,lng))
+                    .add(getLocationFromAddress(getApplicationContext(),mDestination)).width(8);
+            polylineOptions.color(getResources().getColor(R.color.colorActiveNavigation));
+            polylineOptions.geodesic(true);
+            polylineOptions.pattern(PATTERN_POLYGON_ALPHA);
+            mMap.addPolyline(polylineOptions);
+        }
+    }
+
+    private void drawFirstRoute(double lat, double lng) {
+        if(Common.mLastLocationCustomer!=null){
+            PolylineOptions polylineOptions = new PolylineOptions().add(new LatLng(lat,lng))
+                    .add(new LatLng(Common.mLastLocationCustomer.getLatitude(),
+                            Common.mLastLocationCustomer.getLongitude())).width(8);
+            polylineOptions.color(getResources().getColor(R.color.colorActiveNavigation));
+            polylineOptions.geodesic(true);
+            polylineOptions.pattern(PATTERN_POLYGON_ALPHA);
+            mMap.addPolyline(polylineOptions);
+        }
+
+    }
+
+    public static final int PATTERN_DASH_LENGTH_PX = 20;
+    public static final int PATTERN_GAP_LENGTH_PX = 5;
+    public static final PatternItem DOT = new Dot();
+    public static final PatternItem DASH = new Dash(PATTERN_DASH_LENGTH_PX);
+    public static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
+    public static final List<PatternItem> PATTERN_POLYGON_ALPHA = Arrays.asList(DOT, GAP);
 
     private void sendMessageCancelTrip() {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.tokens_tbl);

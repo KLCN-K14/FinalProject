@@ -10,7 +10,7 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/userInputDialog"
         android:hint="Name Vehicle"
-        android:inputType="textPassword"
+        android:inputType="text"
         android:text=""
         android:textColor="@color/edtRegister"
         android:textColorHint="@color/edtRegister"
@@ -25,7 +25,7 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/edit_license_plate"
         android:hint="License plates"
-        android:inputType="textPassword"
+        android:inputType="text"
         android:text=""
         android:textColor="@color/edtRegister"
         android:textColorHint="@color/edtRegister"

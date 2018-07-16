@@ -84,8 +84,18 @@
             android:layout_margin="15dp"
             android:id="@+id/txt_name_location"
             />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_logout"
+            android:id="@+id/img_navigation"
+            android:visibility="gone"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"/>
 
     </RelativeLayout>
+
 
     <fragment
         android:id="@+id/map"
@@ -94,6 +104,16 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/layout_name_direction"
         />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_position"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/layout_name_direction"
+        android:layout_marginTop="5dp"
+        android:id="@+id/ic_position"
+        android:layout_marginRight="5dp"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="150dp"
@@ -152,6 +172,8 @@
                         android:layout_centerInParent="true"/>
                     <ImageView
                         android:layout_width="30dp"
+                        android:visibility="gone"
+
                         android:layout_height="25dp"
                         android:id="@+id/img_notification_message"
                         android:layout_marginLeft="55dp"

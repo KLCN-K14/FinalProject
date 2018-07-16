@@ -128,10 +128,12 @@ public class DriverRatingsActivity extends AppCompatActivity implements View.OnC
         int count = 0;
         if(tripInfos!=null){
             for(int i=0;i<tripInfos.size();i++){
-                if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete))
-                {
-                    if(tripInfos.get(i).getRating().equals("5"))
-                        count++;
+                if(tripInfos.get(i).getStatus()!=null){
+                    if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete))
+                    {
+                        if(tripInfos.get(i).getRating().equals("5"))
+                            count++;
+                    }
                 }
             }
         }
@@ -144,8 +146,10 @@ public class DriverRatingsActivity extends AppCompatActivity implements View.OnC
 
         if(tripInfos!=null){
             for(int i=0;i<tripInfos.size();i++){
-                if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete))
-                    count++;
+                if (tripInfos.get(i).getStatus() != null) {
+                    if(tripInfos.get(i).getStatus().equals(Common.trip_info_status_complete))
+                        count++;
+                }
             }
         }
         return String.valueOf(count);

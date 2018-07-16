@@ -80,16 +80,18 @@ public class DriverPayStatementActivity extends AppCompatActivity{
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot item : dataSnapshot.getChildren()) {
                     TripInfo tripInfo = item.getValue(TripInfo.class);
-                    if (tripInfo.getStatus().equals(Common.trip_info_status_complete) &&
-                            tripInfo.getDriverId().equals(driverID)) {
-                        tripInfo.setKey(item.getKey());
-                        tripInfos.add(tripInfo);
+                    if (tripInfo.getStatus() != null) {
+                        if (tripInfo.getStatus().equals(Common.trip_info_status_complete) &&
+                                tripInfo.getDriverId().equals(driverID)) {
+                            tripInfo.setKey(item.getKey());
+                            tripInfos.add(tripInfo);
+                        }
                     }
-                    Collections.reverse(tripInfos);
-                    mAdapter = new ItemPayStatementAdapter(getApplicationContext(), tripInfos);
-                    mList.setAdapter(mAdapter);
-                    mAdapter.notifyDataSetChanged();
                 }
+                Collections.reverse(tripInfos);
+                mAdapter = new ItemPayStatementAdapter(getApplicationContext(), tripInfos);
+                mList.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
 
                 mQuery.removeEventListener(this);
             }

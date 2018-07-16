@@ -145,22 +145,30 @@
                 app:met_floatingLabel="highlight"
                 app:met_primaryColor="@color/edtRegister"
                 app:met_singleLineEllipsis="true" />
-
-            <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/edt_pass"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:text=""
-                android:textColor="@color/edtRegister"
-                android:textColorHint="@color/edtRegister"
-                android:textSize="20sp"
+                app:passwordToggleEnabled="true"
+                android:theme="@style/NoActionBarDriver"
+                app:hintEnabled="false"
+                >
 
-                app:met_baseColor="@color/edtRegister"
-                app:met_floatingLabel="highlight"
-                app:met_primaryColor="@color/edtRegister"
-                app:met_singleLineEllipsis="true" />
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edt_pass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:text=""
+                    android:textColor="@color/edtRegister"
+                    android:textColorHint="@color/edtRegister"
+                    android:textSize="20sp"
+
+                    app:met_baseColor="@color/edtRegister"
+                    app:met_floatingLabel="highlight"
+                    app:met_primaryColor="@color/edtRegister"
+                    app:met_singleLineEllipsis="true" />
+            </android.support.design.widget.TextInputLayout>
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/edt_name_vehicle"

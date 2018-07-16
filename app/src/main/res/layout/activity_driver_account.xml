@@ -36,7 +36,7 @@
         android:background="@color/colorPayStatement"
         android:orientation="horizontal"
         android:weightSum="2"
-        android:layout_weight="3">
+        android:layout_weight="2">
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"

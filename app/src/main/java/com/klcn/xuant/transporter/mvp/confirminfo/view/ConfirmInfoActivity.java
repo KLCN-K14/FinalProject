@@ -22,9 +22,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.mvp.home.CustomerHomeActivity;
+
+import java.util.HashMap;
 
 
 public class ConfirmInfoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -105,15 +108,24 @@ public class ConfirmInfoActivity extends AppCompatActivity implements View.OnCli
                     customer.setImgUrl(null);
                     customers.child(mFirebaseAuth.getCurrentUser().getUid())
                             .setValue(customer)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(ConfirmInfoActivity.this, "Register success", Toast.LENGTH_LONG)
-                                            .show();
-                                    Intent intent = new Intent(ConfirmInfoActivity.this, CustomerHomeActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
+                            .addOnSuccessListener(aVoid -> {
+
+                                HashMap<String,Object> maps = new HashMap<>();
+                                maps.put("dateCreated", ServerValue.TIMESTAMP);
+
+                                customers.child(mFirebaseAuth.getCurrentUser().getUid())
+                                        .updateChildren(maps)
+                                        .addOnCompleteListener(task -> {
+                                            Toast.makeText(ConfirmInfoActivity.this, "Register success", Toast.LENGTH_LONG)
+                                                    .show();
+
+                                            Intent intent = new Intent(ConfirmInfoActivity.this, CustomerHomeActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        })
+                                        .addOnFailureListener(e -> Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show());
+
+
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override

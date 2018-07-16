@@ -60,7 +60,6 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private void checkIsLogged() {
         if(FirebaseAuth.getInstance().getCurrentUser()!=null){
-            Log.e("Not null", "---------------------");
             FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -83,7 +82,6 @@ public class SplashScreenActivity extends AppCompatActivity {
                     });
 
         }else{
-            Log.e(" null", "---------------------");
             Intent intent = new Intent(getApplicationContext(), ChooseTypeUserActivity.class);
             startActivity(intent);
             finish();

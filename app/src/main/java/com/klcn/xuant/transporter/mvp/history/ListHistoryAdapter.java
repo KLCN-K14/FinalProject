@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
@@ -53,6 +55,7 @@ public class ListHistoryAdapter extends BaseAdapter {
             holder.mTxtDateTime = (TextView) view.findViewById(R.id.txt_date_time);
             holder.mStatus = (TextView) view.findViewById(R.id.trip_status);
             holder.mRating = (SimpleRatingBar) view.findViewById(R.id.ratingbar);
+            holder.mImgTemp = (ImageView) view.findViewById(R.id.img_distance_temp);
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
@@ -60,6 +63,12 @@ public class ListHistoryAdapter extends BaseAdapter {
 
         TripInfo tripInfo = this.listData.get(i);
         holder.mTxtPlaceLocation.setText(tripInfo.getPickup());
+        if(tripInfo.getPickup().length()>27){
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(18, 30);
+            holder.mImgTemp.setLayoutParams(layoutParams);
+        }
+
+
         holder.mTxtPlaceDistination.setText(tripInfo.getDropoff());
         if (tripInfo.getRating() != null)
             holder.mRating.setRating(Float.parseFloat(tripInfo.getRating()));
@@ -84,6 +93,7 @@ public class ListHistoryAdapter extends BaseAdapter {
         TextView mTxtPlaceDistination;
         TextView mTxtDateTime;
         TextView mStatus;
+        ImageView mImgTemp;
         SimpleRatingBar mRating;
     }
 }

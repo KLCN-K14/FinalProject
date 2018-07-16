@@ -9,19 +9,30 @@
 
 
 
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/userInputDialog"
-        android:hint="Name"
-        android:inputType="textPassword"
-        android:text=""
-        android:textColor="@color/edtRegister"
-        android:textColorHint="@color/edtRegister"
-        android:textSize="20sp"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/etPasswordLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:passwordToggleEnabled="true"
+        android:theme="@style/NoActionBarDriver"
+        app:hintEnabled="false"
+        >
 
-        app:met_singleLineEllipsis="true"
-        app:met_baseColor="@color/edtRegister"
-        app:met_floatingLabel="highlight"
-        app:met_primaryColor="@color/edtRegister"/>
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_old_password"
+            android:hint="Old password"
+            android:inputType="textPassword"
+            android:text=""
+            android:textColor="@color/edtRegister"
+            android:textColorHint="@color/edtRegister"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:met_singleLineEllipsis="true"
+            app:met_baseColor="@color/edtRegister"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/edtRegister"/>
+    </android.support.design.widget.TextInputLayout>
+
 </LinearLayout>

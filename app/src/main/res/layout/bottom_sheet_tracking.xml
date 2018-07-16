@@ -144,7 +144,7 @@
         android:layout_height="wrap_content"
         android:background="#000"
         android:foreground="?attr/selectableItemBackground"
-        android:text="Cancel book"
+        android:text="Cancel trip"
         android:textColor="#fff" />
     </LinearLayout>
 

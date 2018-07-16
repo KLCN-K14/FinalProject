@@ -93,6 +93,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     String destination = "";
     String pickup = "";
     String price = "";
+    Double fixedFare = 0.;
     String currentService = "";
     BroadcastReceiver mReceiver;
     Driver mDriver;
@@ -100,7 +101,10 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     GeoQuery geoQuery;
     ArcProgressAnimation anim;
     Boolean isShowDialog = false;
+    Boolean isCustomerResponse = false;
     AlertDialog dialog;
+    Handler handler = new Handler();
+
     DatabaseReference mDriversDatabase;
 
 
@@ -114,6 +118,8 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         mService = Common.getFCMService();
         pickup = getIntent().getStringExtra("pickup");
         price = getIntent().getStringExtra("price");
+        fixedFare = Double.parseDouble(getIntent().getStringExtra("fixedFare"));
+
         destination = getIntent().getStringExtra("destination");
         currentService = getIntent().getStringExtra("currentService");
         mTxtDestination.setText(destination);
@@ -145,6 +151,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         mArcProgress.startAnimation(anim);
 
         mRltCancel.setOnClickListener(this);
+
     }
 
     private void getNameAdress(Double lat, Double lng) {
@@ -152,8 +159,29 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             Address obj = addresses.get(0);
-            String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
-            mTxtYourPlace.setText(namePlacePickup);
+            String namePlacePickup = "";
+//                else
+            if(obj.getSubThoroughfare()!=null)
+                namePlacePickup = namePlacePickup + obj.getSubThoroughfare()+" "+obj.getThoroughfare()
+                        +", "+obj.getLocality()+", "+obj.getSubAdminArea();
+            else{
+                if(obj.getThoroughfare()!=null)
+                    namePlacePickup = namePlacePickup + obj.getThoroughfare()+", "+obj.getSubLocality()+", "+obj.getSubAdminArea();
+                else
+                    namePlacePickup = namePlacePickup + obj.getSubLocality()+", "+obj.getSubAdminArea();
+            }
+//                Log.e("getAdminArea()", "" + obj.getAdminArea());
+//                Log.e(" getCountryCode()", "" + obj.getCountryCode());
+//                Log.e(" getCountryName()", "" + obj.getCountryName());
+//                Log.e(" getFeatureName()", "" + obj.getFeatureName());
+//                Log.e(" getLocality()", "" + obj.getLocality());
+//                Log.e(" getPostalCode()", "" + obj.getPostalCode());
+//                Log.e("Addresses getPremises()", "" + obj.getPremises());
+//                Log.e(" getSubAdminArea()", "" + obj.getSubAdminArea());
+//                Log.e(" getSubLocality()", "" + obj.getSubLocality());
+//                Log.e(" getSubThoroughfare()", "" + obj.getSubThoroughfare());
+//                Log.e(" getThoroughfare()", "" + obj.getThoroughfare());
+                mTxtYourPlace.setText(namePlacePickup);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -178,7 +206,8 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                             if(dataSnapshot.exists()){
                                 boolean isOnline = (Boolean)dataSnapshot.child("isOnline").getValue();
                                 mDriver = dataSnapshot.getValue(Driver.class);
-                                if(isOnline && mDriver.getServiceVehicle().equals(currentService)){
+                                if(isOnline && mDriver.getServiceVehicle().equals(currentService) &&
+                                        fixedFare*Common.transport_fee<Double.parseDouble(mDriver.getCredits())){
                                     if(!isShowDialog){
                                         isShowDialog = true;
                                         showFoundDriverDialog();
@@ -210,23 +239,26 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
             @Override
             public void onGeoQueryReady() {
-                Log.e("RADIUS", String.valueOf(radius));
                 if(!isDriverFound && radius<=LIMIT_RANGE){
                     radius++;
                     findDriver(lat,lng);
                 }else {
+                    Log.e("onGeoQueryReady",driverID);
+                    geoQuery.removeAllListeners();
                     final Intent resultIntent = new Intent();
-
                     // finish when don't have any driver available
                     if (driverID.equals("")) {
+                        Log.e("onGeoQueryReady","No found driver");
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                setResult(RESULT_CANCELED, resultIntent);
+                                setResult(RESULT_FIRST_USER, resultIntent);
                                 finish();
                             }
-                        }, 2000);
+                        }, 5000);
+                    }else{
+                        Log.e("onGeoQueryReady","found driver");
                     }
                 }
             }
@@ -238,7 +270,23 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         });
     }
 
+    public   Runnable customerNoResponse = new Runnable() {
+        @Override
+        public void run() {
+            Log.e("test",isCustomerResponse.toString());
+            if(!isCustomerResponse){
+                dialog.dismiss();
+                mTxtNameDriverFound.setText("No response. Stop find driver");
+                Handler newHandler = new Handler();
+                newHandler.postDelayed(()->
+                                finish()
+                        ,1000);     }
+            }
+    };
+
+
     private void showFoundDriverDialog() {
+        isCustomerResponse = false;
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
 
@@ -247,6 +295,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
         builder.setView(foundDriverLayout);
         dialog = builder.create();
+
 
         final TextView txtNameDriver = foundDriverLayout.findViewById(R.id.txt_name_driver_dialog);
         final TextView txtNameCar = foundDriverLayout.findViewById(R.id.txt_name_car_dialog);
@@ -263,6 +312,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        isCustomerResponse = true;
                         mTxtNameDriverFound.setText("Finding another dirver. . .");
                         isDriverFound = false;
                         driverID = "";
@@ -277,7 +327,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                     public void run() {
                         findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
                     }
-                },2000);
+                },1000);
                 dialog.dismiss();
             }
         });
@@ -285,6 +335,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         btnSendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                isCustomerResponse = true;
+
                 mTxtNameDriverFound.setText("Driver "+mDriver.getName()+" is responding. . .");
                 isDriverFound = true;
                 Log.e("ERROR", "Start send request to dirver");
@@ -297,6 +350,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
             public void onShow(DialogInterface dialogInterface) {
                 isShowDialog = true;
                 mRltCancel.setVisibility(View.GONE);
+                handler.postDelayed(customerNoResponse,10000);
             }
         });
 
@@ -311,13 +365,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
             Log.e("FindDriver",e.getMessage());
         }
 
-        Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            mTxtNameDriverFound.setText("No response. Stop find driver");
-            Handler newHandler = new Handler();
-            newHandler.postDelayed(()-> finish(),1000);
-        },15000);
     }
+
+
 
     private void sendRequestToDriver(String key) {
 
@@ -364,13 +414,13 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                 });
         final Intent intent = new Intent();
         final Handler handlerWaitRequest = new Handler();
-        handlerWaitRequest.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setResult(RESULT_CANCELED, intent);
-                finish();
-            }
-        },18000);
+//        handlerWaitRequest.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                setResult(RESULT_CANCELED, intent);
+//                finish();
+//            }
+//        },30000);
     }
 
     @Override
@@ -480,7 +530,11 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
+                            if(Common.mLastLocationCustomer!=null){
+                                findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
+                            }else{
+                                finish();
+                            }
                         }
                     },2000);
                 }else if(intent.getStringExtra("DriverAccept")!=null){

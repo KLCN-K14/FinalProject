@@ -12,7 +12,7 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/userInputDialog"
         android:hint="Name"
-        android:inputType="textPassword"
+        android:inputType="text"
         android:text=""
         android:textColor="@color/edtRegister"
         android:textColorHint="@color/edtRegister"

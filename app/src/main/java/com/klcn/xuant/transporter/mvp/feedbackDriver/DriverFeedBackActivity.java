@@ -73,9 +73,11 @@ public class DriverFeedBackActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot item : dataSnapshot.getChildren()){
                     TripInfo tripInfo = item.getValue(TripInfo.class);
-                    if(tripInfo.getStatus().equals(Common.trip_info_status_complete)){
-                        tripInfo.setKey(item.getKey());
-                        tripInfos.add(tripInfo);
+                    if (tripInfo.getStatus() != null) {
+                        if(tripInfo.getStatus().equals(Common.trip_info_status_complete)){
+                            tripInfo.setKey(item.getKey());
+                            tripInfos.add(tripInfo);
+                        }
                     }
                 }
                 Collections.reverse(tripInfos);
