@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,9 +64,9 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
     @BindView(R.id.txt_your_destination)
     TextView mTxtYourDestination;
 
-    @BindView(R.id.txt_price)
-    TextView mTxtPrice;
-
+//    @BindView(R.id.txt_price)
+//    TextView mTxtPrice;
+//
     @BindView(R.id.txt_distance)
     TextView mTxtDistance;
 
@@ -80,6 +81,9 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
     @BindView(R.id.arc_progress)
     ArcProgress mArcProgress;
+
+    @BindView(R.id.lnl_panel_distance)
+    RelativeLayout mPanelDistance;
 
     IGoogleAPI mService;
 
@@ -107,6 +111,8 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_customer_call);
         ButterKnife.bind(this);
         mFCMService = Common.getFCMService();
+
+        mPanelDistance.setVisibility(View.GONE);
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.notification);
         mediaPlayer.setLooping(true);
@@ -235,13 +241,16 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
                                 JSONObject distanceJS = legsObject.getJSONObject("distance");
 
                                 Double distance = distanceJS.getDouble("value");
-                                mTxtDistance.setText(distanceJS.getString("text"));
+
 
                                 JSONObject timeJS = legsObject.getJSONObject("duration");
 
                                 Double time = timeJS.getDouble("value");
-
-                                calculateFare(distance,time);
+                                if(distance>15000){
+                                    mPanelDistance.setVisibility(View.VISIBLE);
+                                    mTxtDistance.setText(distanceJS.getString("text"));
+                                    calculateFare(distance,time);
+                                }
 
                                 String address = legsObject.getString("start_address");
 
@@ -455,16 +464,16 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
         }
         mTxtTime.setText(timeArrived);
 
-        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_standard*realTime;
-        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
-        String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
-        String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
-        if(mDriver!=null){
-            if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard)){
-                mTxtPrice.setText(textFareStandard);
-            }else{
-                mTxtPrice.setText(textFarePremium);
-            }
-        }
+//        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_standard*realTime;
+//        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
+//        String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
+//        String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
+//        if(mDriver!=null){
+//            if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard)){
+//                mTxtPrice.setText(textFareStandard);
+//            }else{
+//                mTxtPrice.setText(textFarePremium);
+//            }
+//        }
     }
 }

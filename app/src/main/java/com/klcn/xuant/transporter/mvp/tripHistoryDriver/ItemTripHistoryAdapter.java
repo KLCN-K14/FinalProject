@@ -2,14 +2,19 @@ package com.klcn.xuant.transporter.mvp.tripHistoryDriver;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.klcn.xuant.transporter.OnLoadMoreListener;
 import com.klcn.xuant.transporter.R;
+import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.TripInfo;
 
 import java.util.ArrayList;
@@ -17,59 +22,135 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ItemTripHistoryAdapter extends RecyclerView.Adapter<ItemTripHistoryAdapter.TripInfoViewHolder>{
+public class ItemTripHistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private ArrayList<TripInfo> tripInfos = new ArrayList<>();
     private Context context;
 
-    public ItemTripHistoryAdapter(Context context, ArrayList<TripInfo> tripInfos){
+    private final int VIEW_TYPE_ITEM = 0;
+    private final int VIEW_TYPE_LOADING = 1;
+
+    private boolean isLoading;
+    private int visibleThreshold = 3;
+    private int lastVisibleItem, totalItemCount;
+
+    private OnLoadMoreListener onLoadMoreListener;
+    public void setOnLoadMoreListener(OnLoadMoreListener mOnLoadMoreListener) {
+        this.onLoadMoreListener = mOnLoadMoreListener;
+    }
+
+    public ItemTripHistoryAdapter(RecyclerView recyclerView, Context context, ArrayList<TripInfo> tripInfos){
         this.tripInfos = tripInfos;
         this.context = context;
+
+        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                totalItemCount = linearLayoutManager.getItemCount();
+                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    if (onLoadMoreListener != null) {
+                        onLoadMoreListener.onLoadMore();
+                    }
+                    isLoading = true;
+                }
+            }
+        });
+
     }
 
-    @NonNull
-    @Override
-    public TripInfoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_trip_history_driver, parent, false);
-        TripInfoViewHolder viewHolder = new TripInfoViewHolder(view);
-        return viewHolder;
+    private class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
+
+        public LoadingViewHolder(View view) {
+            super(view);
+            progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+        }
+    }
+
+    // "Normal item" ViewHolder
+    private class TripInfoViewHolder extends RecyclerView.ViewHolder {
+        TextView mTxtTimeTrip;
+        TextView mTxtPickup;
+        TextView mTxtDropoff;
+        TextView mTxtPrice;
+        TextView mTxtStatus;
+        ImageView mImgMoney;
+        private Context mContext;
+
+        public TripInfoViewHolder(View view) {
+            super(view);
+            mTxtTimeTrip = (TextView) view.findViewById(R.id.txt_time_trip);
+            mTxtPickup = (TextView) view.findViewById(R.id.txt_pickup);
+            mTxtDropoff = (TextView) view.findViewById(R.id.txt_destination);
+            mTxtPrice = (TextView) view.findViewById(R.id.txt_price);
+            mTxtStatus = (TextView) view.findViewById(R.id.txt_status);
+            mImgMoney = (ImageView) view.findViewById(R.id.img_money);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TripInfoViewHolder holder, int position) {
-        holder.bindTripInfo(tripInfos.get(position));
+    public int getItemViewType(int position) {
+        return tripInfos.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == VIEW_TYPE_ITEM) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_trip_history_driver, parent, false);
+            return new TripInfoViewHolder(view);
+        } else if (viewType == VIEW_TYPE_LOADING) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loading, parent, false);
+            return new LoadingViewHolder(view);
+        }
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof TripInfoViewHolder) {
+            TripInfo tripInfo = tripInfos.get(position);
+            TripInfoViewHolder userViewHolder = (TripInfoViewHolder) holder;
+
+            userViewHolder.mTxtTimeTrip.setText(DateFormat.format("dd-MM-yyyy, HH:mm", tripInfo.getDateCreated()));
+            userViewHolder.mTxtDropoff.setText(tripInfo.getDropoff());
+            userViewHolder.mTxtPickup.setText(tripInfo.getPickup());
+            Double price = Double.valueOf(tripInfo.getFixedFare())/1000;
+            userViewHolder.mTxtPrice.setText("VND "+price.intValue()+"K");
+            if(tripInfo.getStatus().equals(Common.trip_info_status_driver_cancel)){
+                userViewHolder.mImgMoney.setVisibility(View.GONE);
+                userViewHolder.mTxtPrice.setText("Cause: "+tripInfo.getReasonCancel());
+                userViewHolder.mTxtStatus.setBackground(context.getResources().getDrawable(R.drawable.bg_cancel));
+                userViewHolder.mTxtStatus.setText("Driver canceled");
+                userViewHolder.mTxtStatus.setTextColor(context.getResources().getColor(R.color.red));
+            }else if(tripInfo.getStatus().equals(Common.trip_info_status_customer_cancel)){
+                userViewHolder.mImgMoney.setVisibility(View.GONE);
+                userViewHolder.mTxtPrice.setText("Cause: "+tripInfo.getReasonCancel());
+                userViewHolder.mTxtStatus.setBackground(context.getResources().getDrawable(R.drawable.bg_cancel));
+                userViewHolder.mTxtStatus.setText("Customer canceled");
+                userViewHolder.mTxtStatus.setTextColor(context.getResources().getColor(R.color.red));
+            }
+
+        } else if (holder instanceof LoadingViewHolder) {
+            LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
+            loadingViewHolder.progressBar.setIndeterminate(true);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return tripInfos.size();
+        return tripInfos == null ? 0 : tripInfos.size();
+    }
+
+    public void setLoaded() {
+        isLoading = false;
     }
 
     @Override
     public long getItemId(int position) {
         return Long.valueOf(tripInfos.get(position).getKey());
-    }
-
-    public class TripInfoViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.txt_time_trip) TextView mTxtTimeTrip;
-        @BindView(R.id.txt_pickup) TextView mTxtPickup;
-        @BindView(R.id.txt_destination) TextView mTxtDropoff;
-        @BindView(R.id.txt_price) TextView mTxtPrice;
-        private Context mContext;
-
-        public TripInfoViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this,itemView);
-            mContext = itemView.getContext();
-        }
-
-        public void bindTripInfo(TripInfo tripInfo){
-            mTxtTimeTrip.setText(DateFormat.format("dd-MM-yyyy, HH:mm", tripInfo.getDateCreated()));
-            mTxtDropoff.setText(tripInfo.getDropoff());
-            mTxtPickup.setText(tripInfo.getPickup());
-            Double price = Double.valueOf(tripInfo.getFixedFare())/1000;
-            mTxtPrice.setText("VND "+price.intValue()+"K");
-        }
     }
 
 

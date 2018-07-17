@@ -31,6 +31,11 @@ import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.helper.NotificationHelper;
 import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.TripInfo;
+import com.klcn.xuant.transporter.remote.IGoogleAPI;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +43,9 @@ import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DriverConfirmBillActivity extends AppCompatActivity{
 
@@ -53,20 +61,31 @@ public class DriverConfirmBillActivity extends AppCompatActivity{
     @BindView(R.id.btn_confirm)
     Button btnConfirm;
 
+    IGoogleAPI mService;
+
     String keyTrip = "", feedBack = "Nice Trip", otherToll = "0";
     int fixedFare = 0;
+    String pickup = "", destination = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_payment);
         ButterKnife.bind(this);
+
+
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+        mService = Common.getGoogleAPI();
 
         keyTrip = getIntent().getStringExtra("keyTrip");
         fixedFare = getIntent().getIntExtra("fixedFare",0);
         if(fixedFare == 0){
-
+            pickup = getIntent().getStringExtra("pickup");
+            destination = getIntent().getStringExtra("destination");
+            if(!pickup.equals("")){
+                Log.e("DriverConfirmBill",pickup+"---"+destination);
+            }
         }
 
 

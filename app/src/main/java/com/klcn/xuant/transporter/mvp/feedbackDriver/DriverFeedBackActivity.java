@@ -18,10 +18,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.common.Common;
-import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.TripInfo;
-import com.klcn.xuant.transporter.mvp.tripHistoryDriver.DriverTripHistoryActivity;
-import com.klcn.xuant.transporter.mvp.tripHistoryDriver.ItemTripHistoryAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;

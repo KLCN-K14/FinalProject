@@ -15,10 +15,11 @@
             android:layout_height="wrap_content"
             android:text="Completed"
             android:layout_marginLeft="10dp"
+            android:id="@+id/txt_status"
             android:layout_marginTop="5dp"
             android:padding="5dp"
-            android:textStyle="bold"
             android:background="@drawable/bg_completed"
+            android:textStyle="bold"
             android:textColor="@color/colorActiveNavigation"/>
         <TextView
             android:layout_width="wrap_content"
@@ -74,10 +75,12 @@
             android:layout_margin="10dp"
             android:id="@+id/txt_price"
             android:textStyle="bold"
+            android:maxLines="2"
             android:textColor="@color/black"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/img_money"
             android:src="@drawable/ic_cash"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"

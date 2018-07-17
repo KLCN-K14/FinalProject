@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:text="VND 40k"
                 android:layout_centerVertical="true"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:layout_toRightOf="@+id/txt_temp"
                 android:id="@+id/txt_price"
                 android:layout_marginLeft="5dp"
@@ -100,7 +100,7 @@
                 android:text="Cash"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:id="@+id/txt_temp2"
                 android:layout_marginRight="20dp"
                 android:textColor="@color/colorText"/>
@@ -148,9 +148,9 @@
                     android:id="@+id/txt_your_position"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:layout_marginTop="13dp"
+                    android:layout_marginTop="15dp"
                     android:text="12/109 T12-kp3, Tăng Long"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textColor="@color/black"
                     />
                 <TextView
@@ -158,7 +158,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
                     android:text="Ngã tư thủ đức"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textColor="@color/black"
                     />
             </LinearLayout>

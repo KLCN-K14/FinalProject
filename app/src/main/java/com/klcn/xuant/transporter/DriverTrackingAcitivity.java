@@ -203,6 +203,9 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     String otherToll = "0", keyTrip = "";
     boolean isCustomerCancel = false, isCompleteTrip = false;
     GeoQuery mGeoQueryCheckNear;
+    String pickup = "";
+
+    String currentService = "";
 
     ValueAnimator animNotification;
 
@@ -221,6 +224,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                 .build());
         setContentView(R.layout.activity_driver_tracking);
         ButterKnife.bind(this);
+
+        currentService = Common.service_vehicle_standard;
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -257,7 +262,6 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         FirebaseDatabase.getInstance().getReference().child("Chat")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("onstate").setValue(false);
 
-        getInfoDriver();
         //Geo Fire
         driverWorking = FirebaseDatabase.getInstance().getReference(Common.driver_working_tbl);
         mPickupRequestDatabase = FirebaseDatabase.getInstance().getReference(Common.pickup_request_tbl);
@@ -284,11 +288,14 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                 mTxtNameLocation.setText(getNameAdress(customerLat, customerLng).toUpperCase());
                                 // create trip info
                                 mTripInfo.setPickup(getNameAdress(customerLat, customerLng));
+                                pickup = getNameAdress(customerLat, customerLng);
                                 mTripInfo.setDropoff(destination);
                                 mTripInfo.setCustomerId(mPickupRequest.getCustomerId());
                                 mTripInfo.setDriverId(driverID);
                                 mTripInfoDatabase.setValue(mTripInfo);
                                 mapTripInfo.put("dateCreated", ServerValue.TIMESTAMP);
+
+                                getInfoDriver();
 
                                 getInfoTrip(customerLat,customerLng,destination);
                                 getInfoCustomer(mPickupRequest.getCustomerId());
@@ -382,7 +389,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()){
                             mDriver = dataSnapshot.getValue(Driver.class);
-
+                            currentService = mDriver.getServiceVehicle();
                             mapTripInfo.put("serviceVehicle",mDriver.getServiceVehicle());
                             mTripInfoDatabase.updateChildren(mapTripInfo);
                         }
@@ -845,6 +852,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                     Intent intent = new Intent(DriverTrackingAcitivity.this,DriverConfirmBillActivity.class);
                                     intent.putExtra("keyTrip",keyTrip);
                                     intent.putExtra("fixedFare",fixedFare);
+                                    intent.putExtra("pickup",pickup);
+                                    intent.putExtra("destination",destination);
                                     startActivity(intent);
                                     finish();
 //                                    showPaymentDialog();
@@ -1359,21 +1368,17 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
         String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
         String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
-        if(mDriver!=null){
-            if(mDriver.getServiceVehicle().equals(Common.service_vehicle_standard)){
-                fixedFare = fareStandard.intValue();
-                mapTripInfo.put("fixedFare",String.valueOf(fixedFare*1000));
-            }else{
-                fixedFare = farePremium.intValue();
-                mapTripInfo.put("fixedFare",String.valueOf(fixedFare*1000));
-            }
-
-            Log.e("CalculateFare",""+fixedFare);
-
-            mTripInfoDatabase.updateChildren(mapTripInfo);
+        if(currentService.equals(Common.service_vehicle_standard)){
+            fixedFare = fareStandard.intValue();
+            mapTripInfo.put("fixedFare",String.valueOf(fixedFare*1000));
+        }else{
+            fixedFare = farePremium.intValue();
+            mapTripInfo.put("fixedFare",String.valueOf(fixedFare*1000));
         }
 
+        Log.e("CalculateFare",""+fixedFare);
 
+        mTripInfoDatabase.updateChildren(mapTripInfo);
     }
 
     private void getInfoTrip(double lat, double lng, String destination) {

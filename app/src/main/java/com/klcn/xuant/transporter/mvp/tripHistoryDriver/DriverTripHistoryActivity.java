@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.klcn.xuant.transporter.OnLoadMoreListener;
 import com.klcn.xuant.transporter.R;
 import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.TripInfo;
@@ -46,13 +46,12 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
     ScrollView mScrollView;
 
     String driverID;
-    ArrayList<TripInfo> tripInfos;
+    ArrayList<TripInfo> tripInfos, listTripToAdapter;
 
-    String endAt = "";
-    int count = 0;
-    boolean isLoading = false;
 
     ItemTripHistoryAdapter mAdapter;
+    TripInfo tripTemp;
+    int position = 0;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -71,59 +70,81 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
         }
         driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         tripInfos = new ArrayList<>();
+        listTripToAdapter = new ArrayList<>();
 
         RecyclerView.LayoutManager layoutManager =
                 new LinearLayoutManager(DriverTripHistoryActivity.this);
 
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
 
-        mList.setLayoutManager(layoutManager);
+
+        mList.setLayoutManager(llm);
         mList.setHasFixedSize(true);
 
         mProgressBar.setVisibility(View.GONE);
 
-        mList.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    Log.e("Load more",String.valueOf(scrollY)+"----"+String.valueOf(oldScrollY));
-
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    isLoading = true;
-                    Handler handler = new Handler();
-                count++;
-                Log.e("Count",String.valueOf(count));
-                handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mProgressBar.setVisibility(View.GONE);
-                        }
-                    },2000);
-            }
-        });
-
         setupInit();
+
+        test();
+
+
     }
 
     private void setupInit() {
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
         final Query mQuery = mData.orderByChild("dateCreated");
         mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @TargetApi(Build.VERSION_CODES.N)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot item : dataSnapshot.getChildren()){
                     TripInfo tripInfo = item.getValue(TripInfo.class);
+
                     if(tripInfo.getStatus()!=null){
-                        if(tripInfo.getStatus().equals(Common.trip_info_status_complete) &&
-                                tripInfo.getDriverId().equals(driverID)){
+                        if(tripInfo.getDriverId().equals(driverID)){
                             tripInfo.setKey(item.getKey());
                             tripInfos.add(tripInfo);
                         }
                     }
                 }
+
                 Collections.reverse(tripInfos);
-                mAdapter = new ItemTripHistoryAdapter(getApplicationContext(), tripInfos);
+                listTripToAdapter.add(tripInfos.get(0));
+                listTripToAdapter.add(tripInfos.get(1));
+                listTripToAdapter.add(tripInfos.get(2));
+
+                position = 2 ;
+
+                mAdapter = new ItemTripHistoryAdapter(mList,getApplicationContext(), listTripToAdapter);
                 mList.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
+
+                mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+                    @Override
+                    public void onLoadMore() {
+                        if(position<tripInfos.size()-1){
+                            listTripToAdapter.add(null);
+                            mAdapter.notifyItemInserted(listTripToAdapter.size() - 1);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                listTripToAdapter.remove(listTripToAdapter.size() - 1);
+                                mAdapter.notifyItemRemoved(listTripToAdapter.size());
+
+                                for(;position<tripInfos.size()-1;){
+                                    position++;
+                                    listTripToAdapter.add(tripInfos.get(position));
+                                }
+
+                                mAdapter.notifyDataSetChanged();
+                                mAdapter.setLoaded();
+
+                                }
+                            }, 5000);
+                        }
+                    }
+                });
+
                 mQuery.removeEventListener(this);
             }
 
@@ -133,5 +154,26 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void test() {
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
+        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID).limitToLast(3);
+        mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot item : dataSnapshot.getChildren()){
+                    Log.e("Size",String.valueOf(item.getKey()));
+                }
+
+                mQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
 }
