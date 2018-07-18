@@ -16,8 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -69,6 +72,9 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     @BindView(R.id.txt_your_destination)
     TextView mTxtDestination;
 
+    @BindView(R.id.img_more)
+    ImageView mImgMore;
+
     @BindView(R.id.txt_your_position)
     TextView mTxtYourPlace;
 
@@ -105,6 +111,8 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     AlertDialog dialog;
     Handler handler = new Handler();
 
+    boolean isPickupLong = false;
+
     DatabaseReference mDriversDatabase;
 
 
@@ -119,9 +127,16 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
         pickup = getIntent().getStringExtra("pickup");
         price = getIntent().getStringExtra("price");
         fixedFare = Double.parseDouble(getIntent().getStringExtra("fixedFare"));
+        Log.e("pickup",pickup);
 
         destination = getIntent().getStringExtra("destination");
+        Log.e("destination",destination);
+
         currentService = getIntent().getStringExtra("currentService");
+
+        mImgMore.setVisibility(View.GONE);
+
+
         mTxtDestination.setText(destination);
         mTxtPrice.setText(price);
         mTxtYourPlace.setText(pickup);
@@ -157,37 +172,32 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
     private void getNameAdress(Double lat, Double lng) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
-            Address obj = addresses.get(0);
-            String namePlacePickup = "";
-//                else
-            if(obj.getSubThoroughfare()!=null)
-                namePlacePickup = namePlacePickup + obj.getSubThoroughfare()+" "+obj.getThoroughfare()
-                        +", "+obj.getLocality()+", "+obj.getSubAdminArea();
-            else{
-                if(obj.getThoroughfare()!=null)
-                    namePlacePickup = namePlacePickup + obj.getThoroughfare()+", "+obj.getSubLocality()+", "+obj.getSubAdminArea();
-                else
-                    namePlacePickup = namePlacePickup + obj.getSubLocality()+", "+obj.getSubAdminArea();
-            }
-//                Log.e("getAdminArea()", "" + obj.getAdminArea());
-//                Log.e(" getCountryCode()", "" + obj.getCountryCode());
-//                Log.e(" getCountryName()", "" + obj.getCountryName());
-//                Log.e(" getFeatureName()", "" + obj.getFeatureName());
-//                Log.e(" getLocality()", "" + obj.getLocality());
-//                Log.e(" getPostalCode()", "" + obj.getPostalCode());
-//                Log.e("Addresses getPremises()", "" + obj.getPremises());
-//                Log.e(" getSubAdminArea()", "" + obj.getSubAdminArea());
-//                Log.e(" getSubLocality()", "" + obj.getSubLocality());
-//                Log.e(" getSubThoroughfare()", "" + obj.getSubThoroughfare());
-//                Log.e(" getThoroughfare()", "" + obj.getThoroughfare());
+            List<Address> addresses = geocoder.getFromLocation(lat,lng, 1);
+            if(!addresses.isEmpty()){
+                Address obj = addresses.get(0);
+                String namePlacePickup = "";
+
+                if (obj.getSubThoroughfare() != null && obj.getThoroughfare() != null) {
+                    namePlacePickup = namePlacePickup + obj.getSubThoroughfare() + " "+ obj.getThoroughfare() + ", ";
+                }
+
+                if(obj.getLocality()!=null){
+                    namePlacePickup = namePlacePickup + obj.getLocality() + ", ";
+                }
+
+                namePlacePickup = namePlacePickup + obj.getSubAdminArea()+", "+obj.getAdminArea();
+
                 mTxtYourPlace.setText(namePlacePickup);
+
+            }
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void findDriver(final double lat,final double lng) {
         DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Common.driver_available_tbl);

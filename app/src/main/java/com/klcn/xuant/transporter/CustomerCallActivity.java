@@ -157,7 +157,14 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
                 addDriverAvailable();
                 sendMessageCancelRequest();
-                finish();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                },1000);
+
             }
 
             @Override
@@ -387,10 +394,6 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onResume() {
-        mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.notification);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.start();
-
         IntentFilter intentFilter = new IntentFilter(
                 "android.intent.action.MAIN");
 
@@ -420,27 +423,68 @@ public class CustomerCallActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onStop() {
-        if(mediaPlayer!=null)
+        try {
+            mediaPlayer.stop();
             mediaPlayer.release();
+            mediaPlayer=null;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         this.unregisterReceiver(mReceiver);
         super.onStop();
     }
 
     @Override
     protected void onPause() {
-        if(mediaPlayer!=null)
+        try {
+            mediaPlayer.stop();
             mediaPlayer.release();
+            mediaPlayer=null;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         super.onPause();
     }
 
+    @Override
+    protected void onDestroy() {
+        try {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer=null;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
+
     private String getNameAdress(double lat, double lng) {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(lat,lng, 1);
             if(!addresses.isEmpty()){
                 Address obj = addresses.get(0);
-                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
+                String namePlacePickup = "";
+
+                if (obj.getSubThoroughfare() != null && obj.getThoroughfare() != null) {
+                    namePlacePickup = namePlacePickup + obj.getSubThoroughfare() + " "+ obj.getThoroughfare() + ", ";
+                }
+
+                if(obj.getLocality()!=null){
+                    namePlacePickup = namePlacePickup + obj.getLocality() + ", ";
+                }
+
+                namePlacePickup = namePlacePickup + obj.getSubAdminArea()+", "+obj.getAdminArea();
+
+
                 return namePlacePickup;
+
             }
 
         } catch (IOException e) {

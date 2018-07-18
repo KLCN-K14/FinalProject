@@ -61,7 +61,7 @@
         android:layout_weight="2">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/btn_circle_gray"
@@ -79,6 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="VND 40k"
+                android:textStyle="bold"
                 android:layout_centerVertical="true"
                 android:textSize="14sp"
                 android:layout_toRightOf="@+id/txt_temp"
@@ -118,7 +119,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_marginLeft="5dp">
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -127,6 +129,12 @@
                     app:srcCompat="@drawable/ic_placeholder_pickup" />
                 <ImageView
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_more_vertical" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:id="@+id/img_more"
+                    android:visibility="gone"
                     android:layout_height="wrap_content"
                     app:srcCompat="@drawable/ic_more_vertical" />
 
@@ -146,8 +154,10 @@
                     android:id="@+id/txt_your_position"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:layout_marginTop="15dp"
-                    android:text="12/109 T12-kp3, Tăng Long"
+                    android:layout_marginTop="12dp"
+                    android:paddingRight="10dp"
+                    android:textStyle="bold"
+                    android:text="12/109 T12-kp3 12/109 T12-kp3 12/109 T12-kp3 12/109 T12-kp3"
                     android:textSize="14sp"
                     android:textColor="@color/black"
                     />
@@ -155,7 +165,11 @@
                     android:id="@+id/txt_your_destination"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:text="Ngã tư thủ đức"
+                    android:paddingRight="10dp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="Ngã tư thủ đức Ngã "
                     android:textSize="14sp"
                     android:textColor="@color/black"
                     />

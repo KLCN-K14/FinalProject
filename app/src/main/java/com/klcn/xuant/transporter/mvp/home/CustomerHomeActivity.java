@@ -988,30 +988,28 @@ public class CustomerHomeActivity extends AppCompatActivity
                 Address obj = addresses.get(0);
                 String namePlacePickup = "";
 //                else
-                if(obj.getSubThoroughfare()!=null)
-                    namePlacePickup = namePlacePickup + obj.getSubThoroughfare()+" "+obj.getThoroughfare()
-                            +", "+obj.getLocality()+", "+obj.getSubAdminArea();
-                else{
-                    if(obj.getThoroughfare()!=null)
-                        namePlacePickup = namePlacePickup + obj.getThoroughfare()+", "+obj.getSubLocality()+", "+obj.getSubAdminArea();
-                    else
-                        namePlacePickup = namePlacePickup + obj.getSubLocality()+", "+obj.getSubAdminArea();
+                if (obj.getSubThoroughfare() != null && obj.getThoroughfare() != null) {
+                    namePlacePickup = namePlacePickup + obj.getSubThoroughfare() + " "+ obj.getThoroughfare() + ", ";
                 }
+
+               if(obj.getLocality()!=null){
+                   namePlacePickup = namePlacePickup + obj.getLocality() + ", ";
+               }
+
+                namePlacePickup = namePlacePickup + obj.getSubAdminArea()+", "+obj.getAdminArea();
 //                Log.e("getAdminArea()", "" + obj.getAdminArea());
 //                Log.e(" getCountryCode()", "" + obj.getCountryCode());
 //                Log.e(" getCountryName()", "" + obj.getCountryName());
 //                Log.e(" getFeatureName()", "" + obj.getFeatureName());
 //                Log.e(" getLocality()", "" + obj.getLocality());
 //                Log.e(" getPostalCode()", "" + obj.getPostalCode());
-//                Log.e("Addresses getPremises()", "" + obj.getPremises());
+//                Log.e(" getPremises()", "" + obj.getPremises());
 //                Log.e(" getSubAdminArea()", "" + obj.getSubAdminArea());
 //                Log.e(" getSubLocality()", "" + obj.getSubLocality());
 //                Log.e(" getSubThoroughfare()", "" + obj.getSubThoroughfare());
 //                Log.e(" getThoroughfare()", "" + obj.getThoroughfare());
-                String api = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+mLastLocation.getLatitude()+","+mLastLocation.getLongitude()
-                        +"&key=AIzaSyAOEbw-GFk9BSzU_E8RjTKrPzO64lSxNzM";
-                if(namePlacePickup.contains("null"))
-                    return getNameAdress(mLastLocation);
+//                Log.e("Name", "" + namePlacePickup);
+
                 return namePlacePickup;
 
             }
@@ -1171,8 +1169,11 @@ public class CustomerHomeActivity extends AppCompatActivity
             timeArrived = hour.intValue() + " h "+minute.intValue()+" min";
         }
 
-        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_standard*realTime;
-        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
+        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance
+                + Common.cost_per_minute_standard*realTime + mCustomer.getCountCancel()*Common.cancel_fee;
+        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance
+                + Common.cost_per_minute_premium*realTime + mCustomer.getCountCancel()*Common.cancel_fee;
+
         String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
         String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
         if(currentService.equals(Common.service_vehicle_standard)){

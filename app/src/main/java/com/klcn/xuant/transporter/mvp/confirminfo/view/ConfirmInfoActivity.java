@@ -105,6 +105,8 @@ public class ConfirmInfoActivity extends AppCompatActivity implements View.OnCli
                     customer.setName(mEditFisrtName.getText().toString() + " " + mEditName.getText().toString());
                     customer.setPhoneNum(phoneNumber);
                     customer.setEmail(mEditEmail.getText().toString());
+                    customer.setCountCancel(0);
+                    customer.setCountTrip(0);
                     customer.setImgUrl(null);
                     customers.child(mFirebaseAuth.getCurrentUser().getUid())
                             .setValue(customer)

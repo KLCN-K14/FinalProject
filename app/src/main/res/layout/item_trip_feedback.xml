@@ -18,6 +18,7 @@
             android:text="&quot;Fantastic driver. Nicest driver I've had.&quot;"
             android:maxLines="3"
             android:gravity="center"
+            android:textStyle="bold"
             android:layout_centerHorizontal="true"
             android:textColor="@color/black"
             android:id="@+id/txt_content_feedback"

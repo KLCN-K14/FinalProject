@@ -60,7 +60,7 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
     private String userChoosenTask;
     CircleImageView mAvatar;
-    TextView mTxtName, mTxtMail, mTxtPhone;
+    TextView mTxtName, mTxtMail, mTxtPhone,mCountPenance,mCountTrip;
     ImageView mImgvBack;
     final Context context = this;
     String encodedString = "";
@@ -68,7 +68,7 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
 
     FirebaseAuth mFirebaseAuth;
     DatabaseReference customers;
-    Customer customerModel;
+    Customer mCustomer;
 
     FirebaseStorage storage;
     StorageReference storageReference;
@@ -86,6 +86,8 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
         mImgvBack = (ImageView) findViewById(R.id.toolbar_back);
         mTxtMail = (TextView) findViewById(R.id.txt_profile_mail);
         mTxtPhone = (TextView) findViewById(R.id.txt_profile_phone);
+        mCountPenance = (TextView) findViewById(R.id.count_year);
+        mCountTrip = (TextView) findViewById(R.id.count_trips);
 
 
         mAvatar.setOnClickListener(this);
@@ -305,6 +307,9 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
                     if (map.get("name") != null)
                         mTxtName.setText(map.get("name").toString());
 
+                    mCountPenance.setText(map.get("countCancel").toString());
+                    mCountTrip.setText(map.get("countTrip").toString());
+
                     if (map.get("email") != null)
                         mTxtMail.setText(map.get("email").toString());
 
@@ -320,6 +325,8 @@ public class CustomerProfileActivity extends AppCompatActivity implements View.O
                                 .priority(Priority.HIGH);
                         Glide.with(getApplication()).load(map.get("imgUrl").toString()).apply(options).into(mAvatar);
                     }
+
+
                 }
 
             }

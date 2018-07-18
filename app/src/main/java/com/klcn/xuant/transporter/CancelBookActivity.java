@@ -2,6 +2,7 @@ package com.klcn.xuant.transporter;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,17 +16,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.FCMResponse;
 import com.klcn.xuant.transporter.model.Notification;
 import com.klcn.xuant.transporter.model.Sender;
 import com.klcn.xuant.transporter.model.Token;
 import com.klcn.xuant.transporter.remote.IFCMService;
+
+import java.util.HashMap;
 
 import dmax.dialog.SpotsDialog;
 import retrofit2.Call;
@@ -41,6 +46,7 @@ public class CancelBookActivity extends AppCompatActivity implements View.OnClic
     String currentResson="";
     String driverID="";
     IFCMService mFCMService;
+    Customer mCustomer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +73,8 @@ public class CancelBookActivity extends AppCompatActivity implements View.OnClic
         btnSend.setOnClickListener(this);
 
         mImgback.setOnClickListener(this);
+
+        getInfo();
 
     }
 
@@ -140,6 +148,13 @@ public class CancelBookActivity extends AppCompatActivity implements View.OnClic
                                     Intent intent = new Intent();
                                     intent.putExtra("reasonCancel",currentResson);
                                     setResult(RESULT_OK, intent);
+
+                                    HashMap<String,Object> countMap = new HashMap<>();
+                                    countMap.put("countCancel", mCustomer.getCountCancel()+1);
+                                    FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
+                                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .updateChildren(countMap);
+
                                     sendMessageCancelTrip();
 
 
@@ -160,6 +175,24 @@ public class CancelBookActivity extends AppCompatActivity implements View.OnClic
                 break;
         }
 
+    }
+
+    private void getInfo() {
+        FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            mCustomer = dataSnapshot.getValue(Customer.class);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void sendMessageCancelTrip() {

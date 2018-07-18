@@ -298,11 +298,8 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                                 mTripInfo.setDriverId(driverID);
                                 mTripInfoDatabase.setValue(mTripInfo);
                                 mapTripInfo.put("dateCreated", ServerValue.TIMESTAMP);
-
-                                getInfoDriver();
-
-                                getInfoTrip(customerLat,customerLng,destination);
                                 getInfoCustomer(mPickupRequest.getCustomerId());
+                                getInfoDriver();
                                 sendKeyTripToCustomer(getIntent().getStringExtra("keyTrip"));
                                 // remove event listener
                             }
@@ -369,6 +366,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()){
                             mCustomer = dataSnapshot.getValue(Customer.class);
+                            getInfoTrip(customerLat,customerLng,destination);
                             mCustomerMarker = mMap.addMarker(new MarkerOptions()
                                     .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_pickup_location)))
                                     .position(new LatLng(customerLat, customerLng))
@@ -409,11 +407,22 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     private String getNameAdress(double lat,double lng) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lat, 1);
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             if(!addresses.isEmpty()){
                 Address obj = addresses.get(0);
+                String namePlacePickup = "";
 
-                return obj.getSubThoroughfare()+", "+obj.getThoroughfare()+", "+obj.getSubAdminArea();
+                if (obj.getSubThoroughfare() != null && obj.getThoroughfare() != null) {
+                    namePlacePickup = namePlacePickup + obj.getSubThoroughfare() + " "+ obj.getThoroughfare() + ", ";
+                }
+
+                if(obj.getLocality()!=null){
+                    namePlacePickup = namePlacePickup + obj.getLocality() + ", ";
+                }
+
+                namePlacePickup = namePlacePickup + obj.getSubAdminArea()+", "+obj.getAdminArea();
+
+                return namePlacePickup;
 
             }
 
@@ -1369,8 +1378,11 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         }
 
 
-        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_standard*realTime;
-        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance + Common.cost_per_minute_premium*realTime;
+        Double fareStandard = Common.base_fare + Common.cost_per_km*realDistance
+                + Common.cost_per_minute_standard*realTime + Common.cancel_fee*mCustomer.getCountCancel();
+        Double farePremium = Common.base_fare + Common.cost_per_km*realDistance
+                + Common.cost_per_minute_premium*realTime+ Common.cancel_fee*mCustomer.getCountCancel();
+
         String textFareStandard = "VND "+Integer.toString(fareStandard.intValue())+"K";
         String textFarePremium = "VND "+Integer.toString(farePremium.intValue())+"K";
         if(currentService.equals(Common.service_vehicle_standard)){

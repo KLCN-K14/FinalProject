@@ -24,6 +24,7 @@ public class Common {
     public static final String trip_info_status_complete = "3";
 
     public static final Double base_fare = 5.;
+    public static final Double cancel_fee = 5.;
     public static final Double cost_per_km = 3.5;
     public static final Double cost_per_minute_standard = 2.;
     public static final Double cost_per_minute_premium = 3.5;

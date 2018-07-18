@@ -1,6 +1,7 @@
 package com.klcn.xuant.transporter;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.klcn.xuant.transporter.common.Common;
+import com.klcn.xuant.transporter.model.Customer;
 import com.klcn.xuant.transporter.model.Driver;
 import com.klcn.xuant.transporter.model.TripInfo;
 
@@ -52,6 +55,7 @@ public class CustomerRateActivity extends AppCompatActivity{
     EditText edtComment;
 
     Driver mDriver;
+    Customer mCustomer;
     ArrayList<TripInfo> tripInfos;
     String keyTrip = "",driverID = "", feedBack = "Nice Trip";
 
@@ -67,6 +71,7 @@ public class CustomerRateActivity extends AppCompatActivity{
         keyTrip = getIntent().getStringExtra("keyTrip");
         driverID = getIntent().getStringExtra("driverID");
         getDriverInfo();
+        getInfo();
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -93,6 +98,13 @@ public class CustomerRateActivity extends AppCompatActivity{
 
         // Set button dialog
         btnConfirm.setOnClickListener(view -> {
+            HashMap<String,Object> countMap = new HashMap<>();
+            countMap.put("countTrip", mCustomer.getCountTrip()+1);
+            countMap.put("countCancel", 0);
+            FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .updateChildren(countMap);
+
             if(mDriver!=null){
                 HashMap<String,Object> maps = new HashMap<>();
                 String rating = String.valueOf(ratingBar.getRating());
@@ -140,6 +152,24 @@ public class CustomerRateActivity extends AppCompatActivity{
             }
 
         });
+    }
+
+    private void getInfo() {
+        FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            mCustomer = dataSnapshot.getValue(Customer.class);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
 

@@ -9,15 +9,9 @@ public class Customer {
 
     private Long dateCreated;
 
-    public Customer() {
-    }
+    private int countTrip,countCancel;
 
-    public Customer(String name, String phoneNum, String email, String imgUrl, Long dateCreated) {
-        this.name = name;
-        this.phoneNum = phoneNum;
-        this.email = email;
-        this.imgUrl = imgUrl;
-        this.dateCreated = dateCreated;
+    public Customer() {
     }
 
     public String getName() {
@@ -58,5 +52,32 @@ public class Customer {
 
     public void setDateCreated(Long dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    public int getCountTrip() {
+        return countTrip;
+    }
+
+    public void setCountTrip(int countTrip) {
+        this.countTrip = countTrip;
+    }
+
+    public int getCountCancel() {
+        return countCancel;
+    }
+
+    public void setCountCancel(int countCancel) {
+        this.countCancel = countCancel;
+    }
+
+    public Customer(String name, String phoneNum, String email, String imgUrl, Long dateCreated, int countTrip, int countCancel) {
+
+        this.name = name;
+        this.phoneNum = phoneNum;
+        this.email = email;
+        this.imgUrl = imgUrl;
+        this.dateCreated = dateCreated;
+        this.countTrip = countTrip;
+        this.countCancel = countCancel;
     }
 }
