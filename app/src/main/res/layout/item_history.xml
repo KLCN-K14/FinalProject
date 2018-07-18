@@ -139,7 +139,7 @@
                     android:id="@+id/email_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_cost"/>
+                    app:srcCompat="@drawable/ic_coin_of_dollar"/>
 
                 <TextView
                     android:id="@+id/total_cash"
@@ -172,7 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:src="@drawable/ic_time_black"/>
+                    app:srcCompat="@drawable/ic_clock_circular_outline"/>
 
                 <TextView
                     android:id="@+id/history_time"
@@ -203,32 +203,34 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="5dp">
 
                 <ImageView
-                    android:layout_width="25dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:src="@drawable/pin_maps" />
+                    app:srcCompat="@drawable/ic_placeholder_pickup" />
                 <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:id="@+id/img_temp"
-                    android:layout_marginLeft="3dp"
-                    android:src="@drawable/icons_menu_vertical" />
+                    app:srcCompat="@drawable/ic_more_vertical" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/img_more"
+                    app:srcCompat="@drawable/ic_more_vertical" />
 
                 <ImageView
-                    android:layout_width="15dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-5dp"
-                    android:layout_marginLeft="4dp"
-                    android:src="@drawable/map_localization" />
+                    app:srcCompat="@drawable/ic_placeholder_dropoff" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -237,7 +239,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="99 Nguyễn Văn Thạnh 99 Nguyễn Văn "
+                    android:text="99 Nguyễn Văn Thạnh 99 Nzxczxczczzxcguyễn Văn "
                     android:textSize="18sp"
                     android:maxLines="2"
                     android:textColor="@color/colorBlack"
@@ -256,7 +258,7 @@
             </LinearLayout>
 
         </LinearLayout>
-        <LinearLayout
+        <RelativeLayout
             android:layout_below="@+id/ln_place_group"
             android:layout_width="match_parent"
             android:orientation="horizontal"
@@ -264,17 +266,21 @@
             android:layout_height="wrap_content">
             <ImageView
                 android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:id="@+id/temp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_feedback2"/>
+                app:srcCompat="@drawable/ic_feedback_customer"/>
             <TextView
                 android:id="@+id/feedback_history"
                 android:layout_width="match_parent"
+                android:layout_toRightOf="@id/temp"
+                android:layout_centerVertical="true"
                 android:layout_height="wrap_content"
                 android:text="FeedBack"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="10dp"
                 android:textColor="@color/bgColor6"
                 android:textSize="18sp"/>
-        </LinearLayout>
+        </RelativeLayout>
 
 
     </RelativeLayout>

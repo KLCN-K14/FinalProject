@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -52,6 +55,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -621,7 +625,7 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
                                                     if (mMarker != null)
                                                         mMarker.remove();
                                                     mMarker = mMap.addMarker(new MarkerOptions()
-                                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
+                                                            .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_navigation_driver)))
                                                             .position(new LatLng(latitude, longitude))
                                                             .anchor(0.5f, 0.5f)
                                                             .rotation(bearing)
@@ -906,6 +910,15 @@ public class DriverHomeActivity extends AppCompatActivity implements OnMapReadyC
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
 

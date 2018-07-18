@@ -48,7 +48,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_star_ratings"
+                    app:srcCompat="@drawable/ic_rating_driver"
                     android:id="@+id/img_temp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
@@ -160,7 +160,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="15dp"
                     android:layout_marginRight="20dp"
-                    android:src="@drawable/ic_feedback"/>
+                    app:srcCompat="@drawable/ic_feedback_driver"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -203,7 +203,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="15dp"
                     android:layout_marginRight="20dp"
-                    android:src="@drawable/ic_tips"/>
+                    app:srcCompat="@drawable/ic_tip_driver"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

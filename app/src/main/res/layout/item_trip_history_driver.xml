@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:id="@+id/temp"
-                android:background="@drawable/ic_route_item_trip"/>
+                app:srcCompat="@drawable/ic_travel_driver"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/img_money"
-            android:src="@drawable/ic_cash"
+            app:srcCompat="@drawable/ic_money_item"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_margin="8dp"/>

@@ -23,7 +23,18 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_my_location_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_right_black_24dp.xml" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -33,9 +44,10 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_position" />
-                                      <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="1b1a2a" />
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\xuant\OneDrive\Desktop\elemental-tip.png" />
+                                      <entry key="outputName" value="ic_tips" />
+                                      <entry key="themeColor" value="3a385a" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -81,8 +93,12 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_arrow_back_driver_24dp" />
-                            <entry key="sourceFile" value="C:\Users\xuant" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="height" value="36" />
+                            <entry key="outputName" value="ic_navigation_driver" />
+                            <entry key="overrideSize" value="true" />
+                            <entry key="sourceFile" value="C:\Users\xuant\OneDrive\Desktop\navigation.svg" />
+                            <entry key="width" value="36" />
                           </map>
                         </option>
                       </PersistentState>

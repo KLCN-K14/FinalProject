@@ -12,7 +12,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -55,6 +58,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Dash;
@@ -366,7 +370,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                         if(dataSnapshot.exists()){
                             mCustomer = dataSnapshot.getValue(Customer.class);
                             mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                                    .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_pickup_location)))
                                     .position(new LatLng(customerLat, customerLng))
                                     .snippet(mCustomer.getImgUrl())
                                     .title("Pickup here"+Common.keySplit+mCustomer.getPhoneNum()));
@@ -405,11 +409,12 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
     private String getNameAdress(double lat,double lng) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
-            List<Address> addresses = geocoder.getFromLocation(lat,lng, 1);
+            List<Address> addresses = geocoder.getFromLocation(lat, lat, 1);
             if(!addresses.isEmpty()){
                 Address obj = addresses.get(0);
-                String namePlacePickup = obj.getSubThoroughfare()+", "+obj.getLocality()+", "+obj.getSubAdminArea();
-                return namePlacePickup;
+
+                return obj.getSubThoroughfare()+", "+obj.getThoroughfare()+", "+obj.getSubAdminArea();
+
             }
 
         } catch (IOException e) {
@@ -586,7 +591,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                     mMap.clear();
 
                     mDriverMarker = mMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_driver))
+                            .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_navigation_driver)))
                             .position(new LatLng(latitude, longitude))
                             .flat(true)
                             .anchor(0.5f, 0.5f)
@@ -598,14 +603,14 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
                     if(mCustomer!=null){
                         if(isPickup){
                             mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                                    .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_pickup_location)))
                                     .position(new LatLng(customerLat, customerLng))
                                     .snippet(mCustomer.getImgUrl())
                                     .title("Pickup here"+Common.keySplit+mCustomer.getPhoneNum()));
                             mCustomerMarker.showInfoWindow();
                         }else{
                             mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
+                                    .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_dropoff_location)))
                                     .position(new LatLng(customerLat, customerLng))
                                     .snippet(mCustomer.getImgUrl())
                                     .title("Drop off here"+Common.keySplit+destination));
@@ -813,7 +818,7 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
 
                                             mTxtNameLocation.setText(destination);
                                             Log.e("DESTINATION",destination);
-                                            mImgLocation.setImageResource(R.drawable.ic_drop_off);
+                                            mImgLocation.setImageResource(R.drawable.ic_dropoff_location);
 
                                             mMap.clear();
                                             displayLocation();
@@ -1486,6 +1491,15 @@ public class DriverTrackingAcitivity extends AppCompatActivity implements View.O
         animNotification.setDuration(1000);
         animNotification.setRepeatCount(Animation.INFINITE);
         animNotification.start();
+    }
+
+    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
 

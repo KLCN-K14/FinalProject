@@ -26,7 +26,7 @@
                 android:layout_centerVertical="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_your_place"/>
+                app:srcCompat="@drawable/ic_pickup_location"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
                 android:id="@+id/img_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_drop_off"/>
+                app:srcCompat="@drawable/ic_dropoff_location"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -140,7 +140,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_local_phone_white"
+                        app:srcCompat="@drawable/ic_call_driver"
                         android:layout_centerInParent="true"/>
                 </RelativeLayout>
                 <TextView
@@ -168,7 +168,7 @@
                         android:layout_width="wrap_content"
                         android:id="@+id/temp5"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_chat_white"
+                        app:srcCompat="@drawable/ic_chat_driver"
                         android:layout_centerInParent="true"/>
                     <ImageView
                         android:layout_width="30dp"
@@ -176,7 +176,7 @@
                         android:layout_height="25dp"
                         android:id="@+id/img_notification_message"
                         android:layout_marginLeft="55dp"
-                        android:src="@drawable/ic_notification_message"
+                        app:srcCompat="@drawable/ic_notification_message"
                         />
                 </RelativeLayout>
 
@@ -204,7 +204,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_cancel_white"
+                        app:srcCompat="@drawable/ic_cancel_driver"
                         android:layout_centerInParent="true"/>
                 </RelativeLayout>
                 <TextView

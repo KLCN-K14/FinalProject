@@ -123,13 +123,13 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/img_temp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_waybill"/>
+                app:srcCompat="@drawable/ic_wallet"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -154,13 +154,13 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/img_temp1"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_change_pass"/>
+                app:srcCompat="@drawable/ic_pass"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -185,13 +185,13 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/img_temp2"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_support"/>
+                app:srcCompat="@drawable/ic_support_driver"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -216,13 +216,13 @@
             android:background="@drawable/border_bottom_gray_layout_white"
             android:layout_weight="1">
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/img_temp3"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_logout"/>
+                app:srcCompat="@drawable/ic_sign_out_driver"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

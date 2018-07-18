@@ -54,9 +54,10 @@ public class ItemHistoryActivity extends AppCompatActivity implements View.OnCli
         mPickUp = (TextView) findViewById(R.id.txt_place_location);
         mDropOff = (TextView) findViewById(R.id.txt_place_destination);
         mFeedback = (TextView) findViewById(R.id.feedback_history);
-        mImgTemp = (ImageView) findViewById(R.id.img_temp);
+        mImgTemp = (ImageView) findViewById(R.id.img_more);
 
         mImgback.setOnClickListener(this);
+        mImgTemp.setVisibility(View.GONE);
 
 
         String rating = getIntent().getStringExtra("rating");
@@ -99,8 +100,7 @@ public class ItemHistoryActivity extends AppCompatActivity implements View.OnCli
         mPickUp.setText(pickup);
 
         if(pickup.length()>30){
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(18, 45);
-            mImgTemp.setLayoutParams(layoutParams);
+            mImgTemp.setVisibility(View.VISIBLE);
         }
         mDropOff.setText(dropoff);
         mFeedback.setText(feedback);

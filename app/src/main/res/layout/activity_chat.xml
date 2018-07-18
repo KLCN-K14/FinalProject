@@ -112,7 +112,7 @@
             android:alpha="0.5"
             android:background="@android:color/white"
             android:padding="10dp"
-            app:srcCompat="@drawable/ic_send_black_24dp" />
+            app:srcCompat="@drawable/ic_sent_mail" />
     </LinearLayout>
 
 

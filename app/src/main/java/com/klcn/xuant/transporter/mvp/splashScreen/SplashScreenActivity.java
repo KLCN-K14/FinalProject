@@ -60,26 +60,28 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private void checkIsLogged() {
         if(FirebaseAuth.getInstance().getCurrentUser()!=null){
-            FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.exists()){
-                                Intent intentHome = new Intent(SplashScreenActivity.this, CustomerHomeActivity.class);
-                                startActivity(intentHome);
-                                finish();
-                            }else{
-                                Intent intentHome = new Intent(SplashScreenActivity.this, DriverHomeActivity.class);
-                                startActivity(intentHome);
-                                finish();
-                            }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+           if(FirebaseAuth.getInstance().getCurrentUser().getUid()!=null){
+               FirebaseDatabase.getInstance().getReference(Common.customers_tbl)
+                       .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                       .addListenerForSingleValueEvent(new ValueEventListener() {
+                           @Override
+                           public void onDataChange(DataSnapshot dataSnapshot) {
+                               if(dataSnapshot.exists()){
+                                   Intent intentHome = new Intent(SplashScreenActivity.this, CustomerHomeActivity.class);
+                                   startActivity(intentHome);
+                                   finish();
+                               }else{
+                                   Intent intentHome = new Intent(SplashScreenActivity.this, DriverHomeActivity.class);
+                                   startActivity(intentHome);
+                                   finish();
+                               }
+                           }
+                           @Override
+                           public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
+                           }
+                       });
+           }
 
         }else{
             Intent intent = new Intent(getApplicationContext(), ChooseTypeUserActivity.class);

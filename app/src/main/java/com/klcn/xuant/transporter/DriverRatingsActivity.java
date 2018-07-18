@@ -110,7 +110,8 @@ public class DriverRatingsActivity extends AppCompatActivity implements View.OnC
                     tripInfo.setKey(item.getKey());
                     tripInfos.add(tripInfo);
                 }
-                mTxtAvgRating.setText(mDriver.getAvgRatings().replace(",","."));
+                Double rating = Double.valueOf(mDriver.getAvgRatings().replace(",","."));
+                mTxtAvgRating.setText(String.format("%.1f",rating));
                 mTxtTotalTrip.setText(String.valueOf(tripInfos.size()));
                 mTxtAcceptTrip.setText(getCompletedTrip());
                 mTxtFullStarTrip.setText(getTripFullStar());

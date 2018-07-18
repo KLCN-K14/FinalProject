@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -50,6 +53,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
@@ -512,7 +516,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                                             mMarker = mMap.addMarker(new MarkerOptions()
                                                     .position(new LatLng(location.latitude,location.longitude))
                                                     .snippet(driver.getImgUrl())
-                                                    .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                    .icon(getMarkerIconFromDrawable(getResources().getDrawable(drawable)))
                                                     .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
                                                     .flat(true)
                                                     .anchor(0.5f, 0.5f)
@@ -593,7 +597,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                                                 mMarker = mMap.addMarker(new MarkerOptions()
                                                         .position(new LatLng(location.latitude,location.longitude))
                                                         .snippet(driver.getImgUrl())
-                                                        .icon(BitmapDescriptorFactory.fromResource(drawable))
+                                                        .icon(getMarkerIconFromDrawable(getResources().getDrawable(drawable)))
                                                         .title(driver.getName()+Common.keySplit+driver.getPhoneNum())
                                                         .flat(true)
                                                         .anchor(0.5f, 0.5f)
@@ -743,7 +747,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
                 loadDriverFound();
                 mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_your_place))
+                        .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_pickup_location)))
                         .position(new LatLng(latitude, longitude))
                         .flat(true)
                         .snippet(mCustomer.getImgUrl())
@@ -766,7 +770,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                 mMap.clear();
                 if(dropOffLocation!=null){
                     mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_drop_off))
+                            .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_dropoff_location)))
                             .position(new LatLng(dropOffLocation.latitude, dropOffLocation.longitude))
                             .snippet(mCustomer.getImgUrl())
                             .title("Destination"+Common.keySplit+mDestination));
@@ -779,7 +783,7 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
                             .strokeWidth(3.0f));
                 }
                 mCustomerMarker = mMap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_driver_on_trip))
+                        .icon(getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.ic_driver_on_trip)))
                         .position(new LatLng(latitude, longitude))
                         .flat(true)
                         .anchor(0.5f, 0.5f)
@@ -1123,7 +1127,6 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
             polylineOptions.pattern(PATTERN_POLYGON_ALPHA);
             mMap.addPolyline(polylineOptions);
         }
-
     }
 
     public static final int PATTERN_DASH_LENGTH_PX = 20;
@@ -1169,6 +1172,15 @@ public class CustomerTrackingActivity extends AppCompatActivity implements
 
                     }
                 });
+    }
+
+    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
 }

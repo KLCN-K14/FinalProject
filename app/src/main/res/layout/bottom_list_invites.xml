@@ -20,7 +20,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_double_arrow_top_white"
+                app:srcCompat="@drawable/ic_arrow_up_white"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/img_open_bottom"
                 android:layout_marginTop="5dp"/>

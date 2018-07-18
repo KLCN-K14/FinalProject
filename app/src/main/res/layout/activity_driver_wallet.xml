@@ -45,10 +45,10 @@
         android:background="@color/colorNavigation"
         >
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="70dp"
-            android:src="@drawable/ic_credits"
-            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_credits_driver"
+            android:layout_margin="20dp"
             android:id="@+id/img_temp"
             android:paddingLeft="20dp"/>
         <TextView
@@ -62,7 +62,6 @@
             android:id="@+id/txt_temp"
             android:textStyle="bold"
             >
-
         </TextView>
         <TextView
             android:layout_height="wrap_content"
@@ -87,10 +86,10 @@
         android:background="@color/colorNavigation"
         >
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="70dp"
-            android:src="@drawable/ic_cash_balance"
-            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_cash_balance_driver"
+            android:layout_margin="20dp"
             android:id="@+id/img_temp1"
             android:paddingLeft="20dp"/>
         <TextView

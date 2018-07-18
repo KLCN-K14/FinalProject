@@ -254,6 +254,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                             @Override
                             public void run() {
                                 setResult(RESULT_FIRST_USER, resultIntent);
+                                Log.e("FINISH","FINISH FROM NO FOUND DRIVER");
                                 finish();
                             }
                         }, 5000);
@@ -262,7 +263,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                     }
                 }
             }
-
             @Override
             public void onGeoQueryError(DatabaseError error) {
 
@@ -279,7 +279,7 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                 Handler newHandler = new Handler();
                 newHandler.postDelayed(()->
                                 finish()
-                        ,1000);     }
+                        ,1000);}
             }
     };
 
@@ -294,7 +294,6 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
 
         builder.setView(foundDriverLayout);
         dialog = builder.create();
-
 
         final TextView txtNameDriver = foundDriverLayout.findViewById(R.id.txt_name_driver_dialog);
         final TextView txtNameCar = foundDriverLayout.findViewById(R.id.txt_name_car_dialog);
@@ -532,6 +531,8 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                             if(Common.mLastLocationCustomer!=null){
                                 findDriver(Common.mLastLocationCustomer.getLatitude(),Common.mLastLocationCustomer.getLongitude());
                             }else{
+                                Log.e("FINISH","DRIVER CANCEL REQUEST");
+
                                 finish();
                             }
                         }
@@ -540,6 +541,8 @@ public class CustomerFindDriverActivity extends AppCompatActivity implements Vie
                     Intent resultIntent = new Intent();
                     CustomerFindDriverActivity.this.setResult(RESULT_OK, resultIntent);
                     resultIntent.putExtra("driverID", driverID);
+                    Log.e("FINISH","DRIVER ACCEPT REQUEST");
+
                     finish();
                 }
 

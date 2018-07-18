@@ -175,25 +175,25 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginRight="2dp">
 
             <ImageView
-                android:layout_width="25dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:src="@drawable/pin_maps" />
+                app:srcCompat="@drawable/ic_placeholder_pickup" />
             <ImageView
-                android:layout_width="18dp"
-                android:layout_height="20dp"
-                android:layout_marginLeft="3dp"
-                android:src="@drawable/icons_menu_vertical" />
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_more_vertical" />
 
             <ImageView
-                android:layout_width="15dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-5dp"
-                android:layout_marginLeft="4dp"
-                android:src="@drawable/map_localization" />
+                app:srcCompat="@drawable/ic_placeholder_dropoff" />
         </LinearLayout>
 
         <LinearLayout

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:orientation="vertical">
 
@@ -25,8 +25,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Hoàn thành"
+            android:textStyle="bold"
             android:textColor="@color/bgColor6"
             android:textSize="14sp" />
+
 
         <TextView
             android:id="@+id/txt_date_time"
@@ -55,27 +57,29 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="5dp">
 
             <ImageView
-                android:layout_width="25dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:src="@drawable/pin_maps" />
+                android:background="@drawable/ic_placeholder_pickup" />
 
             <ImageView
-                android:layout_width="18dp"
-                android:layout_height="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/img_distance_temp"
-                android:layout_marginLeft="3dp"
-                android:src="@drawable/icons_menu_vertical" />
+                android:background="@drawable/ic_more_vertical" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_more_vertical" />
 
             <ImageView
-                android:layout_width="15dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="-5dp"
-                android:src="@drawable/map_localization" />
+                android:background="@drawable/ic_placeholder_dropoff" />
         </LinearLayout>
 
         <LinearLayout
@@ -92,7 +96,7 @@
                 android:layout_marginTop="5dp"
                 android:maxLines="2"
                 android:paddingBottom="10dp"
-                android:text="99 Nguyễn Văn Thạnh Nguyễn"
+                android:text="99 Nguyễn Văn Thạnh zxczc zxczNguyễn"
                 android:textColor="@color/colorBlack" />
 
             <TextView

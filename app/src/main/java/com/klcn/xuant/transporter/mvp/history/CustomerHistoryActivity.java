@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.klcn.xuant.transporter.common.Common;
 import com.klcn.xuant.transporter.model.TripInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CustomerHistoryActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -51,6 +53,9 @@ public class CustomerHistoryActivity extends AppCompatActivity implements View.O
         customerId = mFirebaseAuth.getCurrentUser().getUid();
         Query query = trips.orderByChild("customerId").equalTo(customerId);
 
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+
         listData = new ArrayList<>();
 
 
@@ -68,6 +73,7 @@ public class CustomerHistoryActivity extends AppCompatActivity implements View.O
 
 
                 }
+                Collections.reverse(listData);
                 final ListHistoryAdapter listHistoryAdapter = new ListHistoryAdapter(getApplicationContext(), listData);
                 listView.setAdapter(listHistoryAdapter);
                 listHistoryAdapter.notifyDataSetChanged();

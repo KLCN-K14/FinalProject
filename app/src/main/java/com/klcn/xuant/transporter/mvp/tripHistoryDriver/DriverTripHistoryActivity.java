@@ -72,8 +72,6 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
         tripInfos = new ArrayList<>();
         listTripToAdapter = new ArrayList<>();
 
-        RecyclerView.LayoutManager layoutManager =
-                new LinearLayoutManager(DriverTripHistoryActivity.this);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -86,34 +84,34 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
 
         setupInit();
 
-        test();
-
-
     }
 
+    String endAt = "";
+    long lenghtList = 0, countItem = 0;
+    int numLoad = 5;
+
     private void setupInit() {
+        getLongList();
+
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
-        final Query mQuery = mData.orderByChild("dateCreated");
+        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID).limitToLast(numLoad);
         mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot item : dataSnapshot.getChildren()){
                     TripInfo tripInfo = item.getValue(TripInfo.class);
-
                     if(tripInfo.getStatus()!=null){
                         if(tripInfo.getDriverId().equals(driverID)){
                             tripInfo.setKey(item.getKey());
-                            tripInfos.add(tripInfo);
+                            listTripToAdapter.add(tripInfo);
+                            countItem++;
                         }
                     }
                 }
 
-                Collections.reverse(tripInfos);
-                listTripToAdapter.add(tripInfos.get(0));
-                listTripToAdapter.add(tripInfos.get(1));
-                listTripToAdapter.add(tripInfos.get(2));
-
-                position = 2 ;
+                Collections.reverse(listTripToAdapter);
+                if(!listTripToAdapter.isEmpty())
+                    endAt = listTripToAdapter.get(listTripToAdapter.size()-1).getKey();
 
                 mAdapter = new ItemTripHistoryAdapter(mList,getApplicationContext(), listTripToAdapter);
                 mList.setAdapter(mAdapter);
@@ -122,7 +120,7 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
                 mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
                     @Override
                     public void onLoadMore() {
-                        if(position<tripInfos.size()-1){
+                        if(countItem<lenghtList){
                             listTripToAdapter.add(null);
                             mAdapter.notifyItemInserted(listTripToAdapter.size() - 1);
                             new Handler().postDelayed(new Runnable() {
@@ -131,16 +129,10 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
                                 listTripToAdapter.remove(listTripToAdapter.size() - 1);
                                 mAdapter.notifyItemRemoved(listTripToAdapter.size());
 
-                                for(;position<tripInfos.size()-1;){
-                                    position++;
-                                    listTripToAdapter.add(tripInfos.get(position));
-                                }
-
-                                mAdapter.notifyDataSetChanged();
-                                mAdapter.setLoaded();
+                                getMoreData();
 
                                 }
-                            }, 5000);
+                            }, 3000);
                         }
                     }
                 });
@@ -155,15 +147,56 @@ public class DriverTripHistoryActivity extends AppCompatActivity {
         });
     }
 
-    private void test() {
+    private void getLongList() {
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
-        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID).limitToLast(3);
+        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID);
         mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot item : dataSnapshot.getChildren()){
-                    Log.e("Size",String.valueOf(item.getKey()));
+                if (dataSnapshot.exists()) {
+                    lenghtList = dataSnapshot.getChildrenCount();
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getMoreData() {
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference(Common.trip_info_tbl);
+        final Query mQuery = mData.orderByChild("driverId").equalTo(driverID).limitToLast((int)countItem+numLoad);
+        mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count= 0;
+                for(DataSnapshot item : dataSnapshot.getChildren()){
+                    TripInfo tripInfo = item.getValue(TripInfo.class);
+                    if (item.getKey().equals(endAt)) {
+                        break;
+                    } else if (tripInfo.getStatus() != null) {
+                        if (tripInfo.getDriverId().equals(driverID)) {
+                            tripInfo.setKey(item.getKey());
+                            tripInfos.add(tripInfo);
+                            countItem++;
+                            count++;
+                        }
+                    }
+                }
+
+                Collections.reverse(tripInfos);
+                if(!tripInfos.isEmpty())
+                    endAt = tripInfos.get(tripInfos.size()-1).getKey();
+                for(int i= 0 ; i<count;i++){
+                    listTripToAdapter.add(tripInfos.get(i));
+                }
+                tripInfos = new ArrayList<>();
+
+                mAdapter.notifyDataSetChanged();
+                mAdapter.setLoaded();
+
 
                 mQuery.removeEventListener(this);
             }

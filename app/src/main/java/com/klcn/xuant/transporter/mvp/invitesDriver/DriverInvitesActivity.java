@@ -90,10 +90,10 @@ public class DriverInvitesActivity extends AppCompatActivity{
         mRltOpen.setOnClickListener(view -> {
             if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED){
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                mImgOpen.setImageResource(R.drawable.ic_double_arrow_top_white);
+                mImgOpen.setImageResource(R.drawable.ic_arrow_up_white);
             }else if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_COLLAPSED){
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                mImgOpen.setImageResource(R.drawable.ic_double_arrow_bottom_white);
+                mImgOpen.setImageResource(R.drawable.ic_arrow_down_white);
             }
         });
         // set callback for changes
@@ -106,7 +106,7 @@ public class DriverInvitesActivity extends AppCompatActivity{
                     case BottomSheetBehavior.STATE_EXPANDED:
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
-                        mImgOpen.setImageResource(R.drawable.ic_double_arrow_top_white);
+                        mImgOpen.setImageResource(R.drawable.ic_arrow_up_white);
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                         break;
@@ -118,7 +118,7 @@ public class DriverInvitesActivity extends AppCompatActivity{
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                mImgOpen.setImageResource(R.drawable.ic_double_arrow_bottom_white);
+                mImgOpen.setImageResource(R.drawable.ic_arrow_down_white);
             }
         });
 

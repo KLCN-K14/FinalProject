@@ -60,12 +60,11 @@ public class ListHistoryAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) view.getTag();
         }
-
+        holder.mImgTemp.setVisibility(View.GONE);
         TripInfo tripInfo = this.listData.get(i);
         holder.mTxtPlaceLocation.setText(tripInfo.getPickup());
         if(tripInfo.getPickup().length()>27){
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(18, 30);
-            holder.mImgTemp.setLayoutParams(layoutParams);
+            holder.mImgTemp.setVisibility(View.VISIBLE);
         }
 
 
@@ -79,11 +78,12 @@ public class ListHistoryAdapter extends BaseAdapter {
 
             holder.mTxtDateTime.setText(DateFormat.format("dd/MM/yyyy, HH:mm", tripInfo.getDateCreated()));
             holder.mStatus.setText("Huỷ chuyến");
+            holder.mStatus.setTextColor(context.getResources().getColor(R.color.red));
 
         } else {
             holder.mTxtDateTime.setText(DateFormat.format("dd/MM/yyyy, HH:mm", tripInfo.getTimeDropoff()));
             holder.mStatus.setText("Hoàn thành");
-
+            holder.mStatus.setTextColor(context.getResources().getColor(R.color.bgColor6));
         }
         return view;
     }

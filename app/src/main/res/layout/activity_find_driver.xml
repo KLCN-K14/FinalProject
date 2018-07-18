@@ -89,7 +89,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_money"
+                app:srcCompat="@drawable/ic_money_item"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/txt_temp2"
                 android:layout_marginRight="10dp"
@@ -117,25 +117,23 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginLeft="5dp">
 
                 <ImageView
-                    android:layout_width="25dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:src="@drawable/pin_maps" />
+                    app:srcCompat="@drawable/ic_placeholder_pickup" />
                 <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="15dp"
-                    android:layout_marginLeft="3dp"
-                    android:src="@drawable/icons_menu_vertical" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_more_vertical" />
 
                 <ImageView
-                    android:layout_width="15dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-5dp"
-                    android:layout_marginLeft="4dp"
-                    android:src="@drawable/ic_pointer_map" />
+                    app:srcCompat="@drawable/ic_placeholder_dropoff" />
             </LinearLayout>
 
             <LinearLayout

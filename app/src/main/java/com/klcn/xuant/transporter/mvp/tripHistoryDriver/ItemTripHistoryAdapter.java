@@ -31,7 +31,7 @@ public class ItemTripHistoryAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private final int VIEW_TYPE_LOADING = 1;
 
     private boolean isLoading;
-    private int visibleThreshold = 3;
+    private int visibleThreshold = 1;
     private int lastVisibleItem, totalItemCount;
 
     private OnLoadMoreListener onLoadMoreListener;
@@ -112,25 +112,25 @@ public class ItemTripHistoryAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof TripInfoViewHolder) {
             TripInfo tripInfo = tripInfos.get(position);
-            TripInfoViewHolder userViewHolder = (TripInfoViewHolder) holder;
+            TripInfoViewHolder tripInfoViewHolder = (TripInfoViewHolder) holder;
 
-            userViewHolder.mTxtTimeTrip.setText(DateFormat.format("dd-MM-yyyy, HH:mm", tripInfo.getDateCreated()));
-            userViewHolder.mTxtDropoff.setText(tripInfo.getDropoff());
-            userViewHolder.mTxtPickup.setText(tripInfo.getPickup());
+            tripInfoViewHolder.mTxtTimeTrip.setText(DateFormat.format("dd-MM-yyyy, HH:mm", tripInfo.getDateCreated()));
+            tripInfoViewHolder.mTxtDropoff.setText(tripInfo.getDropoff());
+            tripInfoViewHolder.mTxtPickup.setText(tripInfo.getPickup());
             Double price = Double.valueOf(tripInfo.getFixedFare())/1000;
-            userViewHolder.mTxtPrice.setText("VND "+price.intValue()+"K");
+            tripInfoViewHolder.mTxtPrice.setText("VND "+price.intValue()+"K");
             if(tripInfo.getStatus().equals(Common.trip_info_status_driver_cancel)){
-                userViewHolder.mImgMoney.setVisibility(View.GONE);
-                userViewHolder.mTxtPrice.setText("Cause: "+tripInfo.getReasonCancel());
-                userViewHolder.mTxtStatus.setBackground(context.getResources().getDrawable(R.drawable.bg_cancel));
-                userViewHolder.mTxtStatus.setText("Driver canceled");
-                userViewHolder.mTxtStatus.setTextColor(context.getResources().getColor(R.color.red));
+                tripInfoViewHolder.mImgMoney.setVisibility(View.GONE);
+                tripInfoViewHolder.mTxtPrice.setText("Cause: "+tripInfo.getReasonCancel());
+                tripInfoViewHolder.mTxtStatus.setBackground(context.getResources().getDrawable(R.drawable.bg_cancel));
+                tripInfoViewHolder.mTxtStatus.setText("Driver canceled");
+                tripInfoViewHolder.mTxtStatus.setTextColor(context.getResources().getColor(R.color.red));
             }else if(tripInfo.getStatus().equals(Common.trip_info_status_customer_cancel)){
-                userViewHolder.mImgMoney.setVisibility(View.GONE);
-                userViewHolder.mTxtPrice.setText("Cause: "+tripInfo.getReasonCancel());
-                userViewHolder.mTxtStatus.setBackground(context.getResources().getDrawable(R.drawable.bg_cancel));
-                userViewHolder.mTxtStatus.setText("Customer canceled");
-                userViewHolder.mTxtStatus.setTextColor(context.getResources().getColor(R.color.red));
+                tripInfoViewHolder.mImgMoney.setVisibility(View.GONE);
+                tripInfoViewHolder.mTxtPrice.setText("Cause: "+tripInfo.getReasonCancel());
+                tripInfoViewHolder.mTxtStatus.setBackground(context.getResources().getDrawable(R.drawable.bg_cancel));
+                tripInfoViewHolder.mTxtStatus.setText("Customer canceled");
+                tripInfoViewHolder.mTxtStatus.setTextColor(context.getResources().getColor(R.color.red));
             }
 
         } else if (holder instanceof LoadingViewHolder) {
